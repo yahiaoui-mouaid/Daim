@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ML Model Selector Guide</title>
+<style>
+  * { box-sizing: border-box; }
+  body { font-family: system-ui, -apple-system, sans-serif; background: #f1f5f9; margin: 0; padding: 20px; color: #1e293b; }
+  .container { max-width: 900px; margin: 0 auto; }
+  .hero { background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%); color: white; padding: 32px; border-radius: 16px; text-align: center; margin-bottom: 24px; }
+  .hero h1 { margin: 0 0 8px; font-size: 1.6rem; }
+  .hero p { margin: 0; opacity: 0.9; }
+  .step-card { background: #ffffff; border-radius: 12px; padding: 24px; margin-bottom: 16px; box-shadow: 0 1px 3px rgba(0,0,0,0.08); border: 1px solid #e2e8f0; }
+  .step-title { font-size: 1.1rem; font-weight: 700; color: #4f46e5; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+  .btn-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 12px; }
+  .btn { padding: 14px 20px; border-radius: 10px; border: 2px solid #e2e8f0; background: white; cursor: pointer; font-weight: 600; transition: all 0.2s; text-align: center; font-family: inherit; font-size: 0.95rem; }
+  .btn:hover { border-color: #6366f1; background: #eef2ff; }
+  .btn.active { background: #6366f1; color: white; border-color: #6366f1; }
+  .result-box { background: #f0fdf4; border: 2px solid #86efac; border-radius: 12px; padding: 20px; margin-top: 16px; }
+  .result-box.regression { background: #eff6ff; border-color: #93c5fd; }
+  .compare-table { width: 100%; border-collapse: collapse; margin-top: 12px; font-size: 0.9rem; }
+  .compare-table th { background: #f1f5f9; padding: 10px; text-align: left; font-weight: 600; }
+  .compare-table td { padding: 10px; border-bottom: 1px solid #e2e8f0; }
+  .tag { display: inline-block; padding: 3px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: 600; }
+  .tag-class { background: #dbeafe; color: #1e40af; }
+  .tag-reg { background: #dcfce7; color: #166534; }
+  .flow-diagram { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 8px; padding: 16px; background: #f8fafc; border-radius: 10px; margin-top: 12px; }
+  .flow-node { padding: 8px 16px; border-radius: 8px; font-weight: 600; font-size: 0.85rem; }
+  .flow-node.q { background: #fef3c7; color: #92400e; }
+  .flow-node.a { background: #dbeafe; color: #1e40af; }
+  .flow-node.end { background: #dcfce7; color: #166534; }
+  .arrow { color: #64748b; font-size: 1.2rem; }
+  .hidden { display: none !important; }
+  .tip-box { background: #fffbeb; border-left: 4px solid #f59e0b; padding: 14px 18px; border-radius: 0 10px 10px 0; margin-top: 16px; font-size: 0.9rem; }
+  .tip-box strong { color: #92400e; }
+  .muted { color: #64748b; }
+  @media (max-width: 600px) {
+    .btn-grid { grid-template-columns: 1fr; }
+    .hero h1 { font-size: 1.3rem; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <div class="hero">
+    <h1>🤖 ML Model Selector</h1>
+    <p>Decision Trees · SVM · Regression Trees · SVR</p>
+  </div>
+
+  <!-- STEP 1: Target Type -->
+  <div class="step-card" id="step1">
+    <div class="step-title">1️⃣ What is your target variable <em>y</em>?</div>
+    <p class="muted" style="margin-bottom:12px;">This determines whether you have a Classification or Regression problem.</p>
+    <div class="btn-grid">
+      <button class="btn" onclick="chooseType('classification')">📂 Category / Class<br><small>Spam/Not Spam, Yes/No, Obese/Normal</small></button>
+      <button class="btn" onclick="chooseType('regression')">📊 Continuous Number<br><small>House Price, Temperature, Income</small></button>
+    </div>
+  </div>
+
+  <!-- STEP 2: Classification Branch -->
+  <div class="step-card hidden" id="step2-class">
+    <div class="step-title">2️⃣ Classification: How does your decision logic look?</div>
+    <div class="btn-grid">
+      <button class="btn" onclick="chooseClassModel('tree')">🌳 Like a series of IF/ELSE rules<br><small>"If income &gt; 50k AND age &gt; 30 → Approve"</small></button>
+      <button class="btn" onclick="chooseClassModel('svm')">📐 Like a boundary between groups<br><small>"Draw a line/surface separating the classes"</small></button>
+    </div>
+    <div class="flow-diagram" style="margin-top:16px;">
+      <span class="flow-node q">Target = Category</span>
+      <span class="arrow">→</span>
+      <span class="flow-node a">Classification</span>
+      <span class="arrow">→</span>
+      <span class="flow-node end" id="class-flow-end">?</span>
+    </div>
+  </div>
+
+  <!-- STEP 2: Regression Branch -->
+  <div class="step-card hidden" id="step2-reg">
+    <div class="step-title">2️⃣ Regression: What style of prediction do you want?</div>
+    <div class="btn-grid">
+      <button class="btn" onclick="chooseRegModel('tree')">🌳 Rule-based number prediction<br><small>"If area &gt; 150m² → predict $320,000"</small></button>
+      <button class="btn" onclick="chooseRegModel('svr')">📈 Margin-based curve fitting<br><small>"Fit a tube around the data with epsilon margin"</small></button>
+    </div>
+    <div class="flow-diagram" style="margin-top:16px;">
+      <span class="flow-node q">Target = Number</span>
+      <span class="arrow">→</span>
+      <span class="flow-node a">Regression</span>
+      <span class="arrow">→</span>
+      <span class="flow-node end" id="reg-flow-end">?</span>
+    </div>
+  </div>
+
+  <!-- RESULT: Decision Tree -->
+  <div class="step-card hidden" id="res-dt">
+    <div class="step-title">🌳 Decision Tree (Classification)</div>
+    <p>Best when you need <strong>interpretable rules</strong> and your decision logic naturally splits into branches.</p>
+    <table class="compare-table">
+      <tr><th>Strength</th><th>When to Use</th></tr>
+      <tr><td>✅ Highly interpretable</td><td>Loan approval, medical diagnosis rules</td></tr>
+      <tr><td>✅ Handles feature interactions</td><td>When combinations of features matter</td></tr>
+      <tr><td>✅ No scaling needed</td><td>Quick prototyping without preprocessing</td></tr>
+      <tr><td>⚠️ Prone to overfitting</td><td>Use pruning or ensemble methods</td></tr>
+    </table>
+    <div class="tip-box">
+      <strong>💡 Tip:</strong> Prefer Decision Tree when stakeholders ask "<em>Why was this decision made?</em>"
+    </div>
+  </div>
+
+  <!-- RESULT: SVM -->
+  <div class="step-card hidden" id="res-svm">
+    <div class="step-title">📐 SVM / SVC (Classification)</div>
+    <p>Best when <strong>geometry matters</strong> — finding the optimal boundary (margin) between classes.</p>
+    <table class="compare-table">
+      <tr><th>Strength</th><th>When to Use</th></tr>
+      <tr><td>✅ Effective in high dimensions</td><td>Text classification, image features</td></tr>
+      <tr><td>✅ Memory efficient</td><td>Uses only support vectors</td></tr>
+      <tr><td>✅ Kernels handle nonlinearity</td><td>RBF kernel for complex boundaries</td></tr>
+      <tr><td>⚠️ Less interpretable</td><td>Hard to explain "why" to non-technical users</td></tr>
+    </table>
+    <div class="tip-box">
+      <strong>💡 Tip:</strong> Use SVM for small-to-medium datasets with complex, non-linear decision boundaries.
+    </div>
+  </div>
+
+  <!-- RESULT: Regression Tree -->
+  <div class="step-card hidden" id="res-rt">
+    <div class="step-title" style="color:#0369a1;">🌳 Regression Tree</div>
+    <p>A Decision Tree that predicts <strong>continuous numbers</strong> at the leaves instead of classes.</p>
+    <table class="compare-table">
+      <tr><th>Strength</th><th>When to Use</th></tr>
+      <tr><td>✅ Interpretable splits</td><td>"If bedrooms &gt; 3 → price ~$320k"</td></tr>
+      <tr><td>✅ Captures non-linear trends</td><td>When relationships are step-like</td></tr>
+      <tr><td>✅ Handles mixed data types</td><td>Categorical + numerical features</td></tr>
+      <tr><td>⚠️ Can create plateaus</td><td>Predictions cluster at leaf values</td></tr>
+    </table>
+    <div class="tip-box">
+      <strong>💡 Tip:</strong> Great for pricing models where business teams want to see clear "buckets" of value.
+    </div>
+  </div>
+
+  <!-- RESULT: SVR -->
+  <div class="step-card hidden" id="res-svr">
+    <div class="step-title" style="color:#0369a1;">📈 SVR (Support Vector Regression)</div>
+    <p>Applies the SVM margin concept to regression: fit a <strong>tube (epsilon margin)</strong> around the data.</p>
+    <table class="compare-table">
+      <tr><th>Strength</th><th>When to Use</th></tr>
+      <tr><td>✅ Robust to outliers</td><td>Epsilon-insensitive loss ignores small errors</td></tr>
+      <tr><td>✅ Works well with kernels</td><td>Non-linear relationships via RBF/poly</td></tr>
+      <tr><td>✅ Good generalization</td><td>Small-to-medium datasets</td></tr>
+      <tr><td>⚠️ Requires scaling</td><td>Features must be normalized</td></tr>
+    </table>
+    <div class="tip-box">
+      <strong>💡 Tip:</strong> Choose SVR when you want smooth predictions and your dataset isn't massive.
+    </div>
+  </div>
+
+  <!-- COMPARISON SECTION -->
+  <div class="step-card hidden" id="comparison">
+    <div class="step-title">📊 Side-by-Side Comparison</div>
+    <table class="compare-table">
+      <tr>
+        <th>Model</th>
+        <th>Type</th>
+        <th>Mental Picture</th>
+        <th>Best For</th>
+      </tr>
+      <tr>
+        <td><strong>Decision Tree</strong></td>
+        <td><span class="tag tag-class">Classification</span></td>
+        <td>🌳 IF/ELSE rules</td>
+        <td>Interpretability, rule-based decisions</td>
+      </tr>
+      <tr>
+        <td><strong>Regression Tree</strong></td>
+        <td><span class="tag tag-reg">Regression</span></td>
+        <td>🌳 → number</td>
+        <td>Price prediction with clear buckets</td>
+      </tr>
+      <tr>
+        <td><strong>SVM / SVC</strong></td>
+        <td><span class="tag tag-class">Classification</span></td>
+        <td>📐 Boundary with margin</td>
+        <td>High-dim data, complex boundaries</td>
+      </tr>
+      <tr>
+        <td><strong>SVR</strong></td>
+        <td><span class="tag tag-reg">Regression</span></td>
+        <td>📈 Tube around curve</td>
+        <td>Smooth predictions, robust to noise</td>
+      </tr>
+    </table>
+  </div>
+
+  <!-- WORKFLOW -->
+  <div class="step-card hidden" id="workflow">
+    <div class="step-title">🔄 Recommended Workflow</div>
+    <div style="display:flex;flex-direction:column;gap:12px;">
+      <div style="display:flex;align-items:center;gap:12px;">
+        <div style="width:32px;height:32px;background:#6366f1;color:white;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;">1</div>
+        <div><strong>Split data:</strong> 80% training, 20% test (lock the test set away)</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:12px;">
+        <div style="width:32px;height:32px;background:#6366f1;color:white;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;">2</div>
+        <div><strong>Cross-validate</strong> candidate models on the training data</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:12px;">
+        <div style="width:32px;height:32px;background:#6366f1;color:white;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;">3</div>
+        <div><strong>Select</strong> the best model based on CV scores (not test score!)</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:12px;">
+        <div style="width:32px;height:32px;background:#6366f1;color:white;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;">4</div>
+        <div><strong>Tune hyperparameters</strong> on the training data</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:12px;">
+        <div style="width:32px;height:32px;background:#10b981;color:white;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;">5</div>
+        <div><strong>Evaluate ONCE</strong> on the untouched test set</div>
+      </div>
+    </div>
+    <div class="tip-box" style="margin-top:16px;">
+      <strong>⚠️ Golden Rule:</strong> Never use the test set to choose between models. Use validation / cross-validation for model selection, and the test set only for final evaluation.
+    </div>
+  </div>
+
+  <!-- KEY QUESTIONS -->
+  <div class="step-card hidden" id="checklist">
+    <div class="step-title">✅ Pre-Modeling Checklist</div>
+    <p class="muted" style="margin-bottom:12px;">Answer these before writing any Python code:</p>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+      <label style="display:flex;align-items:center;gap:8px;padding:10px;background:#f8fafc;border-radius:8px;cursor:pointer;"><input type="checkbox"> What is <em>y</em>?</label>
+      <label style="display:flex;align-items:center;gap:8px;padding:10px;background:#f8fafc;border-radius:8px;cursor:pointer;"><input type="checkbox"> Is <em>y</em> categorical or numerical?</label>
+      <label style="display:flex;align-items:center;gap:8px;padding:10px;background:#f8fafc;border-radius:8px;cursor:pointer;"><input type="checkbox"> Classification or Regression?</label>
+      <label style="display:flex;align-items:center;gap:8px;padding:10px;background:#f8fafc;border-radius:8px;cursor:pointer;"><input type="checkbox"> Rules vs. geometric boundary?</label>
+      <label style="display:flex;align-items:center;gap:8px;padding:10px;background:#f8fafc;border-radius:8px;cursor:pointer;"><input type="checkbox"> How large is the dataset?</label>
+      <label style="display:flex;align-items:center;gap:8px;padding:10px;background:#f8fafc;border-radius:8px;cursor:pointer;"><input type="checkbox"> Linear or nonlinear relationship?</label>
+      <label style="display:flex;align-items:center;gap:8px;padding:10px;background:#f8fafc;border-radius:8px;cursor:pointer;"><input type="checkbox"> Is interpretability important?</label>
+      <label style="display:flex;align-items:center;gap:8px;padding:10px;background:#f8fafc;border-radius:8px;cursor:pointer;"><input type="checkbox"> Is the data balanced?</label>
+    </div>
+  </div>
+
+  <!-- RESET -->
+  <div style="text-align:center;margin-top:20px;" id="reset-btn" class="hidden">
+    <button class="btn" style="background:#6366f1;color:white;border-color:#6366f1;" onclick="resetAll()">🔄 Start Over</button>
+  </div>
+
+</div>
+
+<script>
+  function hideAll(ids) { ids.forEach(function(id){ document.getElementById(id).classList.add('hidden'); }); }
+  function show(id) { document.getElementById(id).classList.remove('hidden'); }
+  function chooseType(type) {
+    hideAll(['step2-class','step2-reg','res-dt','res-svm','res-rt','res-svr','comparison','workflow','checklist','reset-btn']);
+    var btns = document.querySelectorAll('#step1 .btn');
+    for(var i=0;i<btns.length;i++) btns[i].classList.remove('active');
+    event.target.closest('.btn').classList.add('active');
+    if(type === 'classification') show('step2-class');
+    else show('step2-reg');
+  }
+  function chooseClassModel(model) {
+    hideAll(['res-dt','res-svm','res-rt','res-svr','comparison','workflow','checklist']);
+    var btns = document.querySelectorAll('#step2-class .btn');
+    for(var i=0;i<btns.length;i++) btns[i].classList.remove('active');
+    event.target.closest('.btn').classList.add('active');
+    var end = document.getElementById('class-flow-end');
+    end.textContent = model === 'tree' ? 'Decision Tree' : 'SVM';
+    end.style.background = model === 'tree' ? '#dcfce7' : '#dbeafe';
+    end.style.color = model === 'tree' ? '#166534' : '#1e40af';
+    show(model === 'tree' ? 'res-dt' : 'res-svm');
+    showCommon();
+  }
+  function chooseRegModel(model) {
+    hideAll(['res-dt','res-svm','res-rt','res-svr','comparison','workflow','checklist']);
+    var btns = document.querySelectorAll('#step2-reg .btn');
+    for(var i=0;i<btns.length;i++) btns[i].classList.remove('active');
+    event.target.closest('.btn').classList.add('active');
+    var end = document.getElementById('reg-flow-end');
+    end.textContent = model === 'tree' ? 'Regression Tree' : 'SVR';
+    end.style.background = model === 'tree' ? '#dcfce7' : '#dbeafe';
+    end.style.color = model === 'tree' ? '#166534' : '#1e40af';
+    show(model === 'tree' ? 'res-rt' : 'res-svr');
+    showCommon();
+  }
+  function showCommon() {
+    show('comparison');
+    show('workflow');
+    show('checklist');
+    show('reset-btn');
+  }
+  function resetAll() {
+    hideAll(['step2-class','step2-reg','res-dt','res-svm','res-rt','res-svr','comparison','workflow','checklist','reset-btn']);
+    var allBtns = document.querySelectorAll('.btn');
+    for(var i=0;i<allBtns.length;i++) allBtns[i].classList.remove('active');
+    var cfe = document.getElementById('class-flow-end');
+    cfe.textContent = '?'; cfe.style.background = '#dcfce7'; cfe.style.color = '#166534';
+    var rfe = document.getElementById('reg-flow-end');
+    rfe.textContent = '?'; rfe.style.background = '#dcfce7'; rfe.style.color = '#166534';
+    var cbs = document.querySelectorAll('input[type=checkbox]');
+    for(var i=0;i<cbs.length;i++) cbs[i].checked = false;
+  }
+</script>
+</body>
+</html>

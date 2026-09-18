@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ML Model Selection: SVM vs Trees</title>
+    <style>
+        :root {
+            --primary: #2c3e50;
+            --accent: #3498db;
+            --bg: #f9f9f9;
+            --card-bg: #ffffff;
+            --text: #333;
+            --border: #ddd;
+        }
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+            padding: 20px;
+        }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+        h1 {
+            text-align: center;
+            color: var(--primary);
+            margin-bottom: 10px;
+            font-size: 2rem;
+        }
+        .subtitle {
+            text-align: center;
+            font-style: italic;
+            color: #666;
+            margin-bottom: 30px;
+        }
+        .flow-diagram {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 30px;
+            background: var(--card-bg);
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+        .flow-node {
+            background: var(--accent);
+            color: white;
+            padding: 10px 16px;
+            border-radius: 20px;
+            font-weight: bold;
+            text-align: center;
+            cursor: pointer;
+            transition: transform 0.2s;
+            min-width: 100px;
+        }
+        .flow-node:hover {
+            transform: scale(1.05);
+        }
+        .flow-node.grey {
+            background: #7f8c8d;
+        }
+        .flow-node.green {
+            background: #27ae60;
+        }
+        .flow-node.orange {
+            background: #e67e22;
+        }
+        .flow-arrow {
+            align-self: center;
+            font-size: 1.5rem;
+            color: #aaa;
+        }
+        .accordion {
+            background: var(--card-bg);
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+        .accordion-item {
+            border-bottom: 1px solid var(--border);
+        }
+        .accordion-item:last-child {
+            border-bottom: none;
+        }
+        .accordion-header {
+            background: var(--primary);
+            color: white;
+            padding: 15px 20px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 1.1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: background 0.3s;
+        }
+        .accordion-header:hover {
+            background: #34495e;
+        }
+        .accordion-header .icon {
+            font-size: 1.4rem;
+            transition: transform 0.3s;
+        }
+        .accordion-header.active .icon {
+            transform: rotate(45deg);
+        }
+        .accordion-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out;
+            padding: 0 20px;
+            background: white;
+        }
+        .accordion-content-inner {
+            padding: 20px 0;
+        }
+        .accordion-item.active .accordion-content {
+            max-height: 1000px; /* Enough for content */
+        }
+        ul, ol {
+            margin-left: 20px;
+            margin-bottom: 15px;
+        }
+        li {
+            margin-bottom: 8px;
+        }
+        .highlight {
+            background: #f1c40f;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+        .checklist {
+            background: #ecf0f1;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 10px;
+        }
+        .checklist label {
+            display: block;
+            margin-bottom: 8px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+        }
+        th, td {
+            border: 1px solid var(--border);
+            padding: 10px;
+            text-align: left;
+        }
+        th {
+            background: #f0f0f0;
+        }
+        .warning {
+            background: #fdecea;
+            border-left: 5px solid #e74c3c;
+            padding: 12px;
+            border-radius: 4px;
+            margin: 10px 0;
+        }
+        @media (max-width: 600px) {
+            .flow-diagram {
+                flex-direction: column;
+                align-items: center;
+            }
+            .flow-arrow {
+                transform: rotate(90deg);
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>📊 ML Model Selection: SVM vs Trees</h1>
+    <p class="subtitle">A practical guide to choosing between Decision Trees, SVMs, Regression Trees, and SVR</p>
+
+    <!-- Interactive Flow Diagram -->
+    <div class="flow-diagram">
+        <div class="flow-node" onclick="toggleAccordion('step1')">Start: What is y?</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-node grey" onclick="toggleAccordion('step1')">Categorical?</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-node green" onclick="toggleAccordion('step2')">Classification</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-node" onclick="toggleAccordion('step3')">Decision Tree or SVM?</div>
+    </div>
+    <div class="flow-diagram">
+        <div class="flow-node" onclick="toggleAccordion('step1')">Start: What is y?</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-node grey" onclick="toggleAccordion('step1')">Continuous?</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-node orange" onclick="toggleAccordion('step4')">Regression</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-node" onclick="toggleAccordion('step4')">Regression Tree or SVR?</div>
+    </div>
+
+    <!-- Accordion Sections -->
+    <div class="accordion" id="mainAccordion">
+
+        <!-- Step 1 -->
+        <div class="accordion-item" id="step1">
+            <div class="accordion-header" onclick="toggleAccordion('step1')">
+                <span>1️⃣ First Question: Classification or Regression?</span>
+                <span class="icon">+</span>
+            </div>
+            <div class="accordion-content">
+                <div class="accordion-content-inner">
+                    <p><strong>The target variable <em>y</em> determines the problem type:</strong></p>
+                    <table>
+                        <tr><th>If y is…</th><th>Problem Type</th><th>Candidate Models</th></tr>
+                        <tr><td>A category / class</td><td><span class="highlight">Classification</span></td><td>Decision Tree, SVM (SVC)</td></tr>
+                        <tr><td>A continuous number</td><td><span class="highlight">Regression</span></td><td>Regression Tree, SVR</td></tr>
+                    </table>
+                    <p><strong>Examples:</strong></p>
+                    <ul>
+                        <li>Spam / Not Spam → <strong>Classification</strong></li>
+                        <li>Obese / Normal / Overweight → <strong>Classification</strong></li>
+                        <li>House price = $245,000 → <strong>Regression</strong></li>
+                        <li>Temperature = 27.4°C → <strong>Regression</strong></li>
+                    </ul>
+                    <p>So the first decision is: <em>What am I predicting?</em></p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Step 2 -->
+        <div class="accordion-item" id="step2">
+            <div class="accordion-header" onclick="toggleAccordion('step2')">
+                <span>2️⃣ Model Families: Tree vs SVM</span>
+                <span class="icon">+</span>
+            </div>
+            <div class="accordion-content">
+                <div class="accordion-content-inner">
+                    <p>Both families can handle <strong>both</strong> classification and regression:</p>
+                    <table>
+                        <tr><th>Family</th><th>Classification</th><th>Regression</th></tr>
+                        <tr><td><strong>Tree</strong></td><td>Decision Tree</td><td>Regression Tree</td></tr>
+                        <tr><td><strong>SVM</strong></td><td>SVM / SVC</td><td>SVR</td></tr>
+                    </table>
+                    <p>They differ in <strong>how</strong> they learn:</p>
+                    <ul>
+                        <li><strong>Tree family</strong> → learns a series of if/else rules (splits).</li>
+                        <li><strong>SVM family</strong> → finds a geometric boundary or margin (hyperplane / tube).</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Step 3 -->
+        <div class="accordion-item" id="step3">
+            <div class="accordion-header" onclick="toggleAccordion('step3')">
+                <span>3️⃣ Classification: Decision Tree vs SVM</span>
+                <span class="icon">+</span>
+            </div>
+            <div class="accordion-content">
+                <div class="accordion-content-inner">
+                    <p><strong>Decision Tree</strong> – choose when you want <span class="highlight">understandable rules</span>:</p>
+                    <ul>
+                        <li>Interpretability is important</li>
+                        <li>Non-linear relationships and feature interactions</li>
+                        <li>You can explain decisions as: <em>"Income &gt; 50k AND debt &lt; 10k → approve loan"</em></li>
+                    </ul>
+                    <p><strong>SVM (SVC)</strong> – choose when <span class="highlight">geometry matters</span>:</p>
+                    <ul>
+                        <li>High-dimensional data (e.g., text, images)</li>
+                        <li>Complex, non-linear boundaries (with RBF kernel)</li>
+                        <li>Small/medium dataset size</li>
+                        <li>Interpretability is less critical</li>
+                    </ul>
+                    <p><strong>Mental image:</strong> Decision Tree = "Which rule do I apply?" | SVM = "Where do I draw the boundary?"</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Step 4 -->
+        <div class="accordion-item" id="step4">
+            <div class="accordion-header" onclick="toggleAccordion('step4')">
+                <span>4️⃣ Regression: Regression Tree vs SVR</span>
+                <span class="icon">+</span>
+            </div>
+            <div class="accordion-content">
+                <div class="accordion-content-inner">
+                    <p><strong>Regression Tree</strong> – choose when:</p>
+                    <ul>
+                        <li>Continuous target with non-linear relationships</li>
+                        <li>You want rule-like structure (e.g., Area &gt; 150m² → Bedrooms &gt; 3 → $320k)</li>
+                        <li>Interpretability is valuable</li>
+                    </ul>
+                    <p><strong>SVR</strong> – choose when:</p>
+                    <ul>
+                        <li>Continuous target with complex relationships</li>
+                        <li>You want a margin-based regression ("tube" around the curve)</li>
+                        <li>Dataset is not too large (SVR can be slow)</li>
+                        <li>Interpretability is less important</li>
+                    </ul>
+                    <p><strong>Mental image:</strong> Regression Tree = "rules producing numbers" | SVR = "fit a function within an epsilon tube"</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Step 5 -->
+        <div class="accordion-item" id="step5">
+            <div class="accordion-header" onclick="toggleAccordion('step5')">
+                <span>5️⃣ Evaluation Workflow (Don't Overuse Test Set)</span>
+                <span class="icon">+</span>
+            </div>
+            <div class="accordion-content">
+                <div class="accordion-content-inner">
+                    <p>The correct approach to compare models:</p>
+                    <ol>
+                        <li><strong>Split data:</strong> 80% training, 20% test (keep test untouched).</li>
+                        <li><strong>Cross-validation</strong> on the training set for each candidate model.</li>
+                        <li><strong>Compare metrics</strong> from CV:
+                            <ul>
+                                <li>Classification: Accuracy, F1, ROC-AUC</li>
+                                <li>Regression: MAE, RMSE, R²</li>
+                            </ul>
+                        </li>
+                        <li><strong>Select the better model</strong> based on CV scores + domain considerations.</li>
+                        <li><strong>Train final model</strong> on full training data (optionally tune hyperparameters).</li>
+                        <li><strong>Evaluate once</strong> on the test set.</li>
+                    </ol>
+                    <div class="warning">
+                        ❌ <strong>Don't</strong> repeatedly test on the test set to choose between models — you'll leak information.  
+                        ✅ Use cross-validation for selection, then final test once.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Step 6 -->
+        <div class="accordion-item" id="step6">
+            <div class="accordion-header" onclick="toggleAccordion('step6')">
+                <span>6️⃣ Quick Decision Checklist</span>
+                <span class="icon">+</span>
+            </div>
+            <div class="accordion-content">
+                <div class="accordion-content-inner">
+                    <p>Ask yourself before choosing:</p>
+                    <div class="checklist">
+                        <label><input type="checkbox" disabled> What is <strong>y</strong>? (categorical or numerical?)</label>
+                        <label><input type="checkbox" disabled> Do I need <strong>rule-based</strong> decisions or <strong>geometric boundaries</strong>?</label>
+                        <label><input type="checkbox" disabled> How <strong>large</strong> is my dataset?</label>
+                        <label><input type="checkbox" disabled> Is the relationship likely <strong>linear</strong> or <strong>nonlinear</strong>?</label>
+                        <label><input type="checkbox" disabled> Is <strong>interpretability</strong> important?</label>
+                        <label><input type="checkbox" disabled> What is the <strong>cost of false positives/negatives</strong>? (choosing the right metric)</label>
+                    </div>
+                    <p><strong>Final rule:</strong></p>
+                    <ul>
+                        <li>For <strong>classification</strong>: Try Decision Tree vs SVM, use CV, compare appropriate metric, then final test.</li>
+                        <li>For <strong>regression</strong>: Try Regression Tree vs SVR, use CV, compare appropriate metric, then final test.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <p style="text-align: center; margin-top: 30px; color: #888; font-size: 0.9rem;">
+        Click on any section or flow node to expand/collapse. Start with the problem, not the algorithm.
+    </p>
+</div>
+
+<script>
+    function toggleAccordion(id) {
+        const item = document.getElementById(id);
+        if (!item) return;
+        const header = item.querySelector('.accordion-header');
+        const content = item.querySelector('.accordion-content');
+        const isActive = item.classList.contains('active');
+
+        // Close all items (optional: keep only one open)
+        const allItems = document.querySelectorAll('.accordion-item');
+        allItems.forEach(other => {
+            if (other.id !== id) {
+                other.classList.remove('active');
+                other.querySelector('.accordion-header').classList.remove('active');
+                other.querySelector('.accordion-content').style.maxHeight = null;
+            }
+        });
+
+        // Toggle current item
+        if (isActive) {
+            item.classList.remove('active');
+            header.classList.remove('active');
+            content.style.maxHeight = null;
+        } else {
+            item.classList.add('active');
+            header.classList.add('active');
+            content.style.maxHeight = content.scrollHeight + "px";
+        }
+    }
+</script>
+</body>
+</html>

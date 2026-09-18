@@ -1,0 +1,1653 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>دليل مبيعات الكوزينة والأبواب - MDM</title>
+    <style>
+        :root {
+            --bg: #f8f7f4;
+            --card-bg: #ffffff;
+            --primary: #2c3e50;
+            --primary-dark: #1a252f;
+            --accent: #c0392b;
+            --accent-light: #e74c3c;
+            --gold: #f39c12;
+            --green: #27ae60;
+            --blue: #2980b9;
+            --purple: #8e44ad;
+            --teal: #16a085;
+            --orange: #e67e22;
+            --border: #e0ddd5;
+            --text: #2c3e50;
+            --text-light: #7f8c8d;
+            --shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+            --shadow-hover: 0 4px 20px rgba(0, 0, 0, 0.12);
+            --radius: 12px;
+            --radius-sm: 8px;
+            --transition: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            --font-family: 'Segoe UI', 'Tahoma', 'Arial', sans-serif;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-family);
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.7;
+            min-height: 100vh;
+        }
+
+        .header {
+            background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary) 50%, #34495e 100%);
+            color: #fff;
+            padding: 32px 20px 20px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            border-bottom: 4px solid var(--accent);
+        }
+        .header::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--accent), var(--gold), var(--teal), var(--accent));
+            background-size: 300% 100%;
+            animation: gradientMove 3s ease infinite;
+        }
+        @keyframes gradientMove {
+            0%,
+            100% {
+                background-position: 0% 50%;
+            }
+            50% {
+                background-position: 100% 50%;
+            }
+        }
+        .header h1 {
+            font-size: 1.8rem;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            margin-bottom: 6px;
+        }
+        .header p {
+            font-size: 1rem;
+            opacity: 0.85;
+            font-weight: 400;
+        }
+        .header .badge {
+            display: inline-block;
+            background: var(--accent);
+            color: #fff;
+            padding: 4px 16px;
+            border-radius: 30px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin-top: 10px;
+            letter-spacing: 0.5px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px 16px 50px;
+        }
+
+        .tab-nav {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            justify-content: center;
+            margin: -50px auto 24px;
+            position: relative;
+            z-index: 10;
+            padding: 0 12px;
+        }
+        .tab-btn {
+            padding: 12px 22px;
+            border-radius: 40px;
+            border: 2px solid var(--border);
+            background: var(--card-bg);
+            cursor: pointer;
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: var(--text);
+            transition: all var(--transition);
+            white-space: nowrap;
+            box-shadow: var(--shadow);
+            font-family: var(--font-family);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .tab-btn:hover {
+            border-color: var(--accent);
+            color: var(--accent);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-hover);
+        }
+        .tab-btn.active {
+            background: var(--accent);
+            color: #fff;
+            border-color: var(--accent);
+            box-shadow: 0 4px 16px rgba(192, 57, 43, 0.35);
+        }
+        .tab-btn .icon {
+            font-size: 1.2rem;
+        }
+
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.4s ease;
+        }
+        .tab-content.active {
+            display: block;
+        }
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(12px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .section-title {
+            font-size: 1.4rem;
+            font-weight: 800;
+            margin-bottom: 16px;
+            color: var(--primary-dark);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        .section-title .emoji {
+            font-size: 1.6rem;
+        }
+        .section-title .sub {
+            font-size: 0.9rem;
+            font-weight: 400;
+            color: var(--text-light);
+        }
+
+        .card {
+            background: var(--card-bg);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            padding: 20px 24px;
+            margin-bottom: 20px;
+            border: 1px solid var(--border);
+            transition: box-shadow var(--transition);
+        }
+        .card:hover {
+            box-shadow: var(--shadow-hover);
+        }
+        .card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 10px;
+            cursor: pointer;
+            user-select: none;
+        }
+        .card-header h3 {
+            font-size: 1.15rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--primary-dark);
+        }
+        .card-header .toggle-icon {
+            font-size: 1.3rem;
+            transition: transform var(--transition);
+            color: var(--text-light);
+        }
+        .card.collapsed .toggle-icon {
+            transform: rotate(-90deg);
+        }
+        .card-body {
+            margin-top: 14px;
+            overflow: hidden;
+            transition: max-height 0.4s ease, opacity 0.3s ease;
+        }
+        .card.collapsed .card-body {
+            max-height: 0 !important;
+            opacity: 0;
+            margin-top: 0;
+            pointer-events: none;
+        }
+
+        .question-list {
+            list-style: none;
+            padding: 0;
+        }
+        .question-list li {
+            padding: 8px 12px;
+            border-radius: var(--radius-sm);
+            margin-bottom: 4px;
+            background: #faf9f7;
+            border-right: 3px solid var(--border);
+            transition: all var(--transition);
+            font-size: 0.95rem;
+            display: flex;
+            align-items: flex-start;
+            gap: 8px;
+        }
+        .question-list li:hover {
+            background: #f0ede8;
+            border-right-color: var(--accent);
+            transform: translateX(-2px);
+        }
+        .question-list li .q-icon {
+            flex-shrink: 0;
+            margin-top: 3px;
+            font-size: 0.9rem;
+        }
+
+        .tag {
+            display: inline-block;
+            padding: 3px 12px;
+            border-radius: 20px;
+            font-size: 0.78rem;
+            font-weight: 700;
+            letter-spacing: 0.3px;
+            margin-left: 6px;
+            vertical-align: middle;
+        }
+        .tag-red {
+            background: #fdecea;
+            color: #c0392b;
+        }
+        .tag-green {
+            background: #e8f8f0;
+            color: #27ae60;
+        }
+        .tag-blue {
+            background: #eaf3fb;
+            color: #2980b9;
+        }
+        .tag-gold {
+            background: #fef9e7;
+            color: #f39c12;
+        }
+        .tag-purple {
+            background: #f4ecf7;
+            color: #8e44ad;
+        }
+        .tag-teal {
+            background: #e8f6f3;
+            color: #16a085;
+        }
+        .tag-orange {
+            background: #fef5e7;
+            color: #e67e22;
+        }
+
+        .golden-rule {
+            background: linear-gradient(135deg, #fef9e7, #fdf2d5);
+            border: 2px solid var(--gold);
+            border-radius: var(--radius);
+            padding: 20px 24px;
+            margin: 20px 0;
+            position: relative;
+        }
+        .golden-rule::before {
+            content: '🎯';
+            position: absolute;
+            top: -16px;
+            right: 20px;
+            font-size: 2rem;
+            background: var(--card-bg);
+            border-radius: 50%;
+            padding: 4px;
+            box-shadow: var(--shadow);
+        }
+        .golden-rule h4 {
+            font-size: 1.1rem;
+            font-weight: 800;
+            color: #7d6608;
+            margin-bottom: 8px;
+        }
+        .golden-rule p {
+            font-size: 0.95rem;
+            color: #6b5b0e;
+            font-weight: 500;
+        }
+        .golden-rule .flow {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 10px;
+        }
+        .golden-rule .flow span {
+            background: #fff;
+            padding: 5px 14px;
+            border-radius: 20px;
+            font-weight: 700;
+            font-size: 0.85rem;
+            color: #7d6608;
+            border: 1px solid #f0d77b;
+        }
+
+        .top10-box {
+            background: #f0f3f5;
+            border-radius: var(--radius);
+            padding: 16px 20px;
+            margin: 16px 0;
+            border-right: 4px solid var(--blue);
+        }
+        .top10-box h4 {
+            font-weight: 700;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            color: var(--primary-dark);
+        }
+
+        .glossary-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.88rem;
+            border-radius: var(--radius-sm);
+            overflow: hidden;
+        }
+        .glossary-table th {
+            background: var(--primary-dark);
+            color: #fff;
+            padding: 10px 12px;
+            text-align: right;
+            font-weight: 700;
+            font-size: 0.85rem;
+            letter-spacing: 0.3px;
+            white-space: nowrap;
+        }
+        .glossary-table td {
+            padding: 8px 12px;
+            border-bottom: 1px solid var(--border);
+            vertical-align: middle;
+        }
+        .glossary-table tr:nth-child(even) {
+            background: #faf9f7;
+        }
+        .glossary-table tr:hover {
+            background: #f0ede8;
+        }
+        .glossary-table .fr {
+            font-weight: 600;
+            color: var(--accent);
+        }
+        .glossary-table .en {
+            color: var(--blue);
+        }
+        .glossary-table .ar {
+            font-weight: 600;
+        }
+
+        .glossary-category {
+            margin-bottom: 24px;
+        }
+        .glossary-category h3 {
+            font-size: 1.1rem;
+            font-weight: 700;
+            padding: 10px 16px;
+            border-radius: var(--radius-sm);
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            transition: background var(--transition);
+        }
+        .glossary-category h3:hover {
+            opacity: 0.85;
+        }
+        .glossary-category .table-wrap {
+            overflow-x: auto;
+        }
+
+        .search-bar {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+        .search-bar input {
+            flex: 1;
+            min-width: 200px;
+            padding: 12px 18px;
+            border-radius: 40px;
+            border: 2px solid var(--border);
+            font-size: 0.95rem;
+            font-family: var(--font-family);
+            background: var(--card-bg);
+            transition: border-color var(--transition);
+            outline: none;
+            direction: rtl;
+        }
+        .search-bar input:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(192, 57, 43, 0.1);
+        }
+        .btn {
+            padding: 12px 24px;
+            border-radius: 40px;
+            border: none;
+            cursor: pointer;
+            font-weight: 700;
+            font-size: 0.9rem;
+            font-family: var(--font-family);
+            transition: all var(--transition);
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .btn-accent {
+            background: var(--accent);
+            color: #fff;
+        }
+        .btn-accent:hover {
+            background: #a93226;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 14px rgba(192, 57, 43, 0.35);
+        }
+        .btn-outline {
+            background: transparent;
+            border: 2px solid var(--border);
+            color: var(--text);
+        }
+        .btn-outline:hover {
+            border-color: var(--accent);
+            color: var(--accent);
+        }
+
+        .copy-btn {
+            background: #eef2f5;
+            border: none;
+            border-radius: 6px;
+            padding: 4px 10px;
+            cursor: pointer;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--text-light);
+            transition: all var(--transition);
+            font-family: var(--font-family);
+        }
+        .copy-btn:hover {
+            background: var(--accent);
+            color: #fff;
+        }
+
+        .chip {
+            display: inline-block;
+            background: #f0ede8;
+            border-radius: 20px;
+            padding: 3px 12px;
+            font-size: 0.78rem;
+            font-weight: 600;
+            margin: 2px 4px 2px 0;
+            cursor: pointer;
+            transition: all var(--transition);
+            border: 1px solid transparent;
+        }
+        .chip:hover {
+            background: var(--accent);
+            color: #fff;
+        }
+
+        .priority-star {
+            color: var(--gold);
+            font-weight: 800;
+            font-size: 1.1rem;
+            margin-left: 4px;
+        }
+
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+        @media (max-width: 768px) {
+            .grid-2 {
+                grid-template-columns: 1fr;
+            }
+            .tab-btn {
+                padding: 10px 14px;
+                font-size: 0.82rem;
+            }
+            .header h1 {
+                font-size: 1.3rem;
+            }
+            .card {
+                padding: 14px 16px;
+            }
+            .tab-nav {
+                margin-top: -30px;
+                gap: 4px;
+            }
+            .glossary-table {
+                font-size: 0.78rem;
+            }
+            .glossary-table th,
+            .glossary-table td {
+                padding: 6px 8px;
+            }
+        }
+        @media (max-width: 480px) {
+            .tab-btn {
+                padding: 8px 10px;
+                font-size: 0.72rem;
+                border-radius: 25px;
+            }
+            .tab-btn .icon {
+                font-size: 1rem;
+            }
+            .card-header h3 {
+                font-size: 1rem;
+            }
+            .section-title {
+                font-size: 1.1rem;
+            }
+        }
+
+        .step-flow {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            align-items: center;
+            font-weight: 600;
+            font-size: 0.9rem;
+            margin: 8px 0;
+        }
+        .step-flow .arrow {
+            color: var(--accent);
+            font-weight: 800;
+        }
+
+        .highlight-box {
+            background: #eaf3fb;
+            border-radius: var(--radius-sm);
+            padding: 14px 18px;
+            margin: 12px 0;
+            border-right: 4px solid var(--blue);
+            font-weight: 600;
+            font-size: 0.95rem;
+        }
+
+        .tooltip {
+            position: relative;
+            cursor: help;
+            border-bottom: 1px dashed var(--text-light);
+        }
+        .tooltip:hover::after {
+            content: attr(data-tip);
+            position: absolute;
+            bottom: 100%;
+            right: 0;
+            background: var(--primary-dark);
+            color: #fff;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 0.78rem;
+            white-space: nowrap;
+            z-index: 100;
+            box-shadow: var(--shadow);
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 30px;
+            color: var(--text-light);
+            font-size: 1rem;
+        }
+    </style>
+</head>
+<body>
+
+    <header class="header">
+        <h1>🚪 دليل مبيعات الكوزينة والأبواب — MDM</h1>
+        <p>أسئلة الزبون • أسئلة البائع • المصطلحات الشاملة (FR / EN / AR)</p>
+        <span class="badge">📋 دليل تفاعلي للاستخدام اليومي</span>
+    </header>
+
+    <div class="container">
+
+        <!-- Tab Navigation -->
+        <nav class="tab-nav" id="tabNav">
+            <button class="tab-btn active" data-tab="kitchen-customer">
+                <span class="icon">🍳</span> أسئلة زبون الكوزينة
+            </button>
+            <button class="tab-btn" data-tab="kitchen-seller">
+                <span class="icon">👨‍💼</span> أسئلة البائع للكوزينة
+            </button>
+            <button class="tab-btn" data-tab="door">
+                <span class="icon">🚪</span> أسئلة الأبواب
+            </button>
+            <button class="tab-btn" data-tab="glossary">
+                <span class="icon">📚</span> المصطلحات
+            </button>
+        </nav>
+
+        <!-- ============ TAB 1: KITCHEN CUSTOMER QUESTIONS ============ -->
+        <div class="tab-content active" id="tab-kitchen-customer">
+            <div class="section-title">
+                <span class="emoji">🍳</span> أسئلة زبون الكوزينة
+                <span class="sub">— الأسئلة التي قد يطرحها عليك الزبون</span>
+            </div>
+
+            <div class="card" id="kc-price">
+                <div class="card-header" onclick="toggleCard('kc-price')">
+                    <h3>💰 السعر</h3>
+                    <span class="toggle-icon">▼</span>
+                </div>
+                <div class="card-body">
+                    <ul class="question-list">
+                        <li><span class="q-icon">❓</span> شحال تجيني الكوزينة كاملة؟</li>
+                        <li><span class="q-icon">❓</span> شحال سعر المتر؟</li>
+                        <li><span class="q-icon">❓</span> واش السعر يشمل Plan de travail؟</li>
+                        <li><span class="q-icon">❓</span> واش الأجهزة électroménagers داخلة في السعر؟</li>
+                        <li><span class="q-icon">❓</span> واش التركيب داخل؟</li>
+                        <li><span class="q-icon">❓</span> كاين تخفيض؟</li>
+                        <li><span class="q-icon">❓</span> شحال مدة صلاحية السعر؟</li>
+                        <li><span class="q-icon">❓</span> نقدر نخلص بالتقسيط؟</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="card" id="kc-material">
+                <div class="card-header" onclick="toggleCard('kc-material')">
+                    <h3>🪵 المواد والجودة</h3>
+                    <span class="toggle-icon">▼</span>
+                </div>
+                <div class="card-body">
+                    <ul class="question-list">
+                        <li><span class="q-icon">❓</span> من واش مصنوعة الكوزينة؟</li>
+                        <li><span class="q-icon">❓</span> واش نوع MDF / mélaminé / stratifié؟</li>
+                        <li><span class="q-icon">❓</span> هل تتحمل الماء والحرارة؟</li>
+                        <li><span class="q-icon">❓</span> شحال مدة الضمان؟</li>
+                        <li><span class="q-icon">❓</span> واش الـcharnières وcoulisses نوعيتهم مليحة؟</li>
+                        <li><span class="q-icon">❓</span> هل فيها Soft Close؟</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="card" id="kc-design">
+                <div class="card-header" onclick="toggleCard('kc-design')">
+                    <h3>📐 التصميم والقياسات</h3>
+                    <span class="toggle-icon">▼</span>
+                </div>
+                <div class="card-body">
+                    <ul class="question-list">
+                        <li><span class="q-icon">❓</span> تقدروا تديرولي تصميم حسب المطبخ تاعي؟</li>
+                        <li><span class="q-icon">❓</span> واش لازم نجيبلكم باش تديرولي devis؟</li>
+                        <li><span class="q-icon">❓</span> شحال لازم يكون ارتفاع plan de travail؟</li>
+                        <li><span class="q-icon">❓</span> نقدر نختار اللون؟</li>
+                        <li><span class="q-icon">❓</span> نقدر نبدل شكل الأبواب؟</li>
+                        <li><span class="q-icon">❓</span> نقدر نزيد/ننقص الخزائن؟</li>
+                        <li><span class="q-icon">❓</span> كيفاش تستغلوا الزوايا؟</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="card" id="kc-install">
+                <div class="card-header" onclick="toggleCard('kc-install')">
+                    <h3>🔧 التركيب</h3>
+                    <span class="toggle-icon">▼</span>
+                </div>
+                <div class="card-body">
+                    <ul class="question-list">
+                        <li><span class="q-icon">❓</span> شكون يركبها؟</li>
+                        <li><span class="q-icon">❓</span> التركيب داخل في السعر؟</li>
+                        <li><span class="q-icon">❓</span> شحال تستغرق مدة التركيب؟</li>
+                        <li><span class="q-icon">❓</span> إذا خرج مشكل بعد التركيب، شكون يصلحو؟</li>
+                        <li><span class="q-icon">❓</span> هل تقومون بالـprise de mesures في المنزل؟</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="card" id="kc-appliance">
+                <div class="card-header" onclick="toggleCard('kc-appliance')">
+                    <h3>⚙️ الأجهزة</h3>
+                    <span class="toggle-icon">▼</span>
+                </div>
+                <div class="card-body">
+                    <ul class="question-list">
+                        <li><span class="q-icon">❓</span> واش الأجهزة اللي نقدر نركبها؟</li>
+                        <li><span class="q-icon">❓</span> نقدر نجيب الأجهزة من عندي؟</li>
+                        <li><span class="q-icon">❓</span> واش dimensions تاع four / lave-vaisselle / hotte / réfrigérateur لازم تكون؟</li>
+                        <li><span class="q-icon">❓</span> هل évier داخل؟</li>
+                        <li><span class="q-icon">❓</span> هل découpe تاع évier/plaque داخلة؟</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- ============ TAB 2: KITCHEN SELLER QUESTIONS ============ -->
+        <div class="tab-content" id="tab-kitchen-seller">
+            <div class="section-title">
+                <span class="emoji">👨‍💼</span> أسئلة البائع للزبون — الكوزينة
+                <span class="sub">— الأهم: افهم قبل ما تبيع</span>
+            </div>
+
+            <div class="highlight-box">
+                ⚠️ ما تبدأش مباشرة بـ "واش اللون اللي تحب؟" — ابدأ بفهم احتياجه.
+            </div>
+
+            <div class="card" id="ks-phase1">
+                <div class="card-header" onclick="toggleCard('ks-phase1')">
+                    <h3><span class="tag tag-blue">المرحلة 1</span> فهم المشروع</h3>
+                    <span class="toggle-icon">▼</span>
+                </div>
+                <div class="card-body">
+                    <ul class="question-list">
+                        <li><span class="q-icon">🗣️</span> "تحب تدير كوزينة جديدة كاملة ولا تجديد للكوزينة الحالية؟"</li>
+                        <li><span class="q-icon">🗣️</span> الكوزينة وين راهي؟ Maison / appartement؟</li>
+                        <li><span class="q-icon">🗣️</span> عندك المخطط أو القياسات؟</li>
+                        <li><span class="q-icon">🗣️</span> تقدر تبعثلي صور للمكان؟</li>
+                        <li><span class="q-icon">🗣️</span> واش هي الأبعاد تقريباً؟</li>
+                        <li><span class="q-icon">🗣️</span> وين راهو emplacement تاع الماء والغاز والكهرباء؟</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="card" id="ks-phase2">
+                <div class="card-header" onclick="toggleCard('ks-phase2')">
+                    <h3><span class="tag tag-teal">المرحلة 2</span> الأجهزة — مهمة جداً قبل التصميم</h3>
+                    <span class="toggle-icon">▼</span>
+                </div>
+                <div class="card-body">
+                    <p style="font-weight:600;margin-bottom:8px;">"وش الأجهزة اللي حاب تدخلهم في الكوزينة؟"</p>
+                    <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px;">
+                        <span class="chip">Four</span>
+                        <span class="chip">Plaque</span>
+                        <span class="chip">Hotte</span>
+                        <span class="chip">Réfrigérateur</span>
+                        <span class="chip">Lave-vaisselle</span>
+                        <span class="chip">Micro-ondes</span>
+                        <span class="chip">Évier</span>
+                    </div>
+                    <ul class="question-list">
+                        <li><span class="q-icon">🗣️</span> "الأجهزة عندك من قبل ولا راك حاب تشريهم؟"</li>
+                    </ul>
+                    <div class="highlight-box" style="border-right-color:var(--teal);background:#e8f6f3;">
+                        ⚡ لأن dimensions تاع الأجهزة تأثر مباشرة على التصميم.
+                    </div>
+                </div>
+            </div>
+
+            <div class="card" id="ks-phase3">
+                <div class="card-header" onclick="toggleCard('ks-phase3')">
+                    <h3><span class="tag tag-purple">المرحلة 3</span> طريقة الاستعمال</h3>
+                    <span class="toggle-icon">▼</span>
+                </div>
+                <div class="card-body">
+                    <p style="font-weight:600;margin-bottom:8px;">هنا تبدأ تفهم شخصية الزبون:</p>
+                    <ul class="question-list">
+                        <li><span class="q-icon">❓</span> شحال شخص يستعمل الكوزينة؟</li>
+                        <li><span class="q-icon">❓</span> تطبخ بزاف ولا استعمال خفيف؟</li>
+                        <li><span class="q-icon">❓</span> تحتاج مساحة كبيرة للتحضير؟</li>
+                        <li><span class="q-icon">❓</span> تحب بزاف rangements؟</li>
+                        <li><span class="q-icon">❓</span> تحب الخزائن العلوية؟</li>
+                        <li><span class="q-icon">❓</span> تحب tiroirs أكثر ولا portes؟</li>
+                        <li><span class="q-icon">❓</span> تحتاج poubelle coulissante؟</li>
+                        <li><span class="q-icon">❓</span> تحتاج حلول للزوايا؟</li>
+                    </ul>
+                    <div class="grid-2" style="margin-top:10px;">
+                        <div style="background:#fef9e7;border-radius:8px;padding:12px;border-right:3px solid var(--gold);">
+                            <strong>👨‍🍳 زبون يطبخ يومياً</strong><br>يحتاج Plan de travail مريح + rangement عملي.
+                        </div>
+                        <div style="background:#eaf3fb;border-radius:8px;padding:12px;border-right:3px solid var(--blue);">
+                            <strong>🛋️ زبون نادراً ما يطبخ</strong><br>ممكن يهتم أكثر بالشكل والـdesign.
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card" id="ks-phase4">
+                <div class="card-header" onclick="toggleCard('ks-phase4')">
+                    <h3><span class="tag tag-orange">المرحلة 4</span> الـStyle</h3>
+                    <span class="toggle-icon">▼</span>
+                </div>
+                <div class="card-body">
+                    <ul class="question-list">
+                        <li><span class="q-icon">🗣️</span> "وش الستايل اللي تحبو؟ Moderne، classique، ولا quelque chose de simple؟"</li>
+                        <li><span class="q-icon">🎨</span> اللون؟</li>
+                        <li><span class="q-icon">✨</span> مات mat ولا brillant؟</li>
+                        <li><span class="q-icon">🔘</span> Poignées ولا sans poignées؟</li>
+                        <li><span class="q-icon">🌈</span> تحب لون واحد ولا لونين؟</li>
+                        <li><span class="q-icon">📸</span> عندك صور لكوزينات تعجبك؟</li>
+                    </ul>
+                    <div class="highlight-box" style="border-right-color:var(--orange);background:#fef5e7;">
+                        💡 أفضل سؤال: "عندك صورة لكوزينة عجبتك؟" — الصورة أحياناً تفهمك ذوق الزبون أكثر من 20 سؤال.
+                    </div>
+                </div>
+            </div>
+
+            <div class="card" id="ks-phase5">
+                <div class="card-header" onclick="toggleCard('ks-phase5')">
+                    <h3><span class="tag tag-red">المرحلة 5</span> الميزانية 💰</h3>
+                    <span class="toggle-icon">▼</span>
+                </div>
+                <div class="card-body">
+                    <ul class="question-list">
+                        <li><span class="q-icon">🗣️</span> "باش نوجّهك للحلول المناسبة وما نضيعوش الوقت، عندك budget تقريبي للمشروع؟"</li>
+                    </ul>
+                    <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:10px;">
+                        <span class="chip" style="background:#fdecea;color:#c0392b;">Budget محدود</span>
+                        <span class="chip" style="background:#fef9e7;color:#f39c12;">Budget متوسط</span>
+                        <span class="chip" style="background:#e8f8f0;color:#27ae60;">Budget مفتوح</span>
+                    </div>
+                    <p style="margin-top:10px;font-weight:600;">وبالتالي: basic / medium / premium</p>
+                </div>
+            </div>
+
+            <div class="top10-box">
+                <h4>🧠 أهم 10 أسئلة تحفظهم</h4>
+                <ol style="padding-right:24px;font-size:0.95rem;line-height:2;">
+                    <li>واش dimensions تاع الكوزينة؟</li>
+                    <li>عندك plan أو photos للمكان؟</li>
+                    <li>وين راهو الماء، الغاز والكهرباء؟</li>
+                    <li>واش الأجهزة اللي حاب تدخلهم؟</li>
+                    <li>الأجهزة عندك ولا راك حاب تشريهم؟</li>
+                    <li>كيفاش تستعمل الكوزينة؟</li>
+                    <li>واش نوع الـrangement اللي تحتاجو؟</li>
+                    <li>وش الـstyle واللون اللي تحبو؟</li>
+                    <li>عندك صورة لكوزينة تعجبك؟</li>
+                    <li>عندك budget تقريبي؟</li>
+                </ol>
+            </div>
+
+            <div class="golden-rule">
+                <h4>القاعدة الذهبية</h4>
+                <p>أنت ماشي غير تبيع كوزينة. أنت تحاول تعرف:</p>
+                <div class="step-flow">
+                    <span>📍 المكان</span> <span class="arrow">→</span>
+                    <span>🍽️ الاستعمال</span> <span class="arrow">→</span>
+                    <span>⚙️ الأجهزة</span> <span class="arrow">→</span>
+                    <span>📋 الاحتياجات</span> <span class="arrow">→</span>
+                    <span>🎨 الذوق</span> <span class="arrow">→</span>
+                    <span>💰 الميزانية</span> <span class="arrow">→</span>
+                    <span>📐 التصميم</span>
+                </div>
+                <p style="margin-top:8px;">إذا مشيت بهذا الترتيب، راح تبان للزبون <strong>conseiller يفهم في الكوزينة</strong>، ماشي مجرد vendeur.</p>
+            </div>
+        </div>
+
+        <!-- ============ TAB 3: DOOR QUESTIONS ============ -->
+        <div class="tab-content" id="tab-door">
+            <div class="section-title">
+                <span class="emoji">🚪</span> أسئلة الأبواب
+                <span class="sub">— زبون حاب يشري باب واحد أو عدة أبواب</span>
+            </div>
+
+            <div class="card" id="dr-type">
+                <div class="card-header" onclick="toggleCard('dr-type')">
+                    <h3>1. واش نوع الباب؟</h3>
+                    <span class="toggle-icon">▼</span>
+                </div>
+                <div class="card-body">
+                    <ul class="question-list">
+                        <li><span class="q-icon">🗣️</span> "الباب وين راح يتركب؟"</li>
+                        <li><span class="q-icon">🏷️</span> Porte intérieure — باب غرفة — باب حمام — باب مطبخ — باب مكتب — Porte d'entrée — باب خزانة/meuble</li>
+                        <li><span class="q-icon">🔢</span> "حاب باب واحد ولا عدة أبواب؟"</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="card" id="dr-measure">
+                <div class="card-header" onclick="toggleCard('dr-measure')">
+                    <h3>2. القياسات 📐 <span class="tag tag-red">أهم نقطة</span></h3>
+                    <span class="toggle-icon">▼</span>
+                </div>
+                <div class="card-body">
+                    <ul class="question-list">
+                        <li><span class="q-icon">🗣️</span> "عندك les dimensions تاع الفتحة؟"</li>
+                    </ul>
+                    <div style="display:flex;flex-wrap:wrap;gap:8px;margin:8px 0;">
+                        <span class="chip">Largeur — العرض</span>
+                        <span class="chip">Hauteur — الارتفاع</span>
+                        <span class="chip">Épaisseur du mur — سماكة الحائط</span>
+                        <span class="chip">Bloc-porte/chambranle</span>
+                    </div>
+                    <ul class="question-list">
+                        <li><span class="q-icon">🗣️</span> "تحب نديرولك prise de mesures؟"</li>
+                    </ul>
+                    <div class="highlight-box" style="border-right-color:var(--accent);background:#fdecea;">
+                        ⚠️ لا تعتمد على "تقريباً 80 × 200". لازم تعرف بالضبط: ouverture brute، dimensions du bloc-porte، vantail.
+                    </div>
+                </div>
+            </div>
+
+            <div class="card" id="dr-new">
+                <div class="card-header" onclick="toggleCard('dr-new')">
+                    <h3>3. هل هو باب جديد أم استبدال؟</h3>
+                    <span class="toggle-icon">▼</span>
+                </div>
+                <div class="card-body">
+                    <ul class="question-list">
+                        <li><span class="q-icon">🗣️</span> "راك حاب تركب باب جديد ولا تبدل باب قديم؟"</li>
+                    </ul>
+                    <p style="font-weight:600;margin-top:8px;">إذا تبديل:</p>
+                    <ul class="question-list">
+                        <li><span class="q-icon">❓</span> الباب القديم موجود؟</li>
+                        <li><span class="q-icon">❓</span> الإطار القديم يبقى؟</li>
+                        <li><span class="q-icon">❓</span> ولا حاب تبدل bloc-porte كامل؟</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="card" id="dr-direction">
+                <div class="card-header" onclick="toggleCard('dr-direction')">
+                    <h3>4. الاتجاه ↔️</h3>
+                    <span class="toggle-icon">▼</span>
+                </div>
+                <div class="card-body">
+                    <ul class="question-list">
+                        <li><span class="q-icon">🗣️</span> "الباب يفتح لليمين ولا لليسار؟"</li>
+                        <li><span class="q-icon">🗣️</span> "يفتح للداخل ولا للخارج؟"</li>
+                    </ul>
+                    <p style="margin-top:6px;font-size:0.9rem;color:var(--text-light);">خصوصاً إذا كان الباب يحتاج paumelles / charnières وتجهيزات محددة.</p>
+                </div>
+            </div>
+
+            <div class="card" id="dr-design">
+                <div class="card-header" onclick="toggleCard('dr-design')">
+                    <h3>5. الشكل والـDesign 🎨</h3>
+                    <span class="toggle-icon">▼</span>
+                </div>
+                <div class="card-body">
+                    <ul class="question-list">
+                        <li><span class="q-icon">🗣️</span> "وش الستايل اللي حابو؟ Moderne ولا classique؟"</li>
+                        <li><span class="q-icon">🎨</span> اللون؟</li>
+                        <li><span class="q-icon">🔲</span> Uni ولا فيه ديكور؟</li>
+                        <li><span class="q-icon">✨</span> Mat ولا brillant؟</li>
+                        <li><span class="q-icon">🪟</span> مع vitrage ولا بدون؟</li>
+                        <li><span class="q-icon">🔘</span> نوع المقبض poignée؟ لون الـpoignée؟</li>
+                        <li><span class="q-icon">🎯</span> تحب نفس لون الأبواب الموجودة؟</li>
+                    </ul>
+                    <div class="highlight-box" style="border-right-color:var(--purple);background:#f4ecf7;">
+                        💡 "عندك photo ولا modèle معين عجبك؟"
+                    </div>
+                </div>
+            </div>
+
+            <div class="card" id="dr-usage">
+                <div class="card-header" onclick="toggleCard('dr-usage')">
+                    <h3>6. الاستعمال</h3>
+                    <span class="toggle-icon">▼</span>
+                </div>
+                <div class="card-body">
+                    <ul class="question-list">
+                        <li><span class="q-icon">🗣️</span> "الباب هذا لأي غرفة؟"</li>
+                    </ul>
+                    <p style="font-weight:600;margin-top:8px;">لأن الباب تاع:</p>
+                    <div style="display:flex;flex-wrap:wrap;gap:6px;margin:8px 0;">
+                        <span class="chip">Chambre</span>
+                        <span class="chip">Salle de bain</span>
+                        <span class="chip">Salon</span>
+                        <span class="chip">Bureau</span>
+                    </div>
+                    <ul class="question-list">
+                        <li><span class="q-icon">🔇</span> يحتاج عزل صوتي؟</li>
+                        <li><span class="q-icon">🔒</span> يحتاج خصوصية؟</li>
+                        <li><span class="q-icon">💧</span> هل المكان فيه رطوبة؟</li>
+                        <li><span class="q-icon">🛡️</span> يحتاج مقاومة خاصة؟</li>
+                        <li><span class="q-icon">🔄</span> هل الباب يتعرض للاستعمال الكثيف؟</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="card" id="dr-multi">
+                <div class="card-header" onclick="toggleCard('dr-multi')">
+                    <h3>7. إذا كان عدة أبواب</h3>
+                    <span class="toggle-icon">▼</span>
+                </div>
+                <div class="card-body">
+                    <ul class="question-list">
+                        <li><span class="q-icon">🗣️</span> "الأبواب كامل نفس modèle واللون، ولا كل غرفة عندها modèle مختلف؟"</li>
+                    </ul>
+                    <div class="table-wrap" style="overflow-x:auto;margin:10px 0;">
+                        <table class="glossary-table" style="min-width:400px;">
+                            <thead>
+                                <tr>
+                                    <th>المكان</th>
+                                    <th>الكمية</th>
+                                    <th>Modèle</th>
+                                    <th>اللون</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr><td>Chambre 1</td><td>1</td><td>Modèle A</td><td>Blanc</td></tr>
+                                <tr><td>Chambre 2</td><td>1</td><td>Modèle A</td><td>Blanc</td></tr>
+                                <tr><td>Salle de bain</td><td>1</td><td>Modèle B</td><td>Blanc</td></tr>
+                                <tr><td>Salon</td><td>1</td><td>Modèle C</td><td>Bois</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <ul class="question-list">
+                        <li><span class="q-icon">❓</span> "تحبهم كامل بنفس الـdesign؟"</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="card" id="dr-budget">
+                <div class="card-header" onclick="toggleCard('dr-budget')">
+                    <h3>💰 8. الميزانية</h3>
+                    <span class="toggle-icon">▼</span>
+                </div>
+                <div class="card-body">
+                    <ul class="question-list">
+                        <li><span class="q-icon">🗣️</span> "عندك budget تقريبي للباب؟ باش نقترح عليك modèles مناسبين."</li>
+                        <li><span class="q-icon">🗣️</span> "عندك budget تقريبي للمشروع كامل؟" <span class="tag tag-gold">إذا عدة أبواب</span></li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="card" id="dr-install">
+                <div class="card-header" onclick="toggleCard('dr-install')">
+                    <h3>🔧 9. هل يريد الباب فقط أم التركيب كامل؟</h3>
+                    <span class="toggle-icon">▼</span>
+                </div>
+                <div class="card-body">
+                    <ul class="question-list">
+                        <li><span class="q-icon">🗣️</span> "تحب الباب وحدو ولا الباب مع cadre وaccessoires والتركيب؟"</li>
+                    </ul>
+                    <div style="display:flex;flex-wrap:wrap;gap:6px;margin:10px 0;">
+                        <span class="chip">Porte</span>
+                        <span class="chip">Cadre / huisserie</span>
+                        <span class="chip">Chambranle</span>
+                        <span class="chip">Poignée</span>
+                        <span class="chip">Serrure</span>
+                        <span class="chip">Paumelles / charnières</span>
+                        <span class="chip">Joint</span>
+                        <span class="chip">Installation / pose</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card" id="dr-summary">
+                <div class="card-header" onclick="toggleCard('dr-summary')">
+                    <h3>🧾 في النهاية: لخّص الطلب للزبون</h3>
+                    <span class="toggle-icon">▼</span>
+                </div>
+                <div class="card-body">
+                    <div class="highlight-box" style="border-right-color:var(--teal);background:#e8f6f3;">
+                        "إذن نحتاجولك 3 portes intérieures، dimensions ...، modèle ...، couleur ...، ouverture ...، مع poignées وpose. صحيح؟"
+                    </div>
+                    <p style="margin-top:8px;font-size:0.9rem;">هذه الحركة ممتازة لأنها تمنع سوء الفهم.</p>
+                </div>
+            </div>
+
+            <div class="top10-box" style="border-right-color:var(--accent);">
+                <h4>🧠 احفظ هذه الـ12 سؤال للأبواب</h4>
+                <ol style="padding-right:24px;font-size:0.95rem;line-height:2;">
+                    <li>وين راح يتركب؟</li>
+                    <li>باب جديد ولا remplacement؟</li>
+                    <li>واحد ولا عدة؟</li>
+                    <li>شحال dimensions؟</li>
+                    <li>عندك prise de mesures؟</li>
+                    <li>اتجاه الفتح؟</li>
+                    <li>داخل/خارج؟</li>
+                    <li>شنو الـstyle؟</li>
+                    <li>شنو اللون؟</li>
+                    <li>واش accessoires اللي يحتاجها؟</li>
+                    <li>يحتاج pose؟</li>
+                    <li>شحال budget تقريباً؟</li>
+                </ol>
+            </div>
+
+            <div class="golden-rule">
+                <h4>🎯 والأهم للأبواب</h4>
+                <p>ما تعطيش prix قبل ما تجمع المعلومات الأساسية. لأن "شحال الباب؟" ما عندهاش إجابة واحدة.</p>
+                <p style="margin-top:6px;font-weight:600;">السعر يتأثر بـ: <strong>Modèle + dimensions + matériau + finition + accessoires + quantité + pose</strong></p>
+            </div>
+        </div>
+
+        <!-- ============ TAB 4: GLOSSARY ============ -->
+        <div class="tab-content" id="tab-glossary">
+            <div class="section-title">
+                <span class="emoji">📚</span> قاموس المصطلحات
+                <span class="sub">— FR / EN / AR — من الأكثر استعمالاً إلى الأقل</span>
+            </div>
+
+            <div class="search-bar">
+                <input type="text" id="glossarySearch" placeholder="🔍 ابحث في المصطلحات (فرنسي، إنجليزي، عربي)..." oninput="filterGlossary()">
+                <button class="btn btn-outline" onclick="resetGlossarySearch()">✕ مسح</button>
+                <button class="btn btn-accent" onclick="copyAllGlossary()">📋 نسخ كل المصطلحات</button>
+            </div>
+
+            <div id="glossaryContent">
+
+                <!-- Category 1: Doors -->
+                <div class="glossary-category" data-cat="doors">
+                    <h3 style="background:#fdecea;color:#c0392b;cursor:pointer;" onclick="toggleGlossaryCat('doors')">🚪 1. الأبواب — Portes <span style="margin-right:auto;font-size:0.8rem;">▼</span></h3>
+                    <div class="table-wrap" id="gloss-doors">
+                        <table class="glossary-table">
+                            <thead><tr><th>FR</th><th>EN</th><th>AR</th></tr></thead>
+                            <tbody>
+                                <tr><td class="fr">Porte</td><td class="en">Door</td><td class="ar">باب</td></tr>
+                                <tr><td class="fr">Porte intérieure</td><td class="en">Interior door</td><td class="ar">باب داخلي</td></tr>
+                                <tr><td class="fr">Porte d'entrée</td><td class="en">Entrance door</td><td class="ar">باب مدخل</td></tr>
+                                <tr><td class="fr">Porte coulissante</td><td class="en">Sliding door</td><td class="ar">باب منزلق</td></tr>
+                                <tr><td class="fr">Porte battante</td><td class="en">Swing door</td><td class="ar">باب مفصلي</td></tr>
+                                <tr><td class="fr">Porte vitrée</td><td class="en">Glass door</td><td class="ar">باب زجاجي</td></tr>
+                                <tr><td class="fr">Vantail</td><td class="en">Door leaf</td><td class="ar">ضلفة الباب</td></tr>
+                                <tr><td class="fr">Double vantail</td><td class="en">Double door leaf</td><td class="ar">باب ذو ضلفتين</td></tr>
+                                <tr><td class="fr">Bloc-porte</td><td class="en">Door block / door set</td><td class="ar">مجموعة الباب مع الإطار</td></tr>
+                                <tr><td class="fr">Huisserie</td><td class="en">Door frame</td><td class="ar">إطار الباب</td></tr>
+                                <tr><td class="fr">Cadre</td><td class="en">Frame</td><td class="ar">إطار</td></tr>
+                                <tr><td class="fr">Chambranle</td><td class="en">Door casing / trim</td><td class="ar">حلية/إطار تغطية الباب</td></tr>
+                                <tr><td class="fr">Bâti</td><td class="en">Door frame</td><td class="ar">هيكل/إطار الباب</td></tr>
+                                <tr><td class="fr">Seuil</td><td class="en">Threshold</td><td class="ar">عتبة الباب</td></tr>
+                                <tr><td class="fr">Joint</td><td class="en">Seal / gasket</td><td class="ar">عازل/حشية</td></tr>
+                                <tr><td class="fr">Pareclose</td><td class="en">Glazing bead</td><td class="ar">حابك/تثبيت الزجاج</td></tr>
+                                <tr><td class="fr">Oculus</td><td class="en">Vision panel</td><td class="ar">فتحة زجاجية في الباب</td></tr>
+                                <tr><td class="fr">Panneau</td><td class="en">Panel</td><td class="ar">لوح</td></tr>
+                                <tr><td class="fr">Âme de la porte</td><td class="en">Door core</td><td class="ar">قلب الباب</td></tr>
+                                <tr><td class="fr">Porte pleine</td><td class="en">Solid door</td><td class="ar">باب مصمت</td></tr>
+                                <tr><td class="fr">Porte alvéolaire</td><td class="en">Hollow-core door</td><td class="ar">باب خفيف مجوف</td></tr>
+                                <tr><td class="fr">Porte isoplane</td><td class="en">Flush door</td><td class="ar">باب مسطح</td></tr>
+                                <tr><td class="fr">Porte postformée</td><td class="en">Postformed door</td><td class="ar">باب مشكل حراريًا</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Category 2: Hardware -->
+                <div class="glossary-category" data-cat="hardware">
+                    <h3 style="background:#eaf3fb;color:#2980b9;cursor:pointer;" onclick="toggleGlossaryCat('hardware')">🔧 2. قطع الباب والفيراي — Quincaillerie <span style="margin-right:auto;font-size:0.8rem;">▼</span></h3>
+                    <div class="table-wrap" id="gloss-hardware">
+                        <table class="glossary-table">
+                            <thead><tr><th>FR</th><th>EN</th><th>AR</th></tr></thead>
+                            <tbody>
+                                <tr><td class="fr">Poignée</td><td class="en">Handle</td><td class="ar">مقبض</td></tr>
+                                <tr><td class="fr">Serrure</td><td class="en">Lock</td><td class="ar">قفل</td></tr>
+                                <tr><td class="fr">Cylindre</td><td class="en">Cylinder</td><td class="ar">أسطوانة القفل</td></tr>
+                                <tr><td class="fr">Barillet</td><td class="en">Lock cylinder</td><td class="ar">قلب القفل</td></tr>
+                                <tr><td class="fr">Clé</td><td class="en">Key</td><td class="ar">مفتاح</td></tr>
+                                <tr><td class="fr">Rosace</td><td class="en">Rose / escutcheon</td><td class="ar">قاعدة المقبض</td></tr>
+                                <tr><td class="fr">Plaque</td><td class="en">Backplate</td><td class="ar">صفيحة المقبض</td></tr>
+                                <tr><td class="fr">Béquille</td><td class="en">Lever handle</td><td class="ar">مقبض ذراع</td></tr>
+                                <tr><td class="fr">Bouton</td><td class="en">Door knob</td><td class="ar">مقبض دائري</td></tr>
+                                <tr><td class="fr">Pêne</td><td class="en">Latch / bolt</td><td class="ar">لسان القفل</td></tr>
+                                <tr><td class="fr">Pêne demi-tour</td><td class="en">Latch bolt</td><td class="ar">لسان الإغلاق</td></tr>
+                                <tr><td class="fr">Pêne dormant</td><td class="en">Deadbolt</td><td class="ar">لسان القفل الثابت</td></tr>
+                                <tr><td class="fr">Gâche</td><td class="en">Strike plate</td><td class="ar">صفيحة استقبال القفل</td></tr>
+                                <tr><td class="fr">Paumelle</td><td class="en">Door hinge</td><td class="ar">مفصلة باب</td></tr>
+                                <tr><td class="fr">Charnière</td><td class="en">Hinge</td><td class="ar">مفصلة</td></tr>
+                                <tr><td class="fr">Pivot</td><td class="en">Pivot hinge</td><td class="ar">محور دوران</td></tr>
+                                <tr><td class="fr">Ferme-porte</td><td class="en">Door closer</td><td class="ar">غالق الباب</td></tr>
+                                <tr><td class="fr">Arrêt de porte</td><td class="en">Door stopper</td><td class="ar">مصدّ الباب</td></tr>
+                                <tr><td class="fr">Butée de porte</td><td class="en">Door stop</td><td class="ar">محدد فتح الباب</td></tr>
+                                <tr><td class="fr">Verrou</td><td class="en">Bolt</td><td class="ar">مزلاج</td></tr>
+                                <tr><td class="fr">Espagnolette</td><td class="en">Espagnolette bolt</td><td class="ar">مزلاج متعدد النقاط</td></tr>
+                                <tr><td class="fr">Serrure à clé</td><td class="en">Key lock</td><td class="ar">قفل بالمفتاح</td></tr>
+                                <tr><td class="fr">Serrure magnétique</td><td class="en">Magnetic lock</td><td class="ar">قفل مغناطيسي</td></tr>
+                                <tr><td class="fr">Serrure à condamnation</td><td class="en">Privacy lock</td><td class="ar">قفل خصوصية</td></tr>
+                                <tr><td class="fr">Serrure multipoints</td><td class="en">Multipoint lock</td><td class="ar">قفل متعدد النقاط</td></tr>
+                                <tr><td class="fr">Aimant</td><td class="en">Magnet</td><td class="ar">مغناطيس</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Category 3: Measurements -->
+                <div class="glossary-category" data-cat="measure">
+                    <h3 style="background:#e8f8f0;color:#27ae60;cursor:pointer;" onclick="toggleGlossaryCat('measure')">📐 3. القياسات — Mesures <span style="margin-right:auto;font-size:0.8rem;">▼</span></h3>
+                    <div class="table-wrap" id="gloss-measure">
+                        <table class="glossary-table">
+                            <thead><tr><th>FR</th><th>EN</th><th>AR</th></tr></thead>
+                            <tbody>
+                                <tr><td class="fr">Mesure</td><td class="en">Measurement</td><td class="ar">قياس</td></tr>
+                                <tr><td class="fr">Prise de mesures</td><td class="en">Measuring / site measurement</td><td class="ar">أخذ القياسات</td></tr>
+                                <tr><td class="fr">Largeur</td><td class="en">Width</td><td class="ar">العرض</td></tr>
+                                <tr><td class="fr">Hauteur</td><td class="en">Height</td><td class="ar">الارتفاع</td></tr>
+                                <tr><td class="fr">Longueur</td><td class="en">Length</td><td class="ar">الطول</td></tr>
+                                <tr><td class="fr">Épaisseur</td><td class="en">Thickness</td><td class="ar">السماكة</td></tr>
+                                <tr><td class="fr">Profondeur</td><td class="en">Depth</td><td class="ar">العمق</td></tr>
+                                <tr><td class="fr">Dimensions</td><td class="en">Dimensions</td><td class="ar">الأبعاد</td></tr>
+                                <tr><td class="fr">Cote</td><td class="en">Dimension / measurement</td><td class="ar">المقاس</td></tr>
+                                <tr><td class="fr">Ouverture</td><td class="en">Opening</td><td class="ar">فتحة</td></tr>
+                                <tr><td class="fr">Ouverture brute</td><td class="en">Rough opening</td><td class="ar">الفتحة الخام</td></tr>
+                                <tr><td class="fr">Passage</td><td class="en">Clear opening</td><td class="ar">فتحة المرور</td></tr>
+                                <tr><td class="fr">Jeu</td><td class="en">Clearance / gap</td><td class="ar">الخلوص / الفراغ</td></tr>
+                                <tr><td class="fr">Niveau</td><td class="en">Level</td><td class="ar">الاستواء</td></tr>
+                                <tr><td class="fr">Équerrage</td><td class="en">Squareness</td><td class="ar">التربيع</td></tr>
+                                <tr><td class="fr">Aplomb</td><td class="en">Plumb</td><td class="ar">الشاقولية</td></tr>
+                                <tr><td class="fr">Tolérance</td><td class="en">Tolerance</td><td class="ar">هامش السماح</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Category 4: Kitchen -->
+                <div class="glossary-category" data-cat="kitchen">
+                    <h3 style="background:#fef9e7;color:#f39c12;cursor:pointer;" onclick="toggleGlossaryCat('kitchen')">🍳 4. الكوزينة — Cuisine <span style="margin-right:auto;font-size:0.8rem;">▼</span></h3>
+                    <div class="table-wrap" id="gloss-kitchen">
+                        <table class="glossary-table">
+                            <thead><tr><th>FR</th><th>EN</th><th>AR</th></tr></thead>
+                            <tbody>
+                                <tr><td class="fr">Cuisine</td><td class="en">Kitchen</td><td class="ar">مطبخ</td></tr>
+                                <tr><td class="fr">Meuble</td><td class="en">Cabinet / furniture unit</td><td class="ar">خزانة / أثاث</td></tr>
+                                <tr><td class="fr">Meuble bas</td><td class="en">Base cabinet</td><td class="ar">خزانة سفلية</td></tr>
+                                <tr><td class="fr">Meuble haut</td><td class="en">Wall cabinet</td><td class="ar">خزانة علوية</td></tr>
+                                <tr><td class="fr">Colonne</td><td class="en">Tall cabinet</td><td class="ar">خزانة طويلة</td></tr>
+                                <tr><td class="fr">Caisson</td><td class="en">Cabinet carcass</td><td class="ar">هيكل الخزانة</td></tr>
+                                <tr><td class="fr">Façade</td><td class="en">Front / door front</td><td class="ar">واجهة</td></tr>
+                                <tr><td class="fr">Porte</td><td class="en">Door</td><td class="ar">باب</td></tr>
+                                <tr><td class="fr">Tiroir</td><td class="en">Drawer</td><td class="ar">درج</td></tr>
+                                <tr><td class="fr">Étagère</td><td class="en">Shelf</td><td class="ar">رف</td></tr>
+                                <tr><td class="fr">Fond</td><td class="en">Back panel</td><td class="ar">الظهر</td></tr>
+                                <tr><td class="fr">Joue</td><td class="en">Side panel</td><td class="ar">اللوح الجانبي</td></tr>
+                                <tr><td class="fr">Fileur</td><td class="en">Filler panel</td><td class="ar">قطعة تعويض</td></tr>
+                                <tr><td class="fr">Plinthe</td><td class="en">Plinth / toe kick</td><td class="ar">قاعدة سفلية</td></tr>
+                                <tr><td class="fr">Socle</td><td class="en">Base / plinth</td><td class="ar">قاعدة</td></tr>
+                                <tr><td class="fr">Plan de travail</td><td class="en">Worktop / countertop</td><td class="ar">سطح العمل</td></tr>
+                                <tr><td class="fr">Crédence</td><td class="en">Backsplash</td><td class="ar">واقي خلفي</td></tr>
+                                <tr><td class="fr">Chant</td><td class="en">Edge</td><td class="ar">حافة</td></tr>
+                                <tr><td class="fr">Bande de chant</td><td class="en">Edge banding</td><td class="ar">شريط الحافة</td></tr>
+                                <tr><td class="fr">Découpe</td><td class="en">Cut-out</td><td class="ar">فتحة قص</td></tr>
+                                <tr><td class="fr">Angle</td><td class="en">Corner</td><td class="ar">زاوية</td></tr>
+                                <tr><td class="fr">Meuble d'angle</td><td class="en">Corner cabinet</td><td class="ar">خزانة زاوية</td></tr>
+                                <tr><td class="fr">Rangement</td><td class="en">Storage</td><td class="ar">تخزين</td></tr>
+                                <tr><td class="fr">Aménagement</td><td class="en">Layout / fitting</td><td class="ar">تهيئة/تنظيم</td></tr>
+                                <tr><td class="fr">Évier</td><td class="en">Sink</td><td class="ar">حوض</td></tr>
+                                <tr><td class="fr">Robinet</td><td class="en">Faucet / tap</td><td class="ar">حنفية</td></tr>
+                                <tr><td class="fr">Hotte</td><td class="en">Range hood</td><td class="ar">شفاط</td></tr>
+                                <tr><td class="fr">Plaque de cuisson</td><td class="en">Cooktop</td><td class="ar">بلاطة طبخ</td></tr>
+                                <tr><td class="fr">Four</td><td class="en">Oven</td><td class="ar">فرن</td></tr>
+                                <tr><td class="fr">Lave-vaisselle</td><td class="en">Dishwasher</td><td class="ar">غسالة صحون</td></tr>
+                                <tr><td class="fr">Réfrigérateur</td><td class="en">Refrigerator</td><td class="ar">ثلاجة</td></tr>
+                                <tr><td class="fr">Micro-ondes</td><td class="en">Microwave</td><td class="ar">ميكروويف</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Category 5: Kitchen Hardware -->
+                <div class="glossary-category" data-cat="kitchen-hardware">
+                    <h3 style="background:#f4ecf7;color:#8e44ad;cursor:pointer;" onclick="toggleGlossaryCat('kitchen-hardware')">🔩 5. فيراي الكوزينة — Kitchen Hardware <span style="margin-right:auto;font-size:0.8rem;">▼</span></h3>
+                    <div class="table-wrap" id="gloss-kitchen-hardware">
+                        <table class="glossary-table">
+                            <thead><tr><th>FR</th><th>EN</th><th>AR</th></tr></thead>
+                            <tbody>
+                                <tr><td class="fr">Charnière</td><td class="en">Hinge</td><td class="ar">مفصلة</td></tr>
+                                <tr><td class="fr">Coulisse</td><td class="en">Drawer slide</td><td class="ar">سكة درج</td></tr>
+                                <tr><td class="fr">Coulisse à sortie totale</td><td class="en">Full-extension slide</td><td class="ar">سكة سحب كامل</td></tr>
+                                <tr><td class="fr">Amortisseur</td><td class="en">Soft-close damper</td><td class="ar">مخمّد</td></tr>
+                                <tr><td class="fr">Soft Close</td><td class="en">Soft close</td><td class="ar">إغلاق هادئ</td></tr>
+                                <tr><td class="fr">Vérin</td><td class="en">Gas strut</td><td class="ar">مكبس غازي</td></tr>
+                                <tr><td class="fr">Compas</td><td class="en">Stay / flap stay</td><td class="ar">آلية تثبيت الباب</td></tr>
+                                <tr><td class="fr">Lift</td><td class="en">Lift-up mechanism</td><td class="ar">آلية رفع</td></tr>
+                                <tr><td class="fr">Poignée</td><td class="en">Handle</td><td class="ar">مقبض</td></tr>
+                                <tr><td class="fr">Profilé</td><td class="en">Profile</td><td class="ar">بروفيل</td></tr>
+                                <tr><td class="fr">Gorge</td><td class="en">Finger groove</td><td class="ar">مجرى للإمساك</td></tr>
+                                <tr><td class="fr">Push-to-open</td><td class="en">Push-to-open</td><td class="ar">فتح بالضغط</td></tr>
+                                <tr><td class="fr">Système sans poignée</td><td class="en">Handleless system</td><td class="ar">نظام بدون مقابض</td></tr>
+                                <tr><td class="fr">Panier</td><td class="en">Basket</td><td class="ar">سلة</td></tr>
+                                <tr><td class="fr">Panier coulissant</td><td class="en">Pull-out basket</td><td class="ar">سلة قابلة للسحب</td></tr>
+                                <tr><td class="fr">Carrousel</td><td class="en">Carousel</td><td class="ar">آلية دوارة</td></tr>
+                                <tr><td class="fr">Porte-bouteilles</td><td class="en">Bottle rack</td><td class="ar">حامل القارورات</td></tr>
+                                <tr><td class="fr">Range-couverts</td><td class="en">Cutlery tray</td><td class="ar">منظم أدوات المائدة</td></tr>
+                                <tr><td class="fr">Poubelle coulissante</td><td class="en">Pull-out bin</td><td class="ar">سلة قمامة قابلة للسحب</td></tr>
+                                <tr><td class="fr">Étagère coulissante</td><td class="en">Pull-out shelf</td><td class="ar">رف قابل للسحب</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Category 6: Materials -->
+                <div class="glossary-category" data-cat="materials">
+                    <h3 style="background:#fef5e7;color:#e67e22;cursor:pointer;" onclick="toggleGlossaryCat('materials')">🪵 6. المواد والتشطيبات — Materials &amp; Finishes <span style="margin-right:auto;font-size:0.8rem;">▼</span></h3>
+                    <div class="table-wrap" id="gloss-materials">
+                        <table class="glossary-table">
+                            <thead><tr><th>FR</th><th>EN</th><th>AR</th></tr></thead>
+                            <tbody>
+                                <tr><td class="fr">Bois</td><td class="en">Wood</td><td class="ar">خشب</td></tr>
+                                <tr><td class="fr">Bois massif</td><td class="en">Solid wood</td><td class="ar">خشب طبيعي مصمت</td></tr>
+                                <tr><td class="fr">MDF</td><td class="en">MDF</td><td class="ar">MDF</td></tr>
+                                <tr><td class="fr">Aggloméré</td><td class="en">Particle board</td><td class="ar">خشب حبيبي</td></tr>
+                                <tr><td class="fr">Mélaminé</td><td class="en">Melamine</td><td class="ar">ميلامين</td></tr>
+                                <tr><td class="fr">Stratifié</td><td class="en">Laminate</td><td class="ar">لامينيت</td></tr>
+                                <tr><td class="fr">Contreplaqué</td><td class="en">Plywood</td><td class="ar">خشب رقائقي</td></tr>
+                                <tr><td class="fr">Placage bois</td><td class="en">Wood veneer</td><td class="ar">قشرة خشب</td></tr>
+                                <tr><td class="fr">Acrylique</td><td class="en">Acrylic</td><td class="ar">أكريليك</td></tr>
+                                <tr><td class="fr">Laqué</td><td class="en">Lacquered</td><td class="ar">مطلي باللاك</td></tr>
+                                <tr><td class="fr">PVC</td><td class="en">PVC</td><td class="ar">PVC</td></tr>
+                                <tr><td class="fr">Verre</td><td class="en">Glass</td><td class="ar">زجاج</td></tr>
+                                <tr><td class="fr">Aluminium</td><td class="en">Aluminum</td><td class="ar">ألمنيوم</td></tr>
+                                <tr><td class="fr">Inox</td><td class="en">Stainless steel</td><td class="ar">فولاذ مقاوم للصدأ</td></tr>
+                                <tr><td class="fr">Mat</td><td class="en">Matte</td><td class="ar">مطفي</td></tr>
+                                <tr><td class="fr">Brillant</td><td class="en">Glossy</td><td class="ar">لامع</td></tr>
+                                <tr><td class="fr">Satiné</td><td class="en">Satin</td><td class="ar">ساتاني</td></tr>
+                                <tr><td class="fr">Texturé</td><td class="en">Textured</td><td class="ar">ذو ملمس</td></tr>
+                                <tr><td class="fr">Uni</td><td class="en">Plain / solid color</td><td class="ar">لون موحد</td></tr>
+                                <tr><td class="fr">Imitation bois</td><td class="en">Wood effect</td><td class="ar">تقليد الخشب</td></tr>
+                                <tr><td class="fr">Finition</td><td class="en">Finish</td><td class="ar">تشطيب</td></tr>
+                                <tr><td class="fr">Couleur</td><td class="en">Color</td><td class="ar">لون</td></tr>
+                                <tr><td class="fr">Décor</td><td class="en">Decor / pattern</td><td class="ar">ديكور / نقش</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Category 7: Sales & Design -->
+                <div class="glossary-category" data-cat="sales">
+                    <h3 style="background:#e8f6f3;color:#16a085;cursor:pointer;" onclick="toggleGlossaryCat('sales')">🏠 7. مصطلحات التصميم والبيع <span style="margin-right:auto;font-size:0.8rem;">▼</span></h3>
+                    <div class="table-wrap" id="gloss-sales">
+                        <table class="glossary-table">
+                            <thead><tr><th>FR</th><th>EN</th><th>AR</th></tr></thead>
+                            <tbody>
+                                <tr><td class="fr">Devis</td><td class="en">Quotation</td><td class="ar">عرض سعر</td></tr>
+                                <tr><td class="fr">Prix</td><td class="en">Price</td><td class="ar">السعر</td></tr>
+                                <tr><td class="fr">Tarif</td><td class="en">Pricing</td><td class="ar">التسعيرة</td></tr>
+                                <tr><td class="fr">Budget</td><td class="en">Budget</td><td class="ar">الميزانية</td></tr>
+                                <tr><td class="fr">Commande</td><td class="en">Order</td><td class="ar">طلبية</td></tr>
+                                <tr><td class="fr">Client</td><td class="en">Customer</td><td class="ar">زبون</td></tr>
+                                <tr><td class="fr">Vendeur</td><td class="en">Salesperson</td><td class="ar">بائع</td></tr>
+                                <tr><td class="fr">Conseiller</td><td class="en">Advisor</td><td class="ar">مستشار</td></tr>
+                                <tr><td class="fr">Modèle</td><td class="en">Model</td><td class="ar">نموذج</td></tr>
+                                <tr><td class="fr">Référence</td><td class="en">Reference / SKU</td><td class="ar">المرجع</td></tr>
+                                <tr><td class="fr">Catalogue</td><td class="en">Catalog</td><td class="ar">كتالوج</td></tr>
+                                <tr><td class="fr">Échantillon</td><td class="en">Sample</td><td class="ar">عينة</td></tr>
+                                <tr><td class="fr">Disponibilité</td><td class="en">Availability</td><td class="ar">التوفر</td></tr>
+                                <tr><td class="fr">Stock</td><td class="en">Stock / inventory</td><td class="ar">المخزون</td></tr>
+                                <tr><td class="fr">Délai</td><td class="en">Lead time</td><td class="ar">مدة الانتظار</td></tr>
+                                <tr><td class="fr">Livraison</td><td class="en">Delivery</td><td class="ar">التوصيل</td></tr>
+                                <tr><td class="fr">Pose</td><td class="en">Installation</td><td class="ar">التركيب</td></tr>
+                                <tr><td class="fr">Installation</td><td class="en">Installation</td><td class="ar">تركيب</td></tr>
+                                <tr><td class="fr">Montage</td><td class="en">Assembly</td><td class="ar">تجميع</td></tr>
+                                <tr><td class="fr">Garantie</td><td class="en">Warranty</td><td class="ar">ضمان</td></tr>
+                                <tr><td class="fr">SAV</td><td class="en">After-sales service</td><td class="ar">خدمة ما بعد البيع</td></tr>
+                                <tr><td class="fr">Commande sur mesure</td><td class="en">Custom order</td><td class="ar">طلب حسب المقاس</td></tr>
+                                <tr><td class="fr">Sur mesure</td><td class="en">Custom-made</td><td class="ar">حسب الطلب</td></tr>
+                                <tr><td class="fr">Standard</td><td class="en">Standard</td><td class="ar">قياسي</td></tr>
+                                <tr><td class="fr">Quantité</td><td class="en">Quantity</td><td class="ar">الكمية</td></tr>
+                                <tr><td class="fr">Remise</td><td class="en">Discount</td><td class="ar">تخفيض</td></tr>
+                                <tr><td class="fr">Acompte</td><td class="en">Deposit</td><td class="ar">تسبيق</td></tr>
+                                <tr><td class="fr">Facture</td><td class="en">Invoice</td><td class="ar">فاتورة</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Category 8: Design Terms -->
+                <div class="glossary-category" data-cat="design">
+                    <h3 style="background:#fdecea;color:#c0392b;cursor:pointer;" onclick="toggleGlossaryCat('design')">📏 8. مصطلحات مهمة جدًا في الـDesign <span style="margin-right:auto;font-size:0.8rem;">▼</span></h3>
+                    <div class="table-wrap" id="gloss-design">
+                        <table class="glossary-table">
+                            <thead><tr><th>FR</th><th>EN</th><th>AR</th></tr></thead>
+                            <tbody>
+                                <tr><td class="fr">Plan</td><td class="en">Plan / drawing</td><td class="ar">مخطط</td></tr>
+                                <tr><td class="fr">Plan 2D</td><td class="en">2D plan</td><td class="ar">مخطط ثنائي الأبعاد</td></tr>
+                                <tr><td class="fr">Vue 3D</td><td class="en">3D view</td><td class="ar">عرض ثلاثي الأبعاد</td></tr>
+                                <tr><td class="fr">Rendu 3D</td><td class="en">3D render</td><td class="ar">إخراج ثلاثي الأبعاد</td></tr>
+                                <tr><td class="fr">Implantation</td><td class="en">Layout</td><td class="ar">توزيع</td></tr>
+                                <tr><td class="fr">Configuration</td><td class="en">Configuration</td><td class="ar">تهيئة</td></tr>
+                                <tr><td class="fr">Linéaire</td><td class="en">Linear layout</td><td class="ar">توزيع خطي</td></tr>
+                                <tr><td class="fr">En L</td><td class="en">L-shaped</td><td class="ar">شكل L</td></tr>
+                                <tr><td class="fr">En U</td><td class="en">U-shaped</td><td class="ar">شكل U</td></tr>
+                                <tr><td class="fr">Îlot</td><td class="en">Island</td><td class="ar">جزيرة</td></tr>
+                                <tr><td class="fr">Péninsule</td><td class="en">Peninsula</td><td class="ar">شبه جزيرة</td></tr>
+                                <tr><td class="fr">Hauteur</td><td class="en">Height</td><td class="ar">ارتفاع</td></tr>
+                                <tr><td class="fr">Ergonomie</td><td class="en">Ergonomics</td><td class="ar">بيئة العمل/الراحة</td></tr>
+                                <tr><td class="fr">Circulation</td><td class="en">Traffic flow</td><td class="ar">مسار الحركة</td></tr>
+                                <tr><td class="fr">Espace de travail</td><td class="en">Workspace</td><td class="ar">مساحة العمل</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Category 9: Utilities -->
+                <div class="glossary-category" data-cat="utilities">
+                    <h3 style="background:#eaf3fb;color:#2980b9;cursor:pointer;" onclick="toggleGlossaryCat('utilities')">⚡ 9. الكهرباء والسباكة — Utilities <span style="margin-right:auto;font-size:0.8rem;">▼</span></h3>
+                    <div class="table-wrap" id="gloss-utilities">
+                        <table class="glossary-table">
+                            <thead><tr><th>FR</th><th>EN</th><th>AR</th></tr></thead>
+                            <tbody>
+                                <tr><td class="fr">Prise électrique</td><td class="en">Electrical outlet</td><td class="ar">مأخذ كهربائي</td></tr>
+                                <tr><td class="fr">Interrupteur</td><td class="en">Switch</td><td class="ar">مفتاح</td></tr>
+                                <tr><td class="fr">Arrivée électrique</td><td class="en">Electrical supply</td><td class="ar">نقطة الكهرباء</td></tr>
+                                <tr><td class="fr">Arrivée d'eau</td><td class="en">Water inlet</td><td class="ar">مدخل الماء</td></tr>
+                                <tr><td class="fr">Évacuation</td><td class="en">Drain / waste pipe</td><td class="ar">تصريف</td></tr>
+                                <tr><td class="fr">Évacuation d'eau</td><td class="en">Water drainage</td><td class="ar">تصريف المياه</td></tr>
+                                <tr><td class="fr">Arrivée de gaz</td><td class="en">Gas inlet</td><td class="ar">مدخل الغاز</td></tr>
+                                <tr><td class="fr">Tuyau</td><td class="en">Pipe</td><td class="ar">أنبوب</td></tr>
+                                <tr><td class="fr">Raccord</td><td class="en">Fitting / connector</td><td class="ar">وصلة</td></tr>
+                                <tr><td class="fr">Flexible</td><td class="en">Flexible hose</td><td class="ar">خرطوم مرن</td></tr>
+                                <tr><td class="fr">Diamètre</td><td class="en">Diameter</td><td class="ar">القطر</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Category 10: Installation -->
+                <div class="glossary-category" data-cat="installation">
+                    <h3 style="background:#f4ecf7;color:#8e44ad;cursor:pointer;" onclick="toggleGlossaryCat('installation')">🧱 10. التركيب والأشغال <span style="margin-right:auto;font-size:0.8rem;">▼</span></h3>
+                    <div class="table-wrap" id="gloss-installation">
+                        <table class="glossary-table">
+                            <thead><tr><th>FR</th><th>EN</th><th>AR</th></tr></thead>
+                            <tbody>
+                                <tr><td class="fr">Pose</td><td class="en">Installation</td><td class="ar">تركيب</td></tr>
+                                <tr><td class="fr">Montage</td><td class="en">Assembly</td><td class="ar">تجميع</td></tr>
+                                <tr><td class="fr">Dépose</td><td class="en">Removal</td><td class="ar">فك</td></tr>
+                                <tr><td class="fr">Démontage</td><td class="en">Disassembly</td><td class="ar">تفكيك</td></tr>
+                                <tr><td class="fr">Perçage</td><td class="en">Drilling</td><td class="ar">تخريم</td></tr>
+                                <tr><td class="fr">Découpe</td><td class="en">Cutting</td><td class="ar">قص</td></tr>
+                                <tr><td class="fr">Fixation</td><td class="en">Fixing</td><td class="ar">تثبيت</td></tr>
+                                <tr><td class="fr">Vis</td><td class="en">Screw</td><td class="ar">برغي</td></tr>
+                                <tr><td class="fr">Cheville</td><td class="en">Wall plug / anchor</td><td class="ar">فيشر</td></tr>
+                                <tr><td class="fr">Rail</td><td class="en">Rail / track</td><td class="ar">سكة</td></tr>
+                                <tr><td class="fr">Support</td><td class="en">Bracket / support</td><td class="ar">دعامة</td></tr>
+                                <tr><td class="fr">Ajustement</td><td class="en">Adjustment</td><td class="ar">ضبط</td></tr>
+                                <tr><td class="fr">Réglage</td><td class="en">Adjustment</td><td class="ar">تعديل</td></tr>
+                                <tr><td class="fr">Alignement</td><td class="en">Alignment</td><td class="ar">محاذاة</td></tr>
+                                <tr><td class="fr">Nivellement</td><td class="en">Leveling</td><td class="ar">تسوية</td></tr>
+                                <tr><td class="fr">Finition</td><td class="en">Finishing</td><td class="ar">تشطيب</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Category 11: Customer Phrases -->
+                <div class="glossary-category" data-cat="phrases">
+                    <h3 style="background:#e8f8f0;color:#27ae60;cursor:pointer;" onclick="toggleGlossaryCat('phrases')">🗣️ 11. كلمات تسمعها كثيرًا من الزبون <span style="margin-right:auto;font-size:0.8rem;">▼</span></h3>
+                    <div class="table-wrap" id="gloss-phrases">
+                        <table class="glossary-table">
+                            <thead><tr><th>FR</th><th>EN</th><th>AR</th></tr></thead>
+                            <tbody>
+                                <tr><td class="fr">Je veux...</td><td class="en">I want...</td><td class="ar">أريد...</td></tr>
+                                <tr><td class="fr">Combien ça coûte ?</td><td class="en">How much does it cost?</td><td class="ar">كم السعر؟</td></tr>
+                                <tr><td class="fr">C'est sur mesure ?</td><td class="en">Is it custom-made?</td><td class="ar">هل هو حسب المقاس؟</td></tr>
+                                <tr><td class="fr">Vous faites la pose ?</td><td class="en">Do you install?</td><td class="ar">هل تقومون بالتركيب؟</td></tr>
+                                <tr><td class="fr">C'est disponible ?</td><td class="en">Is it available?</td><td class="ar">هل هو متوفر؟</td></tr>
+                                <tr><td class="fr">Quel est le délai ?</td><td class="en">What is the lead time?</td><td class="ar">ما مدة الانتظار؟</td></tr>
+                                <tr><td class="fr">Il y a une garantie ?</td><td class="en">Is there a warranty?</td><td class="ar">هل يوجد ضمان؟</td></tr>
+                                <tr><td class="fr">Vous avez d'autres modèles ?</td><td class="en">Do you have other models?</td><td class="ar">هل لديكم نماذج أخرى؟</td></tr>
+                                <tr><td class="fr">Je peux choisir la couleur ?</td><td class="en">Can I choose the color?</td><td class="ar">هل يمكنني اختيار اللون؟</td></tr>
+                                <tr><td class="fr">Je peux changer les dimensions ?</td><td class="en">Can I change the dimensions?</td><td class="ar">هل يمكنني تغيير الأبعاد؟</td></tr>
+                                <tr><td class="fr">C'est quoi comme matériau ?</td><td class="en">What material is it?</td><td class="ar">ما نوع المادة؟</td></tr>
+                                <tr><td class="fr">C'est solide ?</td><td class="en">Is it sturdy?</td><td class="ar">هل هو متين؟</td></tr>
+                                <tr><td class="fr">Ça résiste à l'eau ?</td><td class="en">Is it water-resistant?</td><td class="ar">هل يقاوم الماء؟</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Priority Words -->
+                <div class="top10-box" style="border-right-color:var(--gold);margin-top:24px;">
+                    <h4>⭐ أهم الكلمات التي أنصحك تحفظها أولاً</h4>
+                    <p style="font-size:0.9rem;margin-bottom:8px;">لا تحاول حفظ الـ100+ كلمة دفعة واحدة. ابدأ بهذه الـ30:</p>
+                    <p style="font-size:0.88rem;line-height:2;font-weight:600;">
+                        Porte — Vantail — Bloc-porte — Huisserie — Cadre — Chambranle — Seuil — Poignée — Serrure — Cylindre — Charnière — Paumelle — Gâche — Dimensions — Largeur — Hauteur — Épaisseur — Mesure — Ouverture — Sur mesure — Modèle — Référence — Devis — Budget — Commande — Délai — Livraison — Pose — Garantie — SAV.
+                    </p>
+                    <p style="font-size:0.88rem;line-height:2;font-weight:600;margin-top:8px;">
+                        <strong>وبالنسبة للكوزينة:</strong> Caisson — Façade — Meuble bas — Meuble haut — Colonne — Tiroir — Étagère — Joue — Fileur — Plinthe — Plan de travail — Crédence — Chant — Évier — Hotte — Plaque — Four — Coulisse — Charnière — Amortisseur.
+                    </p>
+                    <p style="font-size:0.85rem;margin-top:10px;color:var(--text-light);">إذا حفظت هذه المجموعة وفهمت الفرق بينها، راح تفهم نسبة كبيرة جدًا من الكلام اللي يدور بين الزبون، البائع، والـposeur.</p>
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        // ============ Tab Navigation ============
+        const tabBtns = document.querySelectorAll('.tab-btn');
+        const tabContents = {
+            'kitchen-customer': document.getElementById('tab-kitchen-customer'),
+            'kitchen-seller': document.getElementById('tab-kitchen-seller'),
+            'door': document.getElementById('tab-door'),
+            'glossary': document.getElementById('tab-glossary')
+        };
+
+        tabBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                const tabId = btn.getAttribute('data-tab');
+                tabBtns.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                Object.keys(tabContents).forEach(key => {
+                    tabContents[key].classList.toggle('active', key === tabId);
+                });
+            });
+        });
+
+        // ============ Card Toggle ============
+        function toggleCard(id) {
+            const card = document.getElementById(id);
+            if (card) {
+                card.classList.toggle('collapsed');
+            }
+        }
+
+        // ============ Glossary Category Toggle ============
+        function toggleGlossaryCat(cat) {
+            const el = document.getElementById('gloss-' + cat);
+            if (el) {
+                if (el.style.display === 'none') {
+                    el.style.display = '';
+                } else {
+                    el.style.display = 'none';
+                }
+            }
+        }
+
+        // ============ Glossary Search ============
+        function filterGlossary() {
+            const query = document.getElementById('glossarySearch').value.toLowerCase().trim();
+            const tables = document.querySelectorAll('#glossaryContent .glossary-table tbody tr');
+            const categories = document.querySelectorAll('.glossary-category');
+
+            tables.forEach(row => {
+                const text = row.textContent.toLowerCase();
+                if (query === '' || text.includes(query)) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+
+            // Show/hide categories based on whether they have visible rows
+            categories.forEach(cat => {
+                const rows = cat.querySelectorAll('tbody tr');
+                let visibleCount = 0;
+                rows.forEach(r => {
+                    if (r.style.display !== 'none') visibleCount++;
+                });
+                const tableWrap = cat.querySelector('.table-wrap');
+                const header = cat.querySelector('h3');
+                if (visibleCount === 0 && query !== '') {
+                    cat.style.display = 'none';
+                } else {
+                    cat.style.display = '';
+                    if (query !== '') {
+                        if (tableWrap) tableWrap.style.display = '';
+                    }
+                }
+            });
+        }
+
+        function resetGlossarySearch() {
+            document.getElementById('glossarySearch').value = '';
+            filterGlossary();
+            // Reset all category displays
+            document.querySelectorAll('.glossary-category').forEach(cat => {
+                cat.style.display = '';
+                const tableWrap = cat.querySelector('.table-wrap');
+                if (tableWrap) tableWrap.style.display = '';
+            });
+        }
+
+        // ============ Copy All Glossary ============
+        function copyAllGlossary() {
+            const allRows = document.querySelectorAll('#glossaryContent .glossary-table tbody tr');
+            let text = 'المصطلحات الشاملة — FR / EN / AR\n\n';
+            const categories = document.querySelectorAll('.glossary-category');
+            categories.forEach(cat => {
+                const title = cat.querySelector('h3')?.textContent?.trim() || '';
+                text += '--- ' + title + ' ---\n';
+                const rows = cat.querySelectorAll('tbody tr');
+                rows.forEach(row => {
+                    const cells = row.querySelectorAll('td');
+                    if (cells.length >= 3) {
+                        text += cells[0].textContent.trim() + ' | ' + cells[1].textContent.trim() +
+                            ' | ' + cells[2].textContent.trim() + '\n';
+                    }
+                });
+                text += '\n';
+            });
+            navigator.clipboard.writeText(text).then(() => {
+                alert('✅ تم نسخ جميع المصطلحات إلى الحافظة!');
+            }).catch(() => {
+                alert('⚠️ تعذر النسخ التلقائي. يرجى النسخ يدويًا.');
+            });
+        }
+
+        // ============ Initialize cards (all expanded by default) ============
+        // All cards start expanded. No action needed.
+
+        // ============ Smooth toggle for card bodies ============
+        // Add dynamic max-height for smoother animation
+        document.querySelectorAll('.card-body').forEach(body => {
+            const updateMaxHeight = () => {
+                if (body.parentElement.classList.contains('collapsed')) {
+                    body.style.maxHeight = '0';
+                } else {
+                    body.style.maxHeight = body.scrollHeight + 'px';
+                }
+            };
+            // Initial
+            updateMaxHeight();
+            // On click of header
+            const header = body.parentElement.querySelector('.card-header');
+            if (header) {
+                header.addEventListener('click', () => {
+                    setTimeout(updateMaxHeight, 50);
+                });
+            }
+            // On window resize
+            window.addEventListener('resize', updateMaxHeight);
+        });
+
+        console.log('🚪 دليل مبيعات MDM — تم التحميل بنجاح');
+        console.log('📋 استخدم التبويبات للتنقل بين الأقسام');
+        console.log('🔍 استخدم البحث في قسم المصطلحات للعثور على أي كلمة');
+    </script>
+
+</body>
+</html>

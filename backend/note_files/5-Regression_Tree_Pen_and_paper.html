@@ -1,0 +1,1900 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>بناء Classification Decision Tree بالقلم والورقة</title>
+  <style>
+    :root {
+      --bg: #f4f7fb;
+      --card: #ffffff;
+      --text: #18212f;
+      --muted: #64748b;
+      --border: #dce4ef;
+      --primary: #2563eb;
+      --primary-dark: #1d4ed8;
+      --secondary: #7c3aed;
+      --success: #15803d;
+      --success-bg: #ecfdf3;
+      --danger: #b91c1c;
+      --danger-bg: #fef2f2;
+      --warning: #a16207;
+      --warning-bg: #fefce8;
+      --info-bg: #eff6ff;
+      --shadow: 0 14px 40px rgba(15, 23, 42, 0.08);
+      --radius: 18px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      font-family: "Segoe UI", Tahoma, Arial, sans-serif;
+      background:
+        radial-gradient(circle at top right, rgba(37, 99, 235, 0.07), transparent 28%),
+        radial-gradient(circle at bottom left, rgba(124, 58, 237, 0.06), transparent 28%),
+        var(--bg);
+      color: var(--text);
+      line-height: 1.8;
+    }
+
+    .container {
+      width: min(1180px, 92%);
+      margin: auto;
+    }
+
+    header {
+      padding: 48px 0 28px;
+    }
+
+    .hero {
+      background: linear-gradient(135deg, #0f172a, #1e293b 55%, #334155);
+      color: white;
+      border-radius: 28px;
+      padding: 36px;
+      box-shadow: var(--shadow);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero::before,
+    .hero::after {
+      content: "";
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(4px);
+      opacity: 0.18;
+    }
+
+    .hero::before {
+      width: 240px;
+      height: 240px;
+      background: #60a5fa;
+      left: -70px;
+      top: -80px;
+    }
+
+    .hero::after {
+      width: 260px;
+      height: 260px;
+      background: #a78bfa;
+      right: -90px;
+      bottom: -110px;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      padding: 7px 12px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.12);
+      font-size: 0.85rem;
+      margin-bottom: 14px;
+    }
+
+    h1, h2, h3, h4 {
+      line-height: 1.35;
+      margin-top: 0;
+    }
+
+    .hero h1 {
+      font-size: clamp(2rem, 4vw, 3.3rem);
+      margin-bottom: 12px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .hero p {
+      max-width: 900px;
+      color: #dbeafe;
+      position: relative;
+      z-index: 1;
+    }
+
+    .hero-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 22px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .btn {
+      border: 0;
+      border-radius: 12px;
+      padding: 11px 18px;
+      cursor: pointer;
+      font-weight: 700;
+      transition: 0.2s ease;
+      font-size: 0.96rem;
+    }
+
+    .btn:hover {
+      transform: translateY(-1px);
+    }
+
+    .btn-primary {
+      background: #ffffff;
+      color: #0f172a;
+    }
+
+    .btn-dark {
+      background: #1e293b;
+      color: white;
+      border: 1px solid rgba(255,255,255,0.18);
+    }
+
+    .btn-blue {
+      background: var(--primary);
+      color: white;
+    }
+
+    .btn-blue:hover {
+      background: var(--primary-dark);
+    }
+
+    .section {
+      margin: 28px 0;
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 24px;
+    }
+
+    .grid {
+      display: grid;
+      gap: 18px;
+    }
+
+    .grid-2 {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .grid-3 {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    @media (max-width: 850px) {
+      .grid-2,
+      .grid-3 {
+        grid-template-columns: 1fr;
+      }
+      .hero {
+        padding: 26px;
+      }
+    }
+
+    .notice {
+      border-right: 5px solid var(--warning);
+      background: var(--warning-bg);
+      padding: 18px;
+      border-radius: 14px;
+    }
+
+    .notice strong {
+      color: var(--warning);
+    }
+
+    .definition {
+      border-right: 5px solid var(--primary);
+      background: var(--info-bg);
+      padding: 18px;
+      border-radius: 14px;
+    }
+
+    .concept-card {
+      background: #fbfdff;
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 18px;
+    }
+
+    .concept-icon {
+      font-size: 1.7rem;
+      margin-bottom: 8px;
+    }
+
+    .formula {
+      background: #0f172a;
+      color: #e2e8f0;
+      padding: 18px;
+      border-radius: 14px;
+      overflow-x: auto;
+      font-family: Consolas, "Courier New", monospace;
+      direction: ltr;
+      text-align: left;
+      margin: 14px 0;
+    }
+
+    .mono {
+      font-family: Consolas, "Courier New", monospace;
+      direction: ltr;
+      display: inline-block;
+    }
+
+    details {
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      background: #fff;
+      margin-bottom: 12px;
+      overflow: hidden;
+    }
+
+    details summary {
+      cursor: pointer;
+      padding: 16px 18px;
+      font-weight: 800;
+      list-style: none;
+    }
+
+    details summary::-webkit-details-marker {
+      display: none;
+    }
+
+    details summary::before {
+      content: "＋";
+      margin-left: 8px;
+      color: var(--primary);
+    }
+
+    details[open] summary::before {
+      content: "－";
+    }
+
+    .details-content {
+      padding: 0 18px 18px;
+      border-top: 1px solid var(--border);
+    }
+
+    .table-wrap {
+      overflow-x: auto;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 720px;
+    }
+
+    th,
+    td {
+      padding: 11px 12px;
+      border-bottom: 1px solid var(--border);
+      text-align: center;
+      white-space: nowrap;
+    }
+
+    th {
+      background: #f8fafc;
+      font-weight: 800;
+    }
+
+    tr:last-child td {
+      border-bottom: 0;
+    }
+
+    .step {
+      position: relative;
+      padding-right: 50px;
+    }
+
+    .step-number {
+      position: absolute;
+      right: 0;
+      top: 2px;
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      background: var(--primary);
+      color: white;
+      font-weight: 800;
+    }
+
+    .result-box {
+      margin-top: 14px;
+      padding: 14px;
+      border-radius: 12px;
+      background: #f8fafc;
+      border: 1px solid var(--border);
+    }
+
+    .good {
+      color: var(--success);
+      font-weight: 700;
+    }
+
+    .bad {
+      color: var(--danger);
+      font-weight: 700;
+    }
+
+    .tag {
+      display: inline-flex;
+      align-items: center;
+      padding: 5px 9px;
+      border-radius: 999px;
+      font-size: 0.78rem;
+      font-weight: 800;
+      margin: 2px;
+      background: #eef2ff;
+      color: #4338ca;
+    }
+
+    .tag.blue {
+      background: #eff6ff;
+      color: #1d4ed8;
+    }
+
+    .tag.green {
+      background: #ecfdf5;
+      color: #047857;
+    }
+
+    .tag.orange {
+      background: #fff7ed;
+      color: #c2410c;
+    }
+
+    .tag.red {
+      background: #fef2f2;
+      color: #b91c1c;
+    }
+
+    .tree-wrap {
+      background: #f8fafc;
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 18px;
+      overflow-x: auto;
+    }
+
+    .tree {
+      width: 900px;
+      min-height: 520px;
+      margin: auto;
+      position: relative;
+      direction: ltr;
+    }
+
+    .node {
+      position: absolute;
+      min-width: 140px;
+      padding: 11px 14px;
+      border-radius: 14px;
+      text-align: center;
+      border: 2px solid #cbd5e1;
+      background: white;
+      box-shadow: 0 7px 18px rgba(15,23,42,0.08);
+      font-weight: 800;
+      direction: rtl;
+    }
+
+    .node.root {
+      top: 18px;
+      left: 380px;
+      border-color: #2563eb;
+    }
+
+    .node.mid1 {
+      top: 170px;
+      left: 80px;
+    }
+
+    .node.mid2 {
+      top: 170px;
+      left: 380px;
+    }
+
+    .node.mid3 {
+      top: 170px;
+      left: 680px;
+    }
+
+    .node.leaf {
+      background: #ecfdf5;
+      border-color: #10b981;
+    }
+
+    .node.leaf.no {
+      background: #fef2f2;
+      border-color: #ef4444;
+    }
+
+    .node.l1 { top: 350px; left: 10px; }
+    .node.l2 { top: 350px; left: 150px; }
+    .node.l3 { top: 350px; left: 310px; }
+    .node.l4 { top: 350px; left: 470px; }
+    .node.l5 { top: 350px; left: 630px; }
+    .node.l6 { top: 350px; left: 790px; }
+
+    .line {
+      position: absolute;
+      height: 2px;
+      background: #94a3b8;
+      transform-origin: left center;
+    }
+
+    .l-a { width: 350px; top: 108px; left: 442px; transform: rotate(145deg); }
+    .l-b { width: 130px; top: 95px; left: 440px; transform: rotate(90deg); }
+    .l-c { width: 350px; top: 108px; left: 442px; transform: rotate(35deg); }
+    .l-d { width: 120px; top: 278px; left: 150px; transform: rotate(38deg); }
+    .l-e { width: 120px; top: 278px; left: 150px; transform: rotate(142deg); }
+    .l-f { width: 110px; top: 278px; left: 452px; transform: rotate(62deg); }
+    .l-g { width: 110px; top: 278px; left: 452px; transform: rotate(118deg); }
+
+    .quiz-header {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 18px;
+    }
+
+    .controls {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    select,
+    input[type="text"],
+    textarea {
+      width: 100%;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 11px 12px;
+      background: white;
+      font: inherit;
+    }
+
+    .filter {
+      width: auto;
+      min-width: 180px;
+    }
+
+    .quiz-card {
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 20px;
+      background: #fff;
+    }
+
+    .question-top {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-bottom: 10px;
+    }
+
+    .question-title {
+      font-size: 1.15rem;
+      font-weight: 800;
+      margin-bottom: 16px;
+    }
+
+    .options {
+      display: grid;
+      gap: 10px;
+    }
+
+    .option {
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 12px;
+      cursor: pointer;
+      display: flex;
+      gap: 10px;
+      align-items: flex-start;
+      transition: 0.18s ease;
+      background: #fff;
+    }
+
+    .option:hover {
+      border-color: #93c5fd;
+      background: #f8fbff;
+    }
+
+    .option input {
+      margin-top: 5px;
+    }
+
+    .feedback {
+      margin-top: 16px;
+      border-radius: 12px;
+      padding: 14px;
+      display: none;
+    }
+
+    .feedback.show {
+      display: block;
+    }
+
+    .feedback.correct {
+      background: var(--success-bg);
+      border: 1px solid #bbf7d0;
+      color: #166534;
+    }
+
+    .feedback.incorrect {
+      background: var(--danger-bg);
+      border: 1px solid #fecaca;
+      color: #991b1b;
+    }
+
+    .score-panel {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 10px;
+      margin-top: 18px;
+    }
+
+    @media (max-width: 700px) {
+      .score-panel {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    .score-box {
+      border: 1px solid var(--border);
+      background: #f8fafc;
+      border-radius: 14px;
+      padding: 14px;
+      text-align: center;
+    }
+
+    .score-value {
+      font-size: 1.6rem;
+      font-weight: 900;
+    }
+
+    .open-answer {
+      min-height: 120px;
+      resize: vertical;
+    }
+
+    .progress-bar {
+      height: 12px;
+      border-radius: 999px;
+      background: #e2e8f0;
+      overflow: hidden;
+      margin-top: 8px;
+    }
+
+    .progress {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, #2563eb, #7c3aed);
+      transition: width 0.25s ease;
+    }
+
+    .mini-list {
+      padding-right: 20px;
+    }
+
+    .mini-list li {
+      margin-bottom: 7px;
+    }
+
+    .footer {
+      text-align: center;
+      padding: 35px 0 50px;
+      color: var(--muted);
+    }
+
+    .kbd {
+      background: #0f172a;
+      color: white;
+      padding: 2px 6px;
+      border-radius: 6px;
+      font-family: Consolas, monospace;
+      font-size: 0.85rem;
+      direction: ltr;
+      display: inline-block;
+    }
+
+    .highlight {
+      background: #fff7ed;
+      border-radius: 6px;
+      padding: 1px 5px;
+    }
+
+    .math-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0,1fr));
+      gap: 12px;
+    }
+
+    @media (max-width: 800px) {
+      .math-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <header class="container">
+    <div class="hero">
+      <span class="eyebrow">تعلم ML من الداخل — بالقلم والورقة</span>
+      <h1>بناء Classification Decision Tree يدويًا</h1>
+      <p>
+        سنبني شجرة تصنيف من الصفر باستخدام مثال صغير من العالم الحقيقي،
+        ثم نحسب <span class="kbd">Gini Impurity</span> يدويًا، ونختار أفضل
+        <span class="kbd">Split</span>، ونكرر العملية حتى تصبح لدينا
+        <span class="kbd">Leaves</span> قادرة على اتخاذ القرار.
+      </p>
+      <div class="hero-actions">
+        <button class="btn btn-primary" onclick="scrollToId('roadmap')">ابدأ الدرس</button>
+        <button class="btn btn-dark" onclick="scrollToId('quiz')">اذهب إلى Quiz</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="container">
+
+    <section class="section">
+      <div class="notice">
+        <strong>ملاحظة مهمة:</strong>
+        المصطلح الصحيح لهذا الدرس هو <b>Classification Decision Tree</b> لأن
+        الهدف هنا فئات مثل <b>Yes / No</b>.
+        أما <b>Regression Tree</b> فتُستخدم عندما يكون الهدف رقمًا مستمرًا مثل
+        <b>السعر</b> أو <b>درجة الحرارة</b>.
+      </div>
+    </section>
+
+    <section class="section grid grid-3">
+      <div class="concept-card">
+        <div class="concept-icon">🎯</div>
+        <h3>الهدف</h3>
+        <p>فهم كيف تنتقل البيانات من <b>Root</b> إلى <b>Leaf</b> وكيف تُختار الأسئلة التي تقسّم البيانات.</p>
+      </div>
+
+      <div class="concept-card">
+        <div class="concept-icon">🧠</div>
+        <h3>الفكرة الأساسية</h3>
+        <p>كل عقدة تطرح سؤالًا عن Feature. الإجابة تحدد المسار التالي داخل الشجرة.</p>
+      </div>
+
+      <div class="concept-card">
+        <div class="concept-icon">✍️</div>
+        <h3>طريقة التعلم</h3>
+        <p>لن نستخدم <b>scikit-learn</b> لبناء الشجرة في البداية. سننفذ المنطق يدويًا.</p>
+      </div>
+    </section>
+
+    <section class="section" id="roadmap">
+      <div class="card">
+        <h2>خريطة الدرس</h2>
+        <ol class="mini-list">
+          <li>نفهم أجزاء <b>Decision Tree</b>.</li>
+          <li>نفهم معنى <b>Impurity</b>.</li>
+          <li>نحسب <b>Gini Impurity</b>.</li>
+          <li>نجرّب عدة <b>Splits</b>.</li>
+          <li>نختار أفضل <b>Split</b>.</li>
+          <li>نكرر العملية داخل الفروع الجديدة.</li>
+          <li>نتوقف عندما يصبح الفرع مناسبًا كـ <b>Leaf</b>.</li>
+          <li>نحوّل الشجرة إلى قواعد قرار يستطيع الإنسان تتبعها.</li>
+        </ol>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2>1) ما الذي نحاول أن نبنيه؟</h2>
+
+      <div class="definition">
+        <b>Classification Decision Tree</b> هي Model تتعلم سلسلة من الأسئلة،
+        بحيث تقسم البيانات تدريجيًا إلى مجموعات أكثر "نقاءً"، إلى أن نصل إلى
+        <b>Leaf</b> تُعطي Class Prediction.
+      </div>
+
+      <div class="grid grid-3" style="margin-top:18px;">
+        <div class="concept-card">
+          <h3>Root</h3>
+          <p>أول سؤال في الشجرة. يجب أن يكون Split مفيدًا في فصل Classes.</p>
+        </div>
+        <div class="concept-card">
+          <h3>Internal Node</h3>
+          <p>سؤال جديد يظهر بعد تقسيم البيانات.</p>
+        </div>
+        <div class="concept-card">
+          <h3>Leaf</h3>
+          <p>نقطة النهاية التي تنتج Prediction مثل <b>Yes</b> أو <b>No</b>.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2>2) المثال الواقعي</h2>
+
+      <div class="card">
+        <h3>السؤال الذي تريد الشجرة الإجابة عنه</h3>
+        <p>
+          لدينا بيانات عن الطقس، ونريد التنبؤ:
+          <strong>هل سنلعب Tennis أم لا؟</strong>
+        </p>
+
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Outlook</th>
+                <th>Humidity</th>
+                <th>Windy</th>
+                <th>Play</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td>1</td><td>Sunny</td><td>High</td><td>Weak</td><td>No</td></tr>
+              <tr><td>2</td><td>Sunny</td><td>High</td><td>Strong</td><td>No</td></tr>
+              <tr><td>3</td><td>Overcast</td><td>High</td><td>Weak</td><td>Yes</td></tr>
+              <tr><td>4</td><td>Rain</td><td>Normal</td><td>Weak</td><td>Yes</td></tr>
+              <tr><td>5</td><td>Rain</td><td>Normal</td><td>Strong</td><td>No</td></tr>
+              <tr><td>6</td><td>Overcast</td><td>Normal</td><td>Strong</td><td>Yes</td></tr>
+              <tr><td>7</td><td>Sunny</td><td>Normal</td><td>Weak</td><td>Yes</td></tr>
+              <tr><td>8</td><td>Rain</td><td>High</td><td>Weak</td><td>No</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <p style="margin-top:16px;">
+          <span class="tag blue">Features</span>
+          <b>Outlook</b>, <b>Humidity</b>, <b>Windy</b>
+          &nbsp;&nbsp;
+          <span class="tag green">Target</span>
+          <b>Play</b>
+        </p>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2>3) قبل الحساب: ما معنى "نقاء" المجموعة؟</h2>
+
+      <div class="grid grid-2">
+        <div class="card">
+          <h3>مجموعة نقية</h3>
+          <p>
+            إذا كانت كل العناصر في المجموعة تنتمي إلى نفس Class، فالمجموعة
+            نقية جدًا.
+          </p>
+
+          <div class="result-box">
+            <b>Yes, Yes, Yes, Yes</b>
+            <br />
+            <span class="good">Gini = 0</span>
+          </div>
+        </div>
+
+        <div class="card">
+          <h3>مجموعة مختلطة</h3>
+          <p>
+            إذا كانت Classes مختلطة، نحتاج إلى Split أفضل لفصلها.
+          </p>
+
+          <div class="result-box">
+            <b>Yes, Yes, No, No</b>
+            <br />
+            <span class="bad">Gini = 0.5</span>
+          </div>
+        </div>
+      </div>
+
+      <details>
+        <summary>لماذا نحتاج Metric مثل Gini؟</summary>
+        <div class="details-content">
+          <p>
+            لأن الشجرة لا تستطيع أن "تشعر" أن Split جيد أو سيئ.
+            نحتاج رقمًا نقارن به جودة Splits المختلفة.
+          </p>
+          <p>
+            <b>Gini Impurity</b> يعطي رقمًا يخبرنا بمدى اختلاط الـ Classes داخل المجموعة.
+          </p>
+        </div>
+      </details>
+    </section>
+
+    <section class="section">
+      <h2>4) نحسب Gini Impurity بالقلم والورقة</h2>
+
+      <div class="formula">
+        Gini = 1 - Σ(pᵢ²)
+      </div>
+
+      <p>
+        حيث <span class="mono">pᵢ</span> هي نسبة كل Class داخل المجموعة.
+      </p>
+
+      <div class="math-grid">
+        <div class="card">
+          <h4>مثال 1</h4>
+          <p>المجموعة:</p>
+          <p class="mono">Yes, Yes, Yes</p>
+          <div class="formula">p(Yes)=1</div>
+          <div class="formula">Gini = 1 - 1² = 0</div>
+        </div>
+
+        <div class="card">
+          <h4>مثال 2</h4>
+          <p>المجموعة:</p>
+          <p class="mono">Yes, No</p>
+          <div class="formula">p(Yes)=0.5</div>
+          <div class="formula">p(No)=0.5</div>
+          <div class="formula">Gini = 1 - (0.5²+0.5²)=0.5</div>
+        </div>
+
+        <div class="card">
+          <h4>المعنى</h4>
+          <p>
+            كلما اقترب <b>Gini</b> من <b>0</b> أصبحت المجموعة أكثر نقاءً.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2>5) نحسب Gini للـ Root</h2>
+
+      <div class="card">
+        <p>
+          في البيانات كلها لدينا:
+          <b>4 Yes</b> و <b>4 No</b>.
+        </p>
+
+        <div class="formula">
+          p(Yes)=4/8=0.5<br>
+          p(No)=4/8=0.5<br><br>
+          Gini(root)=1-(0.5²+0.5²)=0.5
+        </div>
+
+        <div class="result-box">
+          <b>إذن:</b>
+          <span class="highlight">المجموعة الأصلية مختلطة بالكامل تقريبًا.</span>
+          نحتاج الآن إلى أفضل Split.
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2>6) نجرب Feature الأولى: Outlook</h2>
+
+      <details open>
+        <summary>Split: Outlook</summary>
+        <div class="details-content">
+
+          <h4>Sunny</h4>
+          <p><b>No, No, Yes</b> → 1 Yes, 2 No</p>
+          <div class="formula">
+            Gini(Sunny)=1-[(1/3)²+(2/3)²]<br>
+            = 1-(1/9+4/9)<br>
+            = 4/9 ≈ 0.444
+          </div>
+
+          <h4>Overcast</h4>
+          <p><b>Yes, Yes</b> → Pure</p>
+          <div class="formula">Gini(Overcast)=0</div>
+
+          <h4>Rain</h4>
+          <p><b>Yes, No, No</b> → 1 Yes, 2 No</p>
+          <div class="formula">Gini(Rain)=4/9 ≈ 0.444</div>
+
+          <h4>الـ Weighted Gini</h4>
+          <div class="formula">
+            Weighted Gini =
+            (3/8 × 0.444) +
+            (2/8 × 0) +
+            (3/8 × 0.444)<br><br>
+            ≈ 0.333
+          </div>
+
+          <div class="result-box">
+            <b>Gain تقريبي:</b>
+            <span class="good">0.5 - 0.333 = 0.167</span>
+          </div>
+        </div>
+      </details>
+    </section>
+
+    <section class="section">
+      <h2>7) نقارن ذلك مع Features الأخرى</h2>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Feature</th>
+              <th>Weighted Gini</th>
+              <th>تحسن بالنسبة لـ Root</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Outlook</td>
+              <td>≈ 0.333</td>
+              <td class="good">≈ 0.167</td>
+            </tr>
+            <tr>
+              <td>Humidity</td>
+              <td>≈ 0.375</td>
+              <td>≈ 0.125</td>
+            </tr>
+            <tr>
+              <td>Windy</td>
+              <td>≈ 0.467</td>
+              <td>≈ 0.033</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="definition" style="margin-top:16px;">
+        لذلك نختار <b>Outlook</b> كأول Split لأن له أقل
+        <b>Weighted Gini</b> وأكبر تحسن في نقاء البيانات.
+      </div>
+    </section>
+
+    <section class="section">
+      <h2>8) الآن تبدأ الشجرة الحقيقية</h2>
+
+      <div class="tree-wrap">
+        <div class="tree">
+
+          <div class="node root">
+            Outlook?
+          </div>
+
+          <div class="node mid1">
+            Sunny
+          </div>
+
+          <div class="node mid2">
+            Overcast
+          </div>
+
+          <div class="node mid3">
+            Rain
+          </div>
+
+          <div class="node leaf no l1">
+            Humidity = High<br><small>No</small>
+          </div>
+
+          <div class="node leaf l2">
+            Humidity = Normal<br><small>Yes</small>
+          </div>
+
+          <div class="node leaf l3">
+            Yes<br><small>Pure</small>
+          </div>
+
+          <div class="node leaf l4">
+            Windy = Weak<br><small>مختلط</small>
+          </div>
+
+          <div class="node leaf no l5">
+            Windy = Strong<br><small>No</small>
+          </div>
+
+          <div class="node leaf no l6">
+            بعد Split إضافي<br><small>حسب Humidity</small>
+          </div>
+
+          <div class="line l-a"></div>
+          <div class="line l-b"></div>
+          <div class="line l-c"></div>
+          <div class="line l-d"></div>
+          <div class="line l-e"></div>
+          <div class="line l-f"></div>
+          <div class="line l-g"></div>
+        </div>
+      </div>
+
+      <div class="grid grid-2" style="margin-top:18px;">
+        <div class="card">
+          <h3>فرع Sunny</h3>
+          <p>
+            لدينا:
+            <span class="mono">No, No, Yes</span>
+          </p>
+          <p>
+            Feature المفيدة هنا هي <b>Humidity</b>:
+          </p>
+          <ul class="mini-list">
+            <li><b>High</b> → No, No → Pure</li>
+            <li><b>Normal</b> → Yes → Pure</li>
+          </ul>
+        </div>
+
+        <div class="card">
+          <h3>فرع Rain</h3>
+          <p>
+            لدينا:
+            <span class="mono">Yes, No, No</span>
+          </p>
+          <p>
+            نختبر <b>Windy</b> أولًا، ثم نواصل التقسيم إذا بقيت المجموعة مختلطة.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2>9) لماذا لا نتوقف عند أول Split؟</h2>
+
+      <details>
+        <summary>لأن كل فرع أصبح Dataset صغيرة جديدة</summary>
+        <div class="details-content">
+          <p>
+            هذه نقطة مهمة جدًا لفهم الشجرة.
+            بعد Split لا نرمي المشكلة كاملة ونبدأ من الصفر.
+            بل نأخذ كل فرع وكأنه مشكلة تصنيف أصغر.
+          </p>
+          <p>
+            نعيد حساب <b>Impurity</b> ونبحث عن أفضل Feature أو Threshold
+            للفرع نفسه.
+          </p>
+        </div>
+      </details>
+
+      <details>
+        <summary>متى نتحول إلى Leaf؟</summary>
+        <div class="details-content">
+          <p>يمكن أن نتوقف عندما:</p>
+          <ul class="mini-list">
+            <li>تصبح المجموعة Pure.</li>
+            <li>لا توجد Features مفيدة إضافية.</li>
+            <li>نصل إلى حد أقصى للعمق مثل <span class="mono">max_depth</span>.</li>
+            <li>يصبح عدد العينات صغيرًا جدًا حسب قواعد النموذج.</li>
+          </ul>
+        </div>
+      </details>
+    </section>
+
+    <section class="section">
+      <h2>10) ماذا يحدث داخل Model جاهز؟</h2>
+
+      <div class="grid grid-3">
+        <div class="concept-card">
+          <h3>1. Generate Candidate Splits</h3>
+          <p>يجرب النموذج Features وValues أو Categories مرشحة للتقسيم.</p>
+        </div>
+
+        <div class="concept-card">
+          <h3>2. Measure Quality</h3>
+          <p>يحسب معيارًا مثل <b>Gini</b> أو <b>Entropy</b>.</p>
+        </div>
+
+        <div class="concept-card">
+          <h3>3. Choose Best Split</h3>
+          <p>يختار التقسيم الذي يحقق أفضل تحسن وفق المعيار المستخدم.</p>
+        </div>
+      </div>
+
+      <details style="margin-top:18px;">
+        <summary>Gini أم Entropy؟</summary>
+        <div class="details-content">
+          <p>
+            كلاهما يستخدم لقياس عدم النقاء، لكن بطريقة حساب مختلفة.
+          </p>
+
+          <div class="formula">
+            Gini = 1 - Σ(pᵢ²)
+          </div>
+
+          <div class="formula">
+            Entropy = -Σ(pᵢ log₂ pᵢ)
+          </div>
+
+          <p>
+            المهم في مرحلة التعلم ليس حفظ الصيغة فقط، بل فهم الفكرة:
+            <b>النموذج يبحث عن Split يجعل الفروع أكثر نقاءً.</b>
+          </p>
+        </div>
+      </details>
+    </section>
+
+    <section class="section">
+      <h2>11) من الورقة إلى Code</h2>
+
+      <div class="card">
+        <p>فكّر في العملية التالية قبل أن تفكر في syntax:</p>
+
+        <div class="formula">
+          DATA<br>
+          ↓<br>
+          FIND CANDIDATE SPLITS<br>
+          ↓<br>
+          CALCULATE IMPURITY FOR EACH SPLIT<br>
+          ↓<br>
+          CHOOSE BEST SPLIT<br>
+          ↓<br>
+          CREATE NODE<br>
+          ↓<br>
+          REPEAT FOR EACH CHILD<br>
+          ↓<br>
+          STOP → LEAF / PREDICTION
+        </div>
+
+        <div class="definition">
+          هذه هي الفكرة التي تريد أن تراها في رأسك عندما تقرأ
+          implementation داخليًا لـ <b>Decision Tree</b>.
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2>12) تحدي بالقلم والورقة</h2>
+
+      <div class="card">
+        <h3>لا تستخدم Calculator في البداية</h3>
+        <p>
+          اكتب بنفسك:
+        </p>
+        <ol class="mini-list">
+          <li>عدد Yes و No في Root.</li>
+          <li>Gini للـ Root.</li>
+          <li>Gini لكل مجموعة ناتجة عن <b>Outlook</b>.</li>
+          <li>Weighted Gini للـ Outlook.</li>
+          <li>قارن النتيجة مع <b>Humidity</b>.</li>
+          <li>قرر أي Feature تستحق أن تكون Root.</li>
+        </ol>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2>13) الخلاصة الذهنية</h2>
+
+      <div class="card">
+        <div class="formula">
+          Decision Tree ≈ "ما هو أفضل سؤال يمكنني طرحه الآن
+          لكي أقسم البيانات إلى مجموعات أكثر نقاءً؟"
+        </div>
+
+        <p>
+          ثم نكرر السؤال نفسه على الفروع الجديدة.
+        </p>
+
+        <p>
+          هذه هي الصورة الداخلية التي ينبغي أن تفهمها قبل استخدام:
+          <b>DecisionTreeClassifier</b>.
+        </p>
+      </div>
+    </section>
+
+    <!-- QUIZ -->
+    <section class="section" id="quiz">
+      <div class="card">
+        <h2>14) Interactive Knowledge Check</h2>
+
+        <p>
+          الأسئلة تبدأ من مستوى متوسط، ثم تصعد تدريجيًا نحو
+          <b>Hard</b> و<b>Very Hard</b>.
+          كل سؤال مرتبط مباشرة بمحتوى الدرس.
+        </p>
+
+        <div class="controls">
+          <select id="purposeFilter" class="filter">
+            <option value="all">كل Purpose</option>
+            <option value="Closed">Closed</option>
+            <option value="Open-Ended">Open-Ended</option>
+            <option value="Probing">Probing</option>
+            <option value="Leading">Leading</option>
+          </select>
+
+          <select id="bloomFilter" class="filter">
+            <option value="all">كل Bloom Level</option>
+            <option value="Remembering">Remembering</option>
+            <option value="Understanding">Understanding</option>
+            <option value="Applying">Applying</option>
+            <option value="Analyzing">Analyzing</option>
+            <option value="Evaluating">Evaluating</option>
+            <option value="Creating">Creating</option>
+          </select>
+
+          <select id="difficultyFilter" class="filter">
+            <option value="all">كل Difficulty</option>
+            <option value="Medium">Medium</option>
+            <option value="Hard">Hard</option>
+            <option value="Very Hard">Very Hard</option>
+          </select>
+
+          <select id="rhetoricFilter" class="filter">
+            <option value="all">كل W / Rhetoric</option>
+            <option value="W">W Questions</option>
+            <option value="Alternative">Alternative</option>
+            <option value="Tag">Tag</option>
+            <option value="Rhetorical">Rhetorical</option>
+            <option value="Loaded">Loaded</option>
+          </select>
+
+          <button class="btn btn-blue" onclick="resetQuiz()">إعادة الاختبار</button>
+        </div>
+
+        <div class="score-panel">
+          <div class="score-box">
+            <div>الأسئلة</div>
+            <div class="score-value" id="totalQuestions">0</div>
+          </div>
+          <div class="score-box">
+            <div>تمت الإجابة</div>
+            <div class="score-value" id="answeredQuestions">0</div>
+          </div>
+          <div class="score-box">
+            <div>الصحيحة</div>
+            <div class="score-value" id="correctQuestions">0</div>
+          </div>
+          <div class="score-box">
+            <div>النسبة</div>
+            <div class="score-value" id="scorePercent">0%</div>
+          </div>
+        </div>
+
+        <div class="progress-bar">
+          <div class="progress" id="quizProgress"></div>
+        </div>
+      </div>
+
+      <div id="quizContainer" style="margin-top:18px;"></div>
+    </section>
+
+    <section class="section">
+      <div class="card">
+        <h2>اختبار التفكير النهائي</h2>
+        <p>
+          أغلق الصفحة أو اخفِ الحلول، ثم حاول شرح هذه السلسلة من الذاكرة:
+        </p>
+
+        <div class="formula">
+          Root
+          → Candidate Splits
+          → Impurity
+          → Weighted Impurity
+          → Best Split
+          → Child Nodes
+          → Repeat
+          → Leaf
+          → Prediction
+        </div>
+
+        <p>
+          إذا استطعت شرح هذه السلسلة بصوتك دون حفظ code syntax،
+          فقد بدأت تفهم <b>Decision Tree Under the Hood</b>.
+        </p>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="footer container">
+    <p>تعلم ML من المنطق أولًا، ثم من الـ APIs والـ Libraries.</p>
+  </footer>
+
+  <script>
+    const questions = [
+      {
+        id: 1,
+        purpose: "Closed",
+        bloom: "Remembering",
+        rhetoric: "W",
+        logical: "Alternative",
+        socratic: "Clarification",
+        difficulty: "Medium",
+        type: "mcq",
+        question: "أي عنصر يمثل الهدف الذي تريد Classification Decision Tree التنبؤ به؟",
+        options: ["Feature", "Target", "Node", "Split"],
+        answer: 1,
+        explanation: "الـ Target هو القيمة التي نريد التنبؤ بها، مثل Play = Yes/No."
+      },
+      {
+        id: 2,
+        purpose: "Closed",
+        bloom: "Understanding",
+        rhetoric: "W",
+        logical: "Tag",
+        socratic: "Clarification",
+        difficulty: "Medium",
+        type: "mcq",
+        question: "لماذا نفضّل Split يخفض Weighted Gini؟",
+        options: [
+          "لأنه يزيد عدد Features المتاحة",
+          "لأنه يجعل الفروع أكثر نقاءً",
+          "لأنه يزيد عدد Rows داخل كل Leaf",
+          "لأنه يضمن دائمًا Accuracy = 100%"
+        ],
+        answer: 1,
+        explanation: "انخفاض Weighted Gini يعني أن المجموعات الناتجة أصبحت أنقى بالنسبة إلى الـ Classes."
+      },
+      {
+        id: 3,
+        purpose: "Closed",
+        bloom: "Understanding",
+        rhetoric: "What",
+        logical: "Alternative",
+        socratic: "Clarification",
+        difficulty: "Medium",
+        type: "mcq",
+        question: "إذا كانت مجموعة تحتوي Yes, Yes, Yes فقط، فما Gini لها؟",
+        options: ["0", "0.25", "0.5", "1"],
+        answer: 0,
+        explanation: "المجموعة Pure، لذلك Gini = 0."
+      },
+      {
+        id: 4,
+        purpose: "Closed",
+        bloom: "Applying",
+        rhetoric: "How",
+        logical: "Alternative",
+        socratic: "Consequences",
+        difficulty: "Medium",
+        type: "mcq",
+        question: "لديك مجموعة فيها Yes, No فقط. ما قيمة Gini؟",
+        options: ["0", "0.25", "0.5", "1"],
+        answer: 2,
+        explanation: "لدينا 0.5 و0.5، لذلك Gini = 1 - (0.25 + 0.25) = 0.5."
+      },
+      {
+        id: 5,
+        purpose: "Probing",
+        bloom: "Analyzing",
+        rhetoric: "Why",
+        logical: "Rhetorical",
+        socratic: "Challenging Assumptions",
+        difficulty: "Hard",
+        type: "mcq",
+        question: "إذا أعطاك Split معين Weighted Gini = 0.33 وآخر = 0.47، لماذا لا تختار 0.47 رغم أن الرقمين كلاهما أقل من Root Gini = 0.5؟",
+        options: [
+          "لأن القيمة الأقرب إلى 0 تمثل نقاءً أعلى",
+          "لأن القيمة الأعلى تعني أن Feature أقوى",
+          "لأن Gini يجب أن يكون دائمًا أكبر من 0.5",
+          "لأن Weighted Gini لا يستخدم للمقارنة"
+        ],
+        answer: 0,
+        explanation: "عند المقارنة نريد أقل Weighted Gini لأن ذلك يعني خليطًا أقل داخل الفروع."
+      },
+      {
+        id: 6,
+        purpose: "Closed",
+        bloom: "Applying",
+        rhetoric: "What",
+        logical: "Alternative",
+        socratic: "Clarification",
+        difficulty: "Hard",
+        type: "mcq",
+        question: "في المثال، لماذا أصبح Outlook هو Root وليس Humidity؟",
+        options: [
+          "لأن Outlook يحتوي على أسماء أكثر",
+          "لأن Weighted Gini لـ Outlook أقل",
+          "لأن Humidity ليست Feature",
+          "لأن Outlook دائمًا أفضل في أي Dataset"
+        ],
+        answer: 1,
+        explanation: "Outlook أعطى Weighted Gini ≈ 0.333 مقابل ≈ 0.375 لـ Humidity."
+      },
+      {
+        id: 7,
+        purpose: "Open-Ended",
+        bloom: "Understanding",
+        rhetoric: "How",
+        logical: "Rhetorical",
+        socratic: "Clarification",
+        difficulty: "Medium",
+        type: "open",
+        question: "اشرح بكلماتك لماذا لا يكفي أن ننظر إلى عدد Yes وNo في Root فقط؟",
+        keywords: ["split", "تقسيم", "نقاء", "gini", "فرع", "impurity"],
+        explanation: "المطلوب فهم أن الشجرة تحتاج Split يحسن نقاء الفروع، وليس مجرد معرفة توزيع الهدف في Root."
+      },
+      {
+        id: 8,
+        purpose: "Probing",
+        bloom: "Analyzing",
+        rhetoric: "Why",
+        logical: "Loaded",
+        socratic: "Challenging Assumptions",
+        difficulty: "Hard",
+        type: "mcq",
+        question: "إذا أصبح أحد الفروع Pure بعد Split، فهل هذا يعني تلقائيًا أن الشجرة أصبحت جيدة؟",
+        options: [
+          "نعم، أي Leaf Pure يضمن Model ممتازًا",
+          "لا، لأن جودة الشجرة تتعلق أيضًا ببقية الفروع وGeneralization",
+          "نعم، لأن Gini = 0 يعني أن كل البيانات Pure",
+          "لا، لأن Gini ليس له علاقة بالـ Splits"
+        ],
+        answer: 1,
+        explanation: "Pure branch واحدة لا تضمن جودة الشجرة على بقية البيانات أو على بيانات جديدة."
+      },
+      {
+        id: 9,
+        purpose: "Closed",
+        bloom: "Remembering",
+        rhetoric: "When",
+        logical: "Tag",
+        socratic: "Clarification",
+        difficulty: "Medium",
+        type: "mcq",
+        question: "ماذا نسمي نقطة النهاية التي تنتج Prediction؟",
+        options: ["Root", "Feature", "Leaf", "Threshold"],
+        answer: 2,
+        explanation: "Leaf هي نقطة النهاية التي تنتج Prediction."
+      },
+      {
+        id: 10,
+        purpose: "Leading",
+        bloom: "Evaluating",
+        rhetoric: "Why",
+        logical: "Loaded",
+        socratic: "Challenging Assumptions",
+        difficulty: "Hard",
+        type: "mcq",
+        question: "أنت متأكد أن أكبر Gain دائمًا يعني أفضل Model في كل حالة، أليس كذلك؟",
+        options: [
+          "نعم، أكبر Gain يضمن عدم وجود Overfitting",
+          "ليس بالضرورة؛ اختيار Split محليًا لا يضمن أفضل Generalization",
+          "نعم، لأن Gain هو نفسه Accuracy",
+          "لا، لأن Gain يستخدم فقط في Regression"
+        ],
+        answer: 1,
+        explanation: "أفضل Split محليًا وفق معيار معين لا يضمن وحده أفضل أداء خارج بيانات التدريب."
+      },
+      {
+        id: 11,
+        purpose: "Closed",
+        bloom: "Applying",
+        rhetoric: "How",
+        logical: "Alternative",
+        socratic: "Consequences",
+        difficulty: "Hard",
+        type: "mcq",
+        question: "في فرع Sunny لدينا No, No, Yes. ما Feature التي استخدمناها لفصل هذا الفرع؟",
+        options: ["Windy", "Play", "Humidity", "Outlook"],
+        answer: 2,
+        explanation: "داخل Sunny، استخدمنا Humidity: High → No، Normal → Yes."
+      },
+      {
+        id: 12,
+        purpose: "Probing",
+        bloom: "Analyzing",
+        rhetoric: "Why",
+        logical: "Rhetorical",
+        socratic: "Questioning the Question",
+        difficulty: "Very Hard",
+        type: "mcq",
+        question: "إذا قلت: «لماذا لا نختار Feature التي لديها أكبر عدد من القيم المختلفة؟» ما المشكلة في السؤال نفسه؟",
+        options: [
+          "لأنه يفترض أن cardinality العالية تعني Split أفضل",
+          "لأن جميع Features يجب أن تكون Binary",
+          "لأن Gini لا يعمل مع Features كثيرة القيم",
+          "لأن Target لا يمكن أن يكون Categorical"
+        ],
+        answer: 0,
+        explanation: "السؤال يفترض علاقة غير صحيحة بين عدد القيم وجودة التقسيم."
+      },
+      {
+        id: 13,
+        purpose: "Open-Ended",
+        bloom: "Analyzing",
+        rhetoric: "Why",
+        logical: "Rhetorical",
+        socratic: "Viewpoints",
+        difficulty: "Hard",
+        type: "open",
+        question: "لديك Splitان: الأول ينتج Weighted Gini = 0.20 والثاني = 0.28. اشرح لماذا الأول أقوى، واذكر شيئًا واحدًا يجب الحذر منه بعد ذلك.",
+        keywords: ["0.2", "0.28", "نقاء", "gini", "overfitting", "generalization"],
+        explanation: "0.20 أفضل لأنه أقل، لكن لا يزال يجب التفكير في Generalization وOverfitting."
+      },
+      {
+        id: 14,
+        purpose: "Closed",
+        bloom: "Understanding",
+        rhetoric: "What",
+        logical: "Alternative",
+        socratic: "Clarification",
+        difficulty: "Medium",
+        type: "mcq",
+        question: "ماذا يحدث للبيانات بعد اختيار Root Split؟",
+        options: [
+          "تختفي البيانات الأصلية",
+          "تتحول كل البيانات مباشرة إلى Leaves",
+          "تنقسم إلى Child Nodes جديدة",
+          "يتوقف التدريب"
+        ],
+        answer: 2,
+        explanation: "البيانات تُقسم إلى مجموعات أصغر، ولكل مجموعة يمكن تنفيذ Splits إضافية."
+      },
+      {
+        id: 15,
+        purpose: "Probing",
+        bloom: "Analyzing",
+        rhetoric: "How",
+        logical: "Rhetorical",
+        socratic: "Consequences",
+        difficulty: "Very Hard",
+        type: "mcq",
+        question: "لو اخترنا في Root Feature ذات Weighted Gini = 0.49 بدل 0.333، ماذا يحدث مفهوميًا؟",
+        options: [
+          "نبدأ من تقسيم أضعف، وبالتالي نحتاج Splits لاحقة أكثر غالبًا",
+          "نضمن Tree أصغر دائمًا",
+          "نضمن أن كل Leaves ستكون Pure",
+          "لا يحدث أي فرق لأن جميع Splits متساوية"
+        ],
+        answer: 0,
+        explanation: "Split الضعيف لا يفصل Classes جيدًا في البداية، وقد يجعل المسار اللاحق أكثر تعقيدًا."
+      },
+      {
+        id: 16,
+        purpose: "Closed",
+        bloom: "Evaluating",
+        rhetoric: "What",
+        logical: "Alternative",
+        socratic: "Viewpoints",
+        difficulty: "Hard",
+        type: "mcq",
+        question: "ما الفرق الأساسي بين Classification Tree وRegression Tree؟",
+        options: [
+          "الأولى تتنبأ بفئات، والثانية عادةً بقيم رقمية مستمرة",
+          "الأولى لا تستخدم Splits والثانية تستخدمها",
+          "الأولى دائمًا Binary والثانية دائمًا Multiclass",
+          "لا يوجد فرق عملي"
+        ],
+        answer: 0,
+        explanation: "Classification تتعامل عادةً مع Classes، بينما Regression تتنبأ بقيم عددية مستمرة."
+      },
+      {
+        id: 17,
+        purpose: "Leading",
+        bloom: "Evaluating",
+        rhetoric: "Why",
+        logical: "Loaded",
+        socratic: "Challenging Assumptions",
+        difficulty: "Very Hard",
+        type: "mcq",
+        question: "بما أن Gini = 0 يعني نقاءً كاملًا، أليس من الأفضل أن نستمر في التقسيم حتى تصبح كل Row داخل Leaf منفصلة؟",
+        options: [
+          "نعم، لأن فصل كل Row هو أفضل تعلم دائمًا",
+          "ليس بالضرورة؛ قد يؤدي ذلك إلى Overfitting",
+          "نعم، لأن Tree لا يمكنها أن تكون عميقة أكثر من البيانات",
+          "لا، لأن Gini لا يقيس النقاء"
+        ],
+        answer: 1,
+        explanation: "الاستمرار في التقسيم حتى حفظ بيانات التدريب قد يؤدي إلى Overfitting وضعف Generalization."
+      },
+      {
+        id: 18,
+        purpose: "Probing",
+        bloom: "Applying",
+        rhetoric: "How",
+        logical: "Alternative",
+        socratic: "Consequences",
+        difficulty: "Hard",
+        type: "mcq",
+        question: "إذا كانت لديك مجموعة 10 Rows: 8 Yes و2 No، ما Gini تقريبًا؟",
+        options: ["0.16", "0.20", "0.32", "0.50"],
+        answer: 2,
+        explanation: "1 - (0.8² + 0.2²) = 1 - (0.64 + 0.04) = 0.32."
+      },
+      {
+        id: 19,
+        purpose: "Open-Ended",
+        bloom: "Creating",
+        rhetoric: "How",
+        logical: "Rhetorical",
+        socratic: "Questioning the Question",
+        difficulty: "Very Hard",
+        type: "open",
+        question: "صمّم Dataset من 6 Rows فقط لـ Classification Tree تحتوي Feature واحدة على الأقل وTarget ثنائي، ثم اقترح Split وتتوقع أن يجعل أحد الفروع Pure.",
+        keywords: ["feature", "target", "split", "yes", "no"],
+        explanation: "الإجابة مفتوحة. يجب أن تحتوي على Dataset منطقية وSplit له أثر واضح على نقاء الفروع."
+      },
+      {
+        id: 20,
+        purpose: "Closed",
+        bloom: "Applying",
+        rhetoric: "What",
+        logical: "Alternative",
+        socratic: "Clarification",
+        difficulty: "Hard",
+        type: "mcq",
+        question: "عندما نقول Weighted Gini، لماذا نستخدم أوزانًا للفروع؟",
+        options: [
+          "لأن كل فرع قد يحتوي عددًا مختلفًا من Rows",
+          "لأن بعض Features أهم من Target",
+          "لأن الفروع ذات العدد الأصغر يجب تجاهلها",
+          "لأن Gini لا يمكن حسابه مباشرة"
+        ],
+        answer: 0,
+        explanation: "نحسب متوسطًا موزونًا لأن فرعًا يحتوي 100 Row ليس مثل فرع يحتوي 2 Rows."
+      },
+      {
+        id: 21,
+        purpose: "Probing",
+        bloom: "Analyzing",
+        rhetoric: "Why",
+        logical: "Alternative",
+        socratic: "Consequences",
+        difficulty: "Very Hard",
+        type: "mcq",
+        question: "إذا كان فرعان لهما نفس Gini، لكن الأول يحتوي 90% من البيانات والثاني 10%، ماذا يذكرك هذا؟",
+        options: [
+          "أن حجمي الفرعين غير مهمين إطلاقًا",
+          "أننا نحتاج Weighted Metric لتأخذ أحجام الفروع في الاعتبار",
+          "أن الفرع الأصغر هو الأفضل دائمًا",
+          "أن Gini لا يمكن استخدامه مع أكثر من فرع"
+        ],
+        answer: 1,
+        explanation: "Weighted Gini يجعل حجم كل فرع جزءًا من القرار."
+      },
+      {
+        id: 22,
+        purpose: "Closed",
+        bloom: "Remembering",
+        rhetoric: "Who",
+        logical: "Tag",
+        socratic: "Clarification",
+        difficulty: "Medium",
+        type: "mcq",
+        question: "أي عنصر داخل الشجرة يطرح السؤال عادةً مثل Outlook = Sunny؟",
+        options: ["Leaf", "Node", "Target", "Dataset"],
+        answer: 1,
+        explanation: "الـ Node تمثل نقطة القرار التي تختبر Feature أو Condition."
+      },
+      {
+        id: 23,
+        purpose: "Probing",
+        bloom: "Evaluating",
+        rhetoric: "Why",
+        logical: "Rhetorical",
+        socratic: "Viewpoints",
+        difficulty: "Very Hard",
+        type: "mcq",
+        question: "لماذا قد يكون تفسير Decision Tree أسهل من بعض النماذج الأخرى؟",
+        options: [
+          "لأنها لا تحتاج بيانات",
+          "لأن مسار القرار يمكن قراءته كقواعد If/Else",
+          "لأنها دائمًا أكثر دقة",
+          "لأنها لا تتأثر بأي Noise"
+        ],
+        answer: 1,
+        explanation: "يمكن تتبع المسار من Root إلى Leaf كقواعد قرار واضحة نسبيًا."
+      },
+      {
+        id: 24,
+        purpose: "Open-Ended",
+        bloom: "Evaluating",
+        rhetoric: "What",
+        logical: "Loaded",
+        socratic: "Viewpoints",
+        difficulty: "Very Hard",
+        type: "open",
+        question: "هل كل Split يعطي تحسنًا في Gini يعني بالضرورة أنه يستحق الإضافة إلى Tree؟ ناقش القرار.",
+        keywords: ["overfitting", "generalization", "depth", "split", "validation"],
+        explanation: "ليس بالضرورة. يجب التفكير في التعقيد، Overfitting، Generalization، وقيود مثل max_depth."
+      }
+    ];
+
+    const quizContainer = document.getElementById("quizContainer");
+    const purposeFilter = document.getElementById("purposeFilter");
+    const bloomFilter = document.getElementById("bloomFilter");
+    const difficultyFilter = document.getElementById("difficultyFilter");
+    const rhetoricFilter = document.getElementById("rhetoricFilter");
+
+    let currentQuestions = [];
+    let state = {};
+
+    function getFilteredQuestions() {
+      return questions.filter(q => {
+        const purposeOk = purposeFilter.value === "all" || q.purpose === purposeFilter.value;
+        const bloomOk = bloomFilter.value === "all" || q.bloom === bloomFilter.value;
+        const diffOk = difficultyFilter.value === "all" || q.difficulty === difficultyFilter.value;
+        const rhetoricOk = rhetoricFilter.value === "all" || q.rhetoric === rhetoricFilter.value || q.logical === rhetoricFilter.value;
+        return purposeOk && bloomOk && diffOk && rhetoricOk;
+      });
+    }
+
+    function tagClass(label) {
+      if (label === "Very Hard" || label === "Leading" || label === "Loaded") return "tag red";
+      if (label === "Hard" || label === "Probing" || label === "Evaluating" || label === "Analyzing") return "tag orange";
+      if (label === "Medium" || label === "Closed" || label === "Remembering") return "tag blue";
+      return "tag green";
+    }
+
+    function renderQuiz() {
+      currentQuestions = getFilteredQuestions();
+      state = {};
+
+      document.getElementById("totalQuestions").textContent = currentQuestions.length;
+      document.getElementById("answeredQuestions").textContent = "0";
+      document.getElementById("correctQuestions").textContent = "0";
+      document.getElementById("scorePercent").textContent = "0%";
+      document.getElementById("quizProgress").style.width = "0%";
+
+      if (!currentQuestions.length) {
+        quizContainer.innerHTML = `
+          <div class="card">
+            <div class="notice">
+              لا توجد أسئلة تطابق هذه الفلاتر. جرّب توسيع الاختيار.
+            </div>
+          </div>
+        `;
+        return;
+      }
+
+      quizContainer.innerHTML = currentQuestions.map((q, index) => {
+        return `
+          <div class="quiz-card" style="margin-bottom:16px;">
+            <div class="question-top">
+              <span class="tag">${index + 1}</span>
+              <span class="${tagClass(q.purpose)}">${q.purpose}</span>
+              <span class="${tagClass(q.bloom)}">${q.bloom}</span>
+              <span class="${tagClass(q.difficulty)}">${q.difficulty}</span>
+              <span class="tag">${q.rhetoric}</span>
+              <span class="tag">${q.logical}</span>
+              <span class="tag">${q.socratic}</span>
+            </div>
+
+            <div class="question-title">${q.question}</div>
+
+            ${
+              q.type === "mcq"
+              ? `
+                <div class="options">
+                  ${q.options.map((option, i) => `
+                    <label class="option">
+                      <input
+                        type="radio"
+                        name="q_${q.id}"
+                        value="${i}"
+                        onchange="handleMCQ(${q.id}, ${i})"
+                      />
+                      <span>${option}</span>
+                    </label>
+                  `).join("")}
+                </div>
+              `
+              : `
+                <textarea
+                  id="open_${q.id}"
+                  class="open-answer"
+                  placeholder="اكتب تفسيرك هنا..."
+                  oninput="handleOpenInput(${q.id})"
+                ></textarea>
+                <div style="margin-top:10px;">
+                  <button class="btn btn-blue" onclick="checkOpen(${q.id})">تحقق من إجابتي</button>
+                </div>
+              `
+            }
+
+            <div id="feedback_${q.id}" class="feedback"></div>
+          </div>
+        `;
+      }).join("");
+    }
+
+    function handleMCQ(questionId, selectedIndex) {
+      const q = questions.find(x => x.id === questionId);
+      if (!q) return;
+
+      const previous = state[questionId];
+      if (previous && previous.answered) return;
+
+      state[questionId] = {
+        answered: true,
+        correct: selectedIndex === q.answer
+      };
+
+      const feedback = document.getElementById(`feedback_${questionId}`);
+      if (selectedIndex === q.answer) {
+        feedback.className = "feedback show correct";
+        feedback.innerHTML = `<b>✅ صحيح.</b> ${q.explanation}`;
+      } else {
+        feedback.className = "feedback show incorrect";
+        feedback.innerHTML = `<b>❌ ليس الأفضل.</b> ${q.explanation}`;
+      }
+
+      updateScore();
+    }
+
+    function handleOpenInput(questionId) {
+      if (state[questionId]?.answered) return;
+    }
+
+    function checkOpen(questionId) {
+      const q = questions.find(x => x.id === questionId);
+      const input = document.getElementById(`open_${questionId}`);
+      const answer = (input.value || "").trim().toLowerCase();
+
+      if (!answer) return;
+
+      const matched = q.keywords.filter(k => answer.includes(k.toLowerCase()));
+      const isStrong = matched.length >= Math.min(2, q.keywords.length);
+
+      state[questionId] = {
+        answered: true,
+        correct: isStrong
+      };
+
+      const feedback = document.getElementById(`feedback_${questionId}`);
+
+      if (isStrong) {
+        feedback.className = "feedback show correct";
+        feedback.innerHTML = `
+          <b>✅ إجابة مقنعة.</b>
+          التقييم الآلي وجد كلمات/أفكار مرتبطة بالمطلوب.
+          <br><br>
+          <strong>نقطة القوة:</strong> ${q.explanation}
+        `;
+      } else {
+        feedback.className = "feedback show incorrect";
+        feedback.innerHTML = `
+          <b>⚠️ تحتاج إلى تعميق.</b>
+          جرّب ربط إجابتك بمفاهيم:
+          <b>${q.keywords.join("، ")}</b>
+          <br><br>
+          <strong>تذكّر:</strong> ${q.explanation}
+        `;
+      }
+
+      updateScore();
+    }
+
+    function updateScore() {
+      const answered = Object.values(state).filter(x => x.answered).length;
+      const correct = Object.values(state).filter(x => x.answered && x.correct).length;
+      const total = currentQuestions.length;
+      const percent = answered ? Math.round((correct / answered) * 100) : 0;
+      const progress = total ? Math.round((answered / total) * 100) : 0;
+
+      document.getElementById("answeredQuestions").textContent = answered;
+      document.getElementById("correctQuestions").textContent = correct;
+      document.getElementById("scorePercent").textContent = percent + "%";
+      document.getElementById("quizProgress").style.width = progress + "%";
+    }
+
+    function resetQuiz() {
+      renderQuiz();
+    }
+
+    [purposeFilter, bloomFilter, difficultyFilter, rhetoricFilter].forEach(el => {
+      el.addEventListener("change", renderQuiz);
+    });
+
+    function scrollToId(id) {
+      document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
+    }
+
+    renderQuiz();
+  </script>
+</body>
+</html>

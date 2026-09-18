@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>سير العمل - نظام التوكنات</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Arial, sans-serif;
+      max-width: 900px;
+      margin: 40px auto;
+      padding: 0 20px;
+      line-height: 1.8;
+      background: #f9f9f9;
+      color: #333;
+    }
+    h1 {
+      color: #2c3e50;
+      border-bottom: 3px solid #3498db;
+      padding-bottom: 10px;
+    }
+    h2 {
+      color: #2c3e50;
+      margin-top: 30px;
+    }
+    h3 {
+      color: #34495e;
+    }
+    code {
+      background: #ecf0f1;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-family: 'Courier New', monospace;
+      font-size: 0.95em;
+      color: #c0392b;
+    }
+    ol, ul {
+      margin-bottom: 20px;
+    }
+    li {
+      margin-bottom: 10px;
+    }
+    strong {
+      color: #2c3e50;
+    }
+    .note {
+      background: #eaf2f8;
+      border-right: 5px solid #3498db;
+      padding: 10px 15px;
+      margin: 15px 0;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>سأشرح لك تدفق العمل (workflow) بالكامل</h1>
+  <p>من لحظة إدخال المستخدم لبياناته إلى حماية الصفحات، بناءً على النظام الجديد (access token في الذاكرة/localStorage + refresh token في httpOnly cookie).</p>
+
+  <h2>1. عملية تسجيل الدخول (Login)</h2>
+  <ol>
+    <li>المستخدم يدخل الإيميل وكلمة المرور في <code>loginForm</code> ويضغط submit.</li>
+    <li>الفرونت إند يرسل طلب <code>POST</code> إلى <code>/api/token/</code> عبر axios، مع <code>withCredentials: true</code> (هذا الإعداد مهم جدًا — بدونه المتصفح لن يقبل أو يرسل الـ cookie لاحقًا).</li>
+    <li>على الباك إند، <code>CookieTokenObtainPairView</code> يستقبل الطلب، يتحقق من صحة البيانات عبر SimpleJWT، وينتج <strong>access token</strong> و <strong>refresh token</strong> معًا.</li>
+    <li>هنا يحدث الفرق الجوهري عن النظام القديم:
+      <ul>
+        <li>الـ <strong>access token</strong> يبقى في جسم الاستجابة (JSON body) ويُرسل للفرونت إند بشكل طبيعي.</li>
+        <li>الـ <strong>refresh token</strong> يُستخرج من الاستجابة (<code>response.data.pop("refresh")</code>) ولا يُرسل في الـ JSON إطلاقًا، بل يُوضع داخل <strong>httpOnly cookie</strong> باسم <code>refresh_token</code>.</li>
+      </ul>
+    </li>
+    <li>الفرونت إند يستقبل الاستجابة، ويحفظ الـ access token في <code>localStorage</code> (عبر <code>ACCESS_TOKEN</code>). أما الـ refresh token — فهو لا يراه أصلاً، لأن المتصفح يخزّن الـ cookie تلقائيًا خارج متناول أي كود JavaScript.</li>
+  </ol>
+
+  <h2>2. حماية الصفحات (ProtectedRoute)</h2>
+  <p>عند فتح أي صفحة محمية:</p>
+  <ol>
+    <li><code>ProtectedRoute</code> يتحقق أولاً هل يوجد access token في <code>localStorage</code>.</li>
+    <li>إذا لم يوجد → المستخدم غير مسجل دخول → تحويل إلى <code>/login</code>.</li>
+    <li>إذا وُجد → يُفك تشفيره محليًا عبر <code>jwtDecode</code> لقراءة تاريخ الانتهاء (<code>exp</code>) فقط (بدون التحقق من التوقيع، فهذا عمل الخادم).</li>
+    <li>إذا كان منتهي الصلاحية → يُستدعى <code>refreshAccessToken()</code>.</li>
+  </ol>
+
+  <h2>3. تجديد الـ access token (Refresh)</h2>
+  <p>هذه هي النقطة التي تغيّرت جذريًا:</p>
+  <ol>
+    <li>الفرونت إند يرسل <code>POST</code> إلى <code>/api/token/refresh/</code> <strong>بدون أي body</strong> — لا حاجة لإرسال أي refresh token يدويًا.</li>
+    <li>بفضل <code>withCredentials: true</code>، المتصفح يُرفق الـ httpOnly cookie تلقائيًا مع الطلب — وهذا يحدث على مستوى المتصفح نفسه، لا على مستوى كود JavaScript.</li>
+    <li>على الباك إند، <code>CookieTokenRefreshView</code> يقرأ التوكن من <code>request.COOKIES.get("refresh_token")</code> بدلاً من انتظاره في جسم الطلب.</li>
+    <li>SimpleJWT يتحقق من صلاحية الـ refresh token، وإذا كان صالحًا يُصدر access token جديد (وربما refresh token جديد إذا كان <code>ROTATE_REFRESH_TOKENS</code> مفعّلاً — وفي هذه الحالة يُعاد وضعه في الـ cookie أيضًا، وليس في الـ body).</li>
+    <li>الفرونت إند يستقبل الـ access token الجديد فقط، ويحدّثه في <code>localStorage</code>.</li>
+  </ol>
+
+  <h2>4. لماذا هذا التصميم أأمن؟</h2>
+  <ul>
+    <li>إذا حدث اختراق XSS في موقعك (سكربت خبيث يعمل داخل الصفحة)، فبإمكانه في أسوأ الأحوال قراءة الـ access token من <code>localStorage</code> — لكنه <strong>قصير الأجل</strong>، فالضرر محدود بوقت انتهائه.</li>
+    <li>لكن الـ refresh token — الذي يبقى فعالاً لساعات أو أيام — <strong>لا يمكن لأي كود JavaScript الوصول إليه إطلاقًا</strong>، لأنه محمي بخاصية <code>httponly</code>. حتى لو تم اختراق الصفحة بالكامل عبر XSS، هذا التوكن يبقى بمنأى عن السرقة.</li>
+  </ul>
+
+  <h2>5. تسجيل الخروج (Logout)</h2>
+  <p><code>CookieTokenLogoutView</code> يحذف الـ cookie الخاص بالـ refresh token من طرف المتصفح (<code>delete_cookie</code>). للحماية الكاملة، يُفضّل لاحقًا تفعيل <code>token_blacklist</code> من SimpleJWT حتى يُبطَل التوكن فعليًا من طرف الخادم أيضًا، وليس فقط حذفه من المتصفح.</p>
+
+  <p>هل تريد أن أشرح أيضًا نقطة <code>ROTATE_REFRESH_TOKENS</code> أو أضيف صفحة <code>Logout</code> في الفرونت إند بنفس الأسلوب؟</p>
+
+</body>
+</html>

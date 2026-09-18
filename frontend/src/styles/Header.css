@@ -1,0 +1,192 @@
+/* ==========================================================================
+   MOMENTUM — Header
+   Sticky, translucent, blurred. Calm neutrals; the accent appears only on
+   the active route and the logo mark's ring.
+   ========================================================================== */
+
+.app-header {
+  position: sticky;
+  top: 0;
+  z-index: 200;
+  width: 100%;
+  background: color-mix(in srgb, var(--mt-bg) 78%, transparent);
+  backdrop-filter: blur(16px) saturate(1.6);
+  -webkit-backdrop-filter: blur(16px) saturate(1.6);
+  border-bottom: 1px solid var(--mt-line);
+  transition: background var(--mt-dur) var(--mt-ease-out),
+              border-color var(--mt-dur) var(--mt-ease-out);
+}
+
+.app-header__inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  min-height: var(--mt-header-height);
+}
+
+/* ---- Brand ----------------------------------------------------------- */
+
+.app-header__brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--mt-ink);
+  text-decoration: none;
+  flex-shrink: 0;
+}
+
+.app-header__mark {
+  display: inline-grid;
+  place-items: center;
+  filter: drop-shadow(0 0 8px var(--mt-accent-glow));
+  transition: transform var(--mt-dur-slow) var(--mt-ease-spring);
+}
+
+.app-header__brand:hover .app-header__mark {
+  transform: rotate(-18deg) scale(1.06);
+}
+
+.app-header__wordmark {
+  font-size: 1.06rem;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+}
+
+.app-header__actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* ---- Nav ------------------------------------------------------------- */
+
+.app-header__nav {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px;
+  border-radius: var(--mt-radius-full);
+  background: var(--mt-surface-2);
+  border: 1px solid var(--mt-line);
+}
+
+.app-header__nav-link {
+  position: relative;
+  padding: 7px 15px;
+  border-radius: var(--mt-radius-full);
+  font-size: 0.85rem;
+  font-weight: 650;
+  color: var(--mt-ink-3);
+  text-decoration: none;
+  transition: color var(--mt-dur-fast) var(--mt-ease-out),
+              background var(--mt-dur-fast) var(--mt-ease-out);
+}
+
+.app-header__nav-link:hover {
+  color: var(--mt-ink);
+  background: var(--mt-surface-3);
+}
+
+.app-header__nav-link--active {
+  color: var(--mt-accent-ink);
+  background: var(--mt-surface);
+  box-shadow: var(--mt-shadow-xs);
+}
+
+[data-theme='dark'] .app-header__nav-link--active {
+  color: var(--mt-accent-ink);
+}
+
+.app-header__theme {
+  flex-shrink: 0;
+}
+
+/* ---- Avatar dropdown ------------------------------------------------- */
+
+.app-header__dropdown {
+  position: relative;
+  flex-shrink: 0;
+}
+
+.app-header__avatar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border: 1px solid var(--mt-line);
+  border-radius: var(--mt-radius-full);
+  background: var(--mt-surface-2);
+  color: var(--mt-ink-2);
+  cursor: pointer;
+  transition: all var(--mt-dur-fast) var(--mt-ease-out);
+}
+
+.app-header__avatar:hover {
+  color: var(--mt-accent-ink);
+  border-color: var(--mt-accent);
+  background: var(--mt-accent-softer);
+  transform: translateY(-1px);
+}
+
+.app-header__dropdown-menu {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  min-width: 172px;
+  padding: 6px;
+  background: var(--mt-surface);
+  border: 1px solid var(--mt-line);
+  border-radius: var(--mt-radius);
+  box-shadow: var(--mt-shadow-lg);
+  z-index: 300;
+  animation: mt-scale-in var(--mt-dur) var(--mt-ease-out) both;
+  transform-origin: top right;
+}
+
+.app-header__dropdown-item {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  gap: 8px;
+  padding: 9px 12px;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--mt-ink-2);
+  font-size: 0.86rem;
+  font-weight: 600;
+  text-align: left;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background var(--mt-dur-fast) var(--mt-ease-out),
+              color var(--mt-dur-fast) var(--mt-ease-out);
+}
+
+.app-header__dropdown-item:hover {
+  background: var(--mt-surface-2);
+  color: var(--mt-ink);
+}
+
+.app-header__dropdown-item--danger {
+  color: var(--mt-danger);
+}
+
+.app-header__dropdown-item--danger:hover {
+  background: var(--mt-danger-soft);
+  color: var(--mt-danger);
+}
+
+/* ---- Responsive ------------------------------------------------------ */
+
+@media (max-width: 640px) {
+  .app-header__wordmark { display: none; }
+  .app-header__nav-link { padding: 7px 11px; font-size: 0.8rem; }
+  .app-header__actions { gap: 7px; }
+}
+
+@media (max-width: 480px) {
+  .app-header__nav { padding: 3px; }
+  .app-header__nav-link { padding: 6px 9px; }
+}

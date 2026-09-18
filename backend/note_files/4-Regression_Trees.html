@@ -1,0 +1,2076 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>أشجار الانحدار - Regression Trees | صفحة تعليمية تفاعلية</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800;900&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #1a56db;
+            --primary-dark: #0f3b8c;
+            --primary-light: #dbeafe;
+            --secondary: #0d9488;
+            --secondary-light: #ccfbf1;
+            --accent: #f59e0b;
+            --accent-light: #fef3c7;
+            --danger: #dc2626;
+            --danger-light: #fee2e2;
+            --success: #16a34a;
+            --success-light: #dcfce7;
+            --warning: #d97706;
+            --warning-light: #fef3c7;
+            --purple: #7c3aed;
+            --purple-light: #ede9fe;
+            --pink: #db2777;
+            --pink-light: #fce7f3;
+            --indigo: #4f46e5;
+            --indigo-light: #e0e7ff;
+            --bg: #f8fafc;
+            --card-bg: #ffffff;
+            --text: #1e293b;
+            --text-secondary: #475569;
+            --text-muted: #64748b;
+            --border: #e2e8f0;
+            --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.06);
+            --shadow-md: 0 4px 14px rgba(0, 0, 0, 0.08);
+            --shadow-lg: 0 10px 30px rgba(0, 0, 0, 0.1);
+            --radius: 14px;
+            --radius-sm: 8px;
+            --radius-lg: 20px;
+            --transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            --font-main: 'Tajawal', sans-serif;
+            --font-mono: 'JetBrains Mono', monospace;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-main);
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.8;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* Header */
+        .header {
+            background: linear-gradient(135deg, #0f3b8c 0%, #1a56db 40%, #0d9488 100%);
+            color: #fff;
+            padding: 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 4px 20px rgba(15, 59, 140, 0.35);
+        }
+
+        .header-inner {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 1.2rem 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 0.8rem;
+        }
+
+        .header-logo {
+            display: flex;
+            align-items: center;
+            gap: 0.7rem;
+            font-size: 1.4rem;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+        }
+
+        .header-logo .icon {
+            width: 42px;
+            height: 42px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+
+        .header-badge {
+            background: rgba(255, 255, 255, 0.18);
+            backdrop-filter: blur(10px);
+            padding: 0.4rem 1rem;
+            border-radius: 50px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            letter-spacing: 0.3px;
+        }
+
+        /* Hero */
+        .hero {
+            background: linear-gradient(135deg, #0f3b8c 0%, #1a56db 30%, #0d9488 70%, #0f766e 100%);
+            color: #fff;
+            padding: 4rem 1.5rem;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -30%;
+            width: 600px;
+            height: 600px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 50%;
+            pointer-events: none;
+        }
+
+        .hero::after {
+            content: '';
+            position: absolute;
+            bottom: -40%;
+            left: -20%;
+            width: 500px;
+            height: 500px;
+            background: rgba(255, 255, 255, 0.04);
+            border-radius: 50%;
+            pointer-events: none;
+        }
+
+        .hero-inner {
+            max-width: 850px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+        }
+
+        .hero h1 {
+            font-size: 3rem;
+            font-weight: 900;
+            letter-spacing: -1px;
+            margin-bottom: 1rem;
+            line-height: 1.3;
+        }
+
+        .hero h1 .en {
+            font-family: var(--font-mono);
+            font-size: 2.8rem;
+            background: rgba(255, 255, 255, 0.15);
+            padding: 0.2rem 0.8rem;
+            border-radius: 12px;
+            display: inline-block;
+            backdrop-filter: blur(10px);
+        }
+
+        .hero p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            font-weight: 400;
+            margin-bottom: 2rem;
+        }
+
+        .hero-stats {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .hero-stat {
+            background: rgba(255, 255, 255, 0.12);
+            backdrop-filter: blur(10px);
+            padding: 0.8rem 1.5rem;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 0.95rem;
+        }
+
+        .hero-stat span {
+            font-size: 1.3rem;
+            display: block;
+            font-weight: 900;
+        }
+
+        /* Main Container */
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 2rem 1.5rem;
+        }
+
+        /* Section Title */
+        .section-title {
+            text-align: center;
+            margin: 3rem 0 2rem;
+            font-size: 2.2rem;
+            font-weight: 800;
+            color: var(--primary-dark);
+            position: relative;
+            padding-bottom: 0.8rem;
+        }
+
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            right: 50%;
+            transform: translateX(50%);
+            width: 80px;
+            height: 4px;
+            border-radius: 4px;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+        }
+
+        .section-subtitle {
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 1.05rem;
+            margin-bottom: 2rem;
+        }
+
+        /* Collapsible Sections */
+        .accordion {
+            margin-bottom: 1rem;
+            border-radius: var(--radius);
+            background: var(--card-bg);
+            box-shadow: var(--shadow-sm);
+            overflow: hidden;
+            border: 1px solid var(--border);
+            transition: var(--transition);
+        }
+
+        .accordion:hover {
+            box-shadow: var(--shadow-md);
+        }
+
+        .accordion-header {
+            padding: 1.3rem 1.5rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+            user-select: none;
+            transition: var(--transition);
+            border: none;
+            background: none;
+            width: 100%;
+            font-family: var(--font-main);
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--text);
+            text-align: right;
+        }
+
+        .accordion-header:hover {
+            background: #f1f5f9;
+        }
+
+        .accordion-header .acc-title {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+        }
+
+        .acc-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            flex-shrink: 0;
+        }
+
+        .acc-icon.blue {
+            background: var(--primary-light);
+            color: var(--primary);
+        }
+        .acc-icon.teal {
+            background: var(--secondary-light);
+            color: var(--secondary);
+        }
+        .acc-icon.amber {
+            background: var(--accent-light);
+            color: var(--warning);
+        }
+        .acc-icon.purple {
+            background: var(--purple-light);
+            color: var(--purple);
+        }
+        .acc-icon.pink {
+            background: var(--pink-light);
+            color: var(--pink);
+        }
+        .acc-icon.indigo {
+            background: var(--indigo-light);
+            color: var(--indigo);
+        }
+
+        .acc-chevron {
+            transition: transform 0.4s ease;
+            font-size: 1.3rem;
+            color: var(--text-muted);
+            flex-shrink: 0;
+        }
+
+        .accordion.open .acc-chevron {
+            transform: rotate(180deg);
+        }
+
+        .accordion-body {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .accordion-body-inner {
+            padding: 1.5rem 1.5rem 2rem;
+            border-top: 1px solid var(--border);
+        }
+
+        /* Content Styling */
+        .content-block {
+            margin-bottom: 1.5rem;
+        }
+
+        .content-block h3 {
+            font-size: 1.15rem;
+            font-weight: 700;
+            color: var(--primary-dark);
+            margin-bottom: 0.8rem;
+        }
+
+        .content-block p {
+            margin-bottom: 0.8rem;
+            color: var(--text-secondary);
+        }
+
+        .content-block .en-term {
+            font-family: var(--font-mono);
+            font-size: 0.9em;
+            background: #f1f5f9;
+            padding: 0.15rem 0.5rem;
+            border-radius: 5px;
+            font-weight: 600;
+            color: var(--primary);
+            white-space: nowrap;
+        }
+
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1.2rem 0;
+            border-radius: var(--radius-sm);
+            overflow: hidden;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .comparison-table th {
+            background: var(--primary);
+            color: #fff;
+            padding: 0.8rem 1rem;
+            text-align: right;
+            font-weight: 700;
+            font-size: 0.95rem;
+        }
+
+        .comparison-table td {
+            padding: 0.8rem 1rem;
+            border-bottom: 1px solid var(--border);
+            background: #fff;
+        }
+
+        .comparison-table tr:nth-child(even) td {
+            background: #f8fafc;
+        }
+
+        .formula-box {
+            background: #f1f5f9;
+            border-right: 4px solid var(--primary);
+            padding: 1.2rem 1.5rem;
+            border-radius: var(--radius-sm);
+            margin: 1rem 0;
+            font-family: var(--font-mono);
+            direction: ltr;
+            text-align: left;
+            font-size: 0.95rem;
+            overflow-x: auto;
+            color: var(--text);
+            line-height: 2;
+        }
+
+        .callout {
+            padding: 1rem 1.2rem;
+            border-radius: var(--radius-sm);
+            margin: 1rem 0;
+            display: flex;
+            gap: 0.8rem;
+            align-items: flex-start;
+            font-size: 0.95rem;
+        }
+
+        .callout.info {
+            background: var(--primary-light);
+            border-right: 4px solid var(--primary);
+            color: var(--primary-dark);
+        }
+        .callout.warning {
+            background: var(--warning-light);
+            border-right: 4px solid var(--warning);
+            color: #78350f;
+        }
+        .callout.success {
+            background: var(--success-light);
+            border-right: 4px solid var(--success);
+            color: #166534;
+        }
+        .callout.danger {
+            background: var(--danger-light);
+            border-right: 4px solid var(--danger);
+            color: #991b1b;
+        }
+
+        .callout .icon {
+            font-size: 1.3rem;
+            flex-shrink: 0;
+            margin-top: 0.2rem;
+        }
+
+        .list-styled {
+            list-style: none;
+            padding: 0;
+            margin: 1rem 0;
+        }
+
+        .list-styled li {
+            padding: 0.6rem 0;
+            padding-right: 1.8rem;
+            position: relative;
+            color: var(--text-secondary);
+        }
+
+        .list-styled li::before {
+            content: '◆';
+            position: absolute;
+            right: 0;
+            color: var(--primary);
+            font-size: 0.75rem;
+            top: 0.75rem;
+        }
+
+        /* Example Cards */
+        .example-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.2rem;
+            margin: 1.5rem 0;
+        }
+
+        .example-card {
+            background: #f8fafc;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            padding: 1.2rem;
+            transition: var(--transition);
+        }
+
+        .example-card:hover {
+            border-color: var(--primary);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .example-card h4 {
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--primary-dark);
+            margin-bottom: 0.6rem;
+        }
+
+        .example-card p {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        .example-card .code {
+            font-family: var(--font-mono);
+            direction: ltr;
+            text-align: left;
+            background: #1e293b;
+            color: #e2e8f0;
+            padding: 0.8rem 1rem;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            margin-top: 0.6rem;
+            overflow-x: auto;
+        }
+
+        /* Quiz Section */
+        .quiz-container {
+            background: var(--card-bg);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-lg);
+            padding: 2rem 1.5rem;
+            border: 2px solid var(--border);
+        }
+
+        .quiz-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .quiz-header h2 {
+            font-size: 2rem;
+            font-weight: 800;
+            color: var(--primary-dark);
+        }
+
+        .quiz-progress {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin: 1.5rem 0;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .progress-bar-container {
+            flex: 1;
+            min-width: 200px;
+            max-width: 400px;
+            height: 8px;
+            background: #e2e8f0;
+            border-radius: 50px;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            border-radius: 50px;
+            transition: width 0.5s ease;
+            width: 0%;
+        }
+
+        .progress-text {
+            font-weight: 700;
+            color: var(--primary);
+            font-size: 0.95rem;
+        }
+
+        .question-card {
+            background: #fff;
+            border: 2px solid var(--border);
+            border-radius: var(--radius);
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            transition: var(--transition);
+            position: relative;
+        }
+
+        .question-card:hover {
+            border-color: var(--primary-light);
+        }
+
+        .question-card.correct-answer {
+            border-color: var(--success);
+            background: var(--success-light);
+        }
+
+        .question-card.wrong-answer {
+            border-color: var(--danger);
+            background: var(--danger-light);
+        }
+
+        .question-card.self-correct {
+            border-color: var(--success);
+            background: var(--success-light);
+        }
+
+        .question-card.self-wrong {
+            border-color: var(--danger);
+            background: var(--danger-light);
+        }
+
+        .question-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .question-number {
+            font-weight: 800;
+            font-size: 1rem;
+            color: var(--primary);
+            background: var(--primary-light);
+            padding: 0.3rem 0.8rem;
+            border-radius: 50px;
+        }
+
+        .badge-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.4rem;
+        }
+
+        .badge {
+            font-size: 0.75rem;
+            font-weight: 600;
+            padding: 0.25rem 0.7rem;
+            border-radius: 50px;
+            letter-spacing: 0.2px;
+            transition: var(--transition);
+        }
+
+        .badge.purpose {
+            background: var(--purple-light);
+            color: var(--purple);
+        }
+        .badge.bloom {
+            background: var(--indigo-light);
+            color: var(--indigo);
+        }
+        .badge.w-question {
+            background: var(--pink-light);
+            color: var(--pink);
+        }
+        .badge.logical {
+            background: var(--accent-light);
+            color: var(--warning);
+        }
+        .badge.socratic {
+            background: var(--secondary-light);
+            color: var(--secondary);
+        }
+        .badge.difficulty-easy {
+            background: var(--success-light);
+            color: var(--success);
+        }
+        .badge.difficulty-hard {
+            background: var(--warning-light);
+            color: var(--warning);
+        }
+        .badge.difficulty-very-hard {
+            background: var(--danger-light);
+            color: var(--danger);
+        }
+
+        .question-text {
+            font-size: 1.05rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: var(--text);
+            line-height: 1.7;
+        }
+
+        .options-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.7rem;
+        }
+
+        .option-label {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.7rem;
+            padding: 0.8rem 1rem;
+            border: 1.5px solid var(--border);
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            transition: var(--transition);
+            font-size: 0.95rem;
+            user-select: none;
+        }
+
+        .option-label:hover {
+            border-color: var(--primary);
+            background: var(--primary-light);
+        }
+
+        .option-label input[type="radio"] {
+            margin-top: 0.3rem;
+            accent-color: var(--primary);
+            width: 18px;
+            height: 18px;
+            flex-shrink: 0;
+        }
+
+        .option-label.selected {
+            border-color: var(--primary);
+            background: var(--primary-light);
+        }
+
+        .option-label.correct-option {
+            border-color: var(--success);
+            background: var(--success-light);
+            font-weight: 700;
+        }
+
+        .option-label.wrong-option {
+            border-color: var(--danger);
+            background: var(--danger-light);
+        }
+
+        .option-text {
+            flex: 1;
+        }
+
+        .textarea-answer {
+            width: 100%;
+            min-height: 120px;
+            padding: 1rem;
+            border: 1.5px solid var(--border);
+            border-radius: var(--radius-sm);
+            font-family: var(--font-main);
+            font-size: 0.95rem;
+            resize: vertical;
+            transition: var(--transition);
+            line-height: 1.7;
+        }
+
+        .textarea-answer:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(26, 86, 219, 0.1);
+        }
+
+        .explanation-box {
+            margin-top: 1rem;
+            padding: 1rem 1.2rem;
+            border-radius: var(--radius-sm);
+            font-size: 0.9rem;
+            line-height: 1.7;
+            display: none;
+        }
+
+        .explanation-box.show {
+            display: block;
+        }
+
+        .explanation-box.correct {
+            background: var(--success-light);
+            border-right: 4px solid var(--success);
+            color: #166534;
+        }
+
+        .explanation-box.wrong {
+            background: var(--danger-light);
+            border-right: 4px solid var(--danger);
+            color: #991b1b;
+        }
+
+        .explanation-box.neutral {
+            background: var(--primary-light);
+            border-right: 4px solid var(--primary);
+            color: var(--primary-dark);
+        }
+
+        .sample-answer {
+            margin-top: 0.8rem;
+            padding: 0.8rem 1rem;
+            background: #f8fafc;
+            border-radius: 6px;
+            font-size: 0.88rem;
+            color: var(--text-secondary);
+            border: 1px dashed var(--border);
+        }
+
+        .self-assessment {
+            margin-top: 0.8rem;
+            display: flex;
+            gap: 0.6rem;
+            flex-wrap: wrap;
+        }
+
+        .self-assessment button {
+            padding: 0.5rem 1.2rem;
+            border-radius: 50px;
+            border: 2px solid var(--border);
+            font-family: var(--font-main);
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            background: #fff;
+        }
+
+        .self-assessment button.btn-correct {
+            border-color: var(--success);
+            color: var(--success);
+        }
+        .self-assessment button.btn-correct:hover,
+        .self-assessment button.btn-correct.active {
+            background: var(--success);
+            color: #fff;
+        }
+
+        .self-assessment button.btn-wrong {
+            border-color: var(--danger);
+            color: var(--danger);
+        }
+        .self-assessment button.btn-wrong:hover,
+        .self-assessment button.btn-wrong.active {
+            background: var(--danger);
+            color: #fff;
+        }
+
+        .quiz-actions {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-top: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 0.9rem 2rem;
+            border-radius: 50px;
+            border: none;
+            font-family: var(--font-main);
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: var(--transition);
+            letter-spacing: 0.3px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: #fff;
+            box-shadow: 0 4px 14px rgba(26, 86, 219, 0.4);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(26, 86, 219, 0.5);
+        }
+
+        .btn-secondary {
+            background: #fff;
+            color: var(--text);
+            border: 2px solid var(--border);
+        }
+
+        .btn-secondary:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .results-container {
+            text-align: center;
+            padding: 2rem;
+            margin-top: 2rem;
+            border-radius: var(--radius);
+            background: #f8fafc;
+            border: 2px solid var(--border);
+            display: none;
+        }
+
+        .results-container.show {
+            display: block;
+        }
+
+        .score-circle {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background: conic-gradient(var(--primary) 0%, var(--secondary) 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 1.5rem auto;
+            position: relative;
+        }
+
+        .score-circle-inner {
+            width: 90px;
+            height: 90px;
+            border-radius: 50%;
+            background: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.6rem;
+            font-weight: 900;
+            color: var(--primary-dark);
+        }
+
+        .results-stats {
+            display: flex;
+            gap: 2rem;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin: 1.5rem 0;
+        }
+
+        .stat-item {
+            background: #fff;
+            padding: 1rem 1.5rem;
+            border-radius: var(--radius-sm);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .stat-item .stat-num {
+            font-size: 1.8rem;
+            font-weight: 900;
+            color: var(--primary);
+        }
+        .stat-item .stat-label {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+
+        /* Footer */
+        .footer {
+            background: #0f3b8c;
+            color: rgba(255, 255, 255, 0.8);
+            text-align: center;
+            padding: 2rem 1.5rem;
+            margin-top: 3rem;
+            font-size: 0.9rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2rem;
+            }
+            .hero h1 .en {
+                font-size: 1.8rem;
+            }
+            .hero p {
+                font-size: 1rem;
+            }
+            .section-title {
+                font-size: 1.6rem;
+            }
+            .quiz-container {
+                padding: 1rem 0.8rem;
+            }
+            .question-card {
+                padding: 1rem;
+            }
+            .header-inner {
+                padding: 0.8rem 1rem;
+            }
+            .badge-group {
+                gap: 0.3rem;
+            }
+            .badge {
+                font-size: 0.7rem;
+                padding: 0.2rem 0.5rem;
+            }
+            .comparison-table {
+                font-size: 0.85rem;
+            }
+            .comparison-table th,
+            .comparison-table td {
+                padding: 0.5rem 0.6rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .hero h1 {
+                font-size: 1.5rem;
+            }
+            .hero h1 .en {
+                font-size: 1.3rem;
+            }
+            .hero-stats {
+                gap: 0.8rem;
+            }
+            .hero-stat {
+                font-size: 0.8rem;
+                padding: 0.5rem 0.9rem;
+            }
+            .quiz-actions {
+                flex-direction: column;
+            }
+            .btn {
+                width: 100%;
+            }
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #94a3b8;
+            border-radius: 50px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #64748b;
+        }
+
+        /* Smooth scroll */
+        html {
+            scroll-behavior: smooth;
+        }
+
+        /* Highlighted English term in quiz */
+        .quiz-en {
+            font-family: var(--font-mono);
+            font-weight: 600;
+            color: var(--primary);
+            font-size: 0.9em;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ========== HEADER ========== -->
+    <header class="header">
+        <div class="header-inner">
+            <div class="header-logo">
+                <div class="icon">🌳</div>
+                <span>أشجار الانحدار <span style="font-family:var(--font-mono);font-size:0.9em;">Regression Trees</span></span>
+            </div>
+            <div class="header-badge">صفحة تعليمية تفاعلية | Interactive Learning Page</div>
+        </div>
+    </header>
+
+    <!-- ========== HERO ========== -->
+    <section class="hero">
+        <div class="hero-inner">
+            <h1>
+                أشجار الانحدار<br>
+                <span class="en">Regression Trees</span>
+            </h1>
+            <p>دليل تفاعلي شامل لفهم أشجار الانحدار، الفرق بينها وبين أشجار التصنيف، وكيفية إنشائها وتقييم جودة الانقسامات باستخدام <span style="font-family:var(--font-mono);">MSE</span>.</p>
+            <div class="hero-stats">
+                <div class="hero-stat"><span>6</span> أقسام تعليمية</div>
+                <div class="hero-stat"><span>20</span> سؤالًا تفاعليًا</div>
+                <div class="hero-stat"><span>5</span> فئات تصنيف للأسئلة</div>
+                <div class="hero-stat"><span>3</span> مستويات صعوبة</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ========== MAIN CONTENT ========== -->
+    <main class="container">
+
+        <!-- Section: Learning Content -->
+        <h2 class="section-title">📚 المحتوى التعليمي</h2>
+        <p class="section-subtitle">اضغط على كل قسم لعرض الشرح الكامل مع الأمثلة العملية</p>
+
+        <!-- Accordion 1: Introduction -->
+        <div class="accordion open" id="acc1">
+            <button class="accordion-header" onclick="toggleAccordion('acc1')">
+                <span class="acc-title">
+                    <span class="acc-icon blue">🌱</span>
+                    مقدمة إلى أشجار الانحدار
+                </span>
+                <span class="acc-chevron">▼</span>
+            </button>
+            <div class="accordion-body">
+                <div class="accordion-body-inner">
+                    <div class="content-block">
+                        <h3>ما هي شجرة الانحدار؟</h3>
+                        <p>
+                            شجرة الانحدار <span class="en-term">Regression Tree</span> هي نموذج مشابه لشجرة القرار <span class="en-term">Decision Tree</span>، لكنها تتنبأ بقيم مستمرة <span class="en-term">Continuous Values</span> بدلاً من فئات منفصلة <span class="en-term">Discrete Classes</span>. بمعنى آخر، هي امتداد لشجرة القرار لحل مسائل الانحدار <span class="en-term">Regression Problems</span>.
+                        </p>
+                        <p>
+                            الميزة المميزة بين التصنيف <span class="en-term">Classification</span> والانحدار <span class="en-term">Regression</span> تكمن في طبيعة المتغير الهدف أو البيانات المسماة <span class="en-term">Target / Labeled Data</span>. في التصنيف، يكون المتغير الهدف فئويًا <span class="en-term">Categorical</span> مثل صح أو خطأ، بينما في الانحدار يكون المتغير الهدف قيمة مستمرة مثل درجة الحرارة أو الراتب.
+                        </p>
+                        <div class="callout info">
+                            <span class="icon">💡</span>
+                            <span>عندما يتم تكييف شجرة القرار لحل مسائل الانحدار، تُسمى شجرة انحدار <span class="en-term">Regression Tree</span>.</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Accordion 2: Classification vs Regression -->
+        <div class="accordion" id="acc2">
+            <button class="accordion-header" onclick="toggleAccordion('acc2')">
+                <span class="acc-title">
+                    <span class="acc-icon teal">⚖️</span>
+                    الفرق بين أشجار التصنيف وأشجار الانحدار
+                </span>
+                <span class="acc-chevron">▼</span>
+            </button>
+            <div class="accordion-body">
+                <div class="accordion-body-inner">
+                    <div class="content-block">
+                        <h3>مقارنة شاملة</h3>
+                        <p>لفهم كيفية اختلافهما، دعنا نقارن بين أشجار التصنيف <span class="en-term">Classification Trees</span> وأشجار الانحدار <span class="en-term">Regression Trees</span>:</p>
+
+                        <table class="comparison-table">
+                            <thead>
+                                <tr>
+                                    <th>وجه المقارنة</th>
+                                    <th>شجرة التصنيف <span style="font-family:var(--font-mono);">Classification Tree</span></th>
+                                    <th>شجرة الانحدار <span style="font-family:var(--font-mono);">Regression Tree</span></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><strong>الهدف</strong></td>
+                                    <td>تصنيف البيانات إلى مجموعات منفصلة</td>
+                                    <td>التنبؤ بمتغيرات هدف مستمرة</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>المتغير الهدف</strong></td>
+                                    <td>فئوي <span class="en-term">Categorical</span></td>
+                                    <td>مستمر / عائم <span class="en-term">Floating</span></td>
+                                </tr>
+                                <tr>
+                                    <td><strong>التنبؤ عند العقد الورقية</strong></td>
+                                    <td>تصويت الأغلبية للفئات <span class="en-term">Class-Labeled Majority Vote</span></td>
+                                    <td>متوسط القيم الهدف <span class="en-term">Average of Target Values</span></td>
+                                </tr>
+                                <tr>
+                                    <td><strong>حالات الاستخدام</strong></td>
+                                    <td>كشف البريد المزعج، تصنيف الصور، التشخيص الطبي</td>
+                                    <td>التنبؤ بالإيرادات، درجات الحرارة، مخاطر حرائق الغابات</td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <div class="example-grid">
+                            <div class="example-card">
+                                <h4>📧 مثال تصنيف</h4>
+                                <p>كشف البريد المزعج <span class="en-term">Spam Detection</span> - الهدف: "بريد مزعج" أو "بريد عادي" (فئتان منفصلتان)</p>
+                                <div class="code">Target: {spam, not_spam} → Categorical</div>
+                            </div>
+                            <div class="example-card">
+                                <h4>🌡️ مثال انحدار</h4>
+                                <p>التنبؤ بدرجة الحرارة <span class="en-term">Temperature Prediction</span> - الهدف: قيمة حرارية مثل 25.3°C</p>
+                                <div class="code">Target: temperature ∈ ℝ → Continuous</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Accordion 3: Creating Regression Trees -->
+        <div class="accordion" id="acc3">
+            <button class="accordion-header" onclick="toggleAccordion('acc3')">
+                <span class="acc-title">
+                    <span class="acc-icon amber">🔨</span>
+                    كيفية إنشاء شجرة الانحدار
+                </span>
+                <span class="acc-chevron">▼</span>
+            </button>
+            <div class="accordion-body">
+                <div class="accordion-body-inner">
+                    <div class="content-block">
+                        <h3>عملية الإنشاء التكراري</h3>
+                        <p>
+                            تُنشأ أشجار الانحدار عن طريق تقسيم مجموعة البيانات <span class="en-term">Dataset</span> بشكل تكراري <span class="en-term">Recursively</span> إلى مجموعات فرعية <span class="en-term">Subsets</span> لتعظيم المعلومات المكتسبة من تقسيم البيانات <span class="en-term">Information Gained</span>. هذه العملية تولّد بنية شجرية وتقلل من عشوائية الفئات المسندة إلى العقد المنقسمة.
+                        </p>
+
+                        <h3>مثال توضيحي</h3>
+                        <p>
+                            لنفترض أن لدينا ميزة مستمرة <span class="en-term">Continuous Feature</span> من مجموعة البيانات وقيمة عتبة تجريبية <span class="en-term">α (Alpha)</span>. يتم تقسيم البيانات في العقدة إلى مجموعتين فرعيتين وفقًا لما إذا كانت البيانات أكبر من أو أقل من <span class="en-term">α</span>، ويتم تعيين النقاط المقابلة إلى العقد اليسرى واليمنى.
+                        </p>
+                        <p>
+                            إذا كانت الميزة ثنائية <span class="en-term">Binary</span> (تتكون من فئتين)، فإن الانقسام يتم وفقًا للفئتين مباشرة. تقوم بالتنبؤ عند كل عقدة إما بناءً على مخطط تصويت الفئات كما هو الحال في أشجار القرار، أو باستخدام متوسط القيم الهدف في العقدة.
+                        </p>
+
+                        <div class="formula-box">
+                            ŷ = (1/n) Σ yᵢ &nbsp;&nbsp;for all data points in the node
+                        </div>
+                        <p style="text-align:center;font-size:0.9rem;color:var(--text-muted);">القيمة المتوقعة <span class="en-term">ŷ (y-hat)</span> لعقدة معينة تُعرّف كمتوسط القيم الفعلية الهدف <span class="en-term">yᵢ</span> لنقاط البيانات في تلك العقدة.</p>
+
+                        <div class="callout warning">
+                            <span class="icon">⚠️</span>
+                            <span>يمكن استخدام إحصائيات أخرى مثل الوسيط <span class="en-term">Median</span> لتعيين التنبؤ. يُفضل الوسيط عندما تكون البيانات منحرفة <span class="en-term">Skewed</span>. للبيانات الموزعة توزيعًا طبيعيًا <span class="en-term">Normally Distributed</span>، يكون الوسيط مشابهًا للمتوسط، لكن الوسيط أكثر تكلفة حسابيًا.</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Accordion 4: MSE and Split Quality -->
+        <div class="accordion" id="acc4">
+            <button class="accordion-header" onclick="toggleAccordion('acc4')">
+                <span class="acc-title">
+                    <span class="acc-icon purple">📊</span>
+                    جودة الانقسام ومعيار MSE
+                </span>
+                <span class="acc-chevron">▼</span>
+            </button>
+            <div class="accordion-body">
+                <div class="accordion-body-inner">
+                    <div class="content-block">
+                        <h3>لماذا MSE بدلاً من Entropy؟</h3>
+                        <p>
+                            بدلاً من استخدام معايير <span class="en-term">Entropy</span> أو <span class="en-term">Information Gain</span> لقياس جودة الانقسام كما في أشجار القرار، تختار أشجار الانحدار الميزات التي تقلل الخطأ بين القيم الفعلية <span class="en-term">yᵢ</span> في العقد الناتجة والقيمة المتوقعة <span class="en-term">ŷ</span>.
+                        </p>
+                        <p>
+                            المعيار الطبيعي لقياس جودة الانقسام لميزة معينة يستخدم متوسط مربع الخطأ <span class="en-term">Mean-Squared Error (MSE)</span>. لاحظ أن هذا يعادل قياس التباين <span class="en-term">Variance</span> للقيم الهدف داخل كل عقدة، مما يقيس مدى تشتت القيم. كلما كان التباين أصغر، كانت القيم أكثر توافقًا.
+                        </p>
+
+                        <h3>حساب Weighted MSE</h3>
+                        <p>
+                            لقياس جودة الانقسام، يمكن استخدام المتوسط المرجح <span class="en-term">Weighted Average</span> لقيم <span class="en-term">MSE</span> لكل عقدة منقسمة:
+                        </p>
+                        <div class="formula-box">
+                            Weighted MSE = (1 / (n_left + n_right)) × (n_left × MSE_left + n_right × MSE_right)
+                        </div>
+                        <p>
+                            كلما انخفضت هذه القيمة، انخفض التباين، وبالتالي ارتفعت جودة الانقسام. أثناء التدريب <span class="en-term">Training</span>، تجد الشجرة الميزة والعتبة التي تقسم كل عقدة بأفضل شكل. لكل انقسام محتمل لميزة ما، تحسب الشجرة <span class="en-term">MSE</span> للمجموعتين الفرعيتين اليسرى واليمنى، ثم تختار الانقسام ذا أدنى <span class="en-term">Weighted MSE</span>.
+                        </p>
+
+                        <div class="callout success">
+                            <span class="icon">✅</span>
+                            <span>هذه العملية تقلل التباين في القيم المتوقعة وتحسن دقة شجرة الانحدار.</span>
+                        </div>
+
+                        <h3>التعامل مع الميزات المختلفة</h3>
+                        <ul class="list-styled">
+                            <li><strong>الميزة الثنائية <span class="en-term">Binary Feature</span>:</strong> بدلاً من استخدام العتبات، يتم فصل البيانات إلى فئتيها مباشرة، وجودة الانقسام هي ببساطة المتوسط المرجح لـ <span class="en-term">MSE</span> للفئتين. للمتوسط المرجح نتيجة واحدة فقط ممكنة، لذا فهو مُحسَّن بالفعل.</li>
+                            <li><strong>الميزة متعددة الفئات <span class="en-term">Multi-class Feature</span>:</strong> يمكن استخدام استراتيجيات مثل <span class="en-term">One-versus-One</span> أو <span class="en-term">One-versus-All</span> لتوليد مجموعة من الانقسامات الثنائية الممكنة، ثم لكل انقسام ثنائي، حساب المتوسط المرجح لـ <span class="en-term">MSE</span>، واختيار الانقسام الذي يقلل <span class="en-term">Weighted MSE</span>.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Accordion 5: Threshold Selection -->
+        <div class="accordion" id="acc5">
+            <button class="accordion-header" onclick="toggleAccordion('acc5')">
+                <span class="acc-title">
+                    <span class="acc-icon pink">🎯</span>
+                    استراتيجيات اختيار العتبات
+                </span>
+                <span class="acc-chevron">▼</span>
+            </button>
+            <div class="accordion-body">
+                <div class="accordion-body-inner">
+                    <div class="content-block">
+                        <h3>كيف تختار مجموعة العتبات التجريبية لتقسيم ميزة مستمرة؟</h3>
+                        <p>هناك طرق عديدة. إليك استراتيجية واحدة فعالة:</p>
+
+                        <ul class="list-styled">
+                            <li><strong>الخطوة 1:</strong> ابدأ بفرز قيم الميزة بحيث يكون <span class="en-term">Xᵢ ≤ Xⱼ</span> لكل المؤشرات <span class="en-term">i < j</span>.</li>
+                            <li><strong>الخطوة 2:</strong> احذف أي قيم مكررة بحيث يكون <span class="en-term">Xᵢ < Xⱼ</span> تمامًا لكل <span class="en-term">i < j</span>.</li>
+                            <li><strong>الخطوة 3:</strong> عرّف العتبات المرشحة <span class="en-term">αᵢ</span> كنقاط المنتصف بين كل زوج من القيم المتتالية: <span class="en-term">αᵢ = ½(Xᵢ + Xᵢ₊₁)</span></li>
+                            <li><strong>الخطوة 4:</strong> اختر العتبة التي تقلل <span class="en-term">Weighted MSE</span> لانقسام بياناتها.</li>
+                        </ul>
+
+                        <div class="example-card">
+                            <h4>💡 مثال عملي: حساب العتبات المرشحة</h4>
+                            <p>إذا كانت قيم الميزة هي: <strong>[2, 8, 5, 10, 5]</strong></p>
+                            <p><strong>الترتيب:</strong> 2, 5, 5, 8, 10</p>
+                            <p><strong>إزالة التكرار:</strong> 2, 5, 8, 10</p>
+                            <p><strong>العتبات المرشحة:</strong></p>
+                            <div class="code">α₁ = (2+5)/2 = 3.5<br>α₂ = (5+8)/2 = 6.5<br>α₃ = (8+10)/2 = 9</div>
+                        </div>
+
+                        <div class="callout danger">
+                            <span class="icon">🚨</span>
+                            <span>
+                                <strong>ملاحظة مهمة:</strong> هذه الطريقة هي بحث شامل <span class="en-term">Exhaustive Search</span> لا يتوسع جيدًا مع البيانات الكبيرة <span class="en-term">Big Data</span>. للمجموعات الكبيرة جدًا، يمكن اختيار مجموعة فرعية متفرقة <span class="en-term">Sparse Subset</span> من هذه العتبات لتحسين الكفاءة على حساب الدقة. كما تفترض الطريقة أن القيم الهدف موزعة توزيعًا منتظمًا <span class="en-term">Uniformly Distributed</span>. للكفاءة، يجب مراعاة التوزيع عند أخذ عينات العتبات.
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Accordion 6: Practical Examples & Summary -->
+        <div class="accordion" id="acc6">
+            <button class="accordion-header" onclick="toggleAccordion('acc6')">
+                <span class="acc-title">
+                    <span class="acc-icon indigo">📝</span>
+                    أمثلة عملية وملخص شامل
+                </span>
+                <span class="acc-chevron">▼</span>
+            </button>
+            <div class="accordion-body">
+                <div class="accordion-body-inner">
+                    <div class="content-block">
+                        <h3>مثال: حساب MSE لانقسام مقترح</h3>
+                        <p>لنفترض أن لدينا عقدة تحتوي على القيم الهدف التالية: <span class="en-term">[10, 12, 15, 18, 20, 25]</span> ونريد تقييم انقسام عند قيمة الميزة التي تفصل البيانات إلى:</p>
+                        <ul class="list-styled">
+                            <li><strong>المجموعة اليسرى:</strong> [10, 12, 15] → المتوسط = 12.33</li>
+                            <li><strong>المجموعة اليمنى:</strong> [18, 20, 25] → المتوسط = 21</li>
+                        </ul>
+                        <p><strong>حساب MSE للمجموعة اليسرى:</strong></p>
+                        <div class="formula-box">
+                            MSE_left = [(10-12.33)² + (12-12.33)² + (15-12.33)²] / 3<br>
+                            = [5.43 + 0.11 + 7.13] / 3 ≈ 4.22
+                        </div>
+                        <p><strong>حساب MSE للمجموعة اليمنى:</strong></p>
+                        <div class="formula-box">
+                            MSE_right = [(18-21)² + (20-21)² + (25-21)²] / 3<br>
+                            = [9 + 1 + 16] / 3 ≈ 8.67
+                        </div>
+                        <p><strong>حساب Weighted MSE:</strong></p>
+                        <div class="formula-box">
+                            Weighted MSE = (3×4.22 + 3×8.67) / 6 = (12.67 + 26) / 6 ≈ 6.44
+                        </div>
+                        <p>كلما انخفضت هذه القيمة، كان الانقسام أفضل لأنه يعني تباينًا أقل داخل المجموعات.</p>
+
+                        <h3>ملخص ما تعلمته في هذا الدرس</h3>
+                        <ul class="list-styled">
+                            <li>شجرة الانحدار <span class="en-term">Regression Tree</span> مشابهة لشجرة القرار لكنها تتنبأ بقيم مستمرة.</li>
+                            <li>في التصنيف، المتغير الهدف فئوي، وفي الانحدار، الهدف قيمة مستمرة.</li>
+                            <li>تُنشأ أشجار الانحدار بتقسيم مجموعة البيانات تكراريًا لتعظيم المعلومات المكتسبة.</li>
+                            <li><span class="en-term">MSE</span> هو المعيار الطبيعي لقياس جودة الانقسام.</li>
+                            <li>تجد الشجرة الميزة والعتبة الأفضل لتقسيم كل عقدة أثناء التدريب.</li>
+                            <li>الميزة يمكن أن تكون ثنائية أو متعددة الفئات.</li>
+                            <li>يمكن اختيار العتبات التجريبية للميزات المستمرة بطرق متعددة حسب حجم البيانات.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ========== QUIZ SECTION ========== -->
+        <h2 class="section-title" style="margin-top:4rem;">📝 الاختبار التفاعلي</h2>
+        <p class="section-subtitle">
+            اختبر فهمك لأشجار الانحدار من خلال 20 سؤالًا مصنفًا حسب الغرض، تصنيف بلوم، الأسئلة الست (W Questions)، البنية المنطقية، والأنواع السقراطية.
+        </p>
+
+        <div class="quiz-container">
+            <div class="quiz-header">
+                <h2>🎯 اختبر معرفتك</h2>
+                <p style="color:var(--text-muted);">أجب عن جميع الأسئلة ثم اضغط "إنهاء الاختبار" لعرض النتائج</p>
+            </div>
+
+            <div class="quiz-progress">
+                <span style="font-weight:600;">التقدم:</span>
+                <div class="progress-bar-container">
+                    <div class="progress-bar" id="progressBar"></div>
+                </div>
+                <span class="progress-text" id="progressText">0 / 20</span>
+            </div>
+
+            <div id="quizQuestions"></div>
+
+            <div class="quiz-actions">
+                <button class="btn btn-primary" id="submitQuiz" onclick="submitQuiz()">إنهاء الاختبار</button>
+                <button class="btn btn-secondary" onclick="resetQuiz()">إعادة الاختبار</button>
+            </div>
+
+            <div class="results-container" id="resultsContainer">
+                <h2 style="color:var(--primary-dark);">📊 النتائج</h2>
+                <div class="score-circle">
+                    <div class="score-circle-inner" id="scorePercentage">0%</div>
+                </div>
+                <div class="results-stats">
+                    <div class="stat-item">
+                        <div class="stat-num" id="correctCount">0</div>
+                        <div class="stat-label">إجابات صحيحة</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-num" id="wrongCount">0</div>
+                        <div class="stat-label">إجابات خاطئة</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-num" id="unansweredCount">0</div>
+                        <div class="stat-label">بدون إجابة</div>
+                    </div>
+                </div>
+                <p id="resultsMessage" style="font-weight:600;font-size:1.1rem;"></p>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- ========== FOOTER ========== -->
+    <footer class="footer">
+        <p>صفحة تعليمية تفاعلية | أشجار الانحدار <span style="font-family:var(--font-mono);">Regression Trees</span></p>
+        <p style="margin-top:0.5rem;font-size:0.8rem;">صُممت هذه الصفحة للتعلم الذاتي وتقييم الفهم وفق تصنيفات متعددة للأغراض التعليمية</p>
+    </footer>
+
+    <script>
+        // ========== ACCORDION LOGIC ==========
+        function toggleAccordion(id) {
+            const accordion = document.getElementById(id);
+            const body = accordion.querySelector('.accordion-body');
+            const isOpen = accordion.classList.contains('open');
+
+            if (isOpen) {
+                accordion.classList.remove('open');
+                body.style.maxHeight = '0';
+            } else {
+                accordion.classList.add('open');
+                body.style.maxHeight = body.scrollHeight + 'px';
+            }
+        }
+
+        // Initialize accordions
+        document.addEventListener('DOMContentLoaded', function() {
+            const accordions = document.querySelectorAll('.accordion');
+            accordions.forEach(acc => {
+                const body = acc.querySelector('.accordion-body');
+                if (acc.classList.contains('open')) {
+                    body.style.maxHeight = body.scrollHeight + 'px';
+                } else {
+                    body.style.maxHeight = '0';
+                }
+            });
+        });
+
+        // Recalculate on window resize
+        window.addEventListener('resize', function() {
+            document.querySelectorAll('.accordion.open').forEach(acc => {
+                const body = acc.querySelector('.accordion-body');
+                body.style.maxHeight = body.scrollHeight + 'px';
+            });
+        });
+
+        // ========== QUIZ DATA ==========
+        const questions = [{
+            id: 1,
+            type: 'mcq',
+            question: 'ما هو الهدف الأساسي لشجرة الانحدار <span class="quiz-en">(Regression Tree)</span>؟',
+            options: [
+                'تصنيف البيانات إلى فئات منفصلة <span class="quiz-en">(Discrete Classes)</span>',
+                'التنبؤ بقيم مستمرة <span class="quiz-en">(Continuous Values)</span>',
+                'تقليل عدد الميزات <span class="quiz-en">(Features)</span> في مجموعة البيانات',
+                'تحسين دقة التصنيف الثنائي <span class="quiz-en">(Binary Classification)</span>'
+            ],
+            correct: 1,
+            explanation: 'الهدف الأساسي لشجرة الانحدار هو التنبؤ بقيم مستمرة وليس تصنيف البيانات إلى فئات. الخيار الأول هو هدف شجرة التصنيف، والبقية غير ذات صلة مباشرة.',
+            categories: {
+                purpose: 'Closed',
+                bloom: 'Remembering',
+                w: 'What',
+                logical: null,
+                socratic: 'Clarification'
+            },
+            difficulty: 'Medium'
+        }, {
+            id: 2,
+            type: 'open',
+            question: 'اشرح كيف يتم اختيار أفضل ميزة وعتبة <span class="quiz-en">(Threshold)</span> لتقسيم العقدة في شجرة الانحدار أثناء التدريب <span class="quiz-en">(Training)</span>.',
+            sampleAnswer: 'أثناء التدريب، تبحث الشجرة عن الميزة والعتبة الأفضل لتقسيم كل عقدة. لكل انقسام محتمل لميزة، تحسب الشجرة MSE للمجموعات الفرعية اليسرى واليمنى، ثم تحسب Weighted MSE للانقسام. يتم اختيار الانقسام ذي أدنى Weighted MSE لأنه يقلل التباين في القيم المتوقعة ويحسن الدقة.',
+            explanation: 'العملية تهدف إلى تقليل التباين داخل العقد الناتجة. كلما انخفض Weighted MSE، كان الانقسام أفضل.',
+            categories: {
+                purpose: 'Open-Ended',
+                bloom: 'Understanding',
+                w: 'How',
+                logical: null,
+                socratic: 'Challenging Assumptions'
+            },
+            difficulty: 'Hard'
+        }, {
+            id: 3,
+            type: 'mcq',
+            question: 'إذا كان لديك ميزة ثنائية <span class="quiz-en">(Binary Feature)</span> في شجرة انحدار، فكم عدد الانقسامات الممكنة للعقدة؟',
+            options: [
+                'انقسام واحد فقط',
+                'انقسامان',
+                'عدد لا نهائي من الانقسامات',
+                'يعتمد على عدد العينات في العقدة'
+            ],
+            correct: 0,
+            explanation: 'الميزة الثنائية لها انقسام واحد فقط: الفصل بين الفئتين مباشرة. لا توجد عتبات متعددة للاختبار. الخيار الثاني خاطئ لأنه لا يوجد سوى فصل واحد بين الفئتين، والثالث خاطئ لأن الميزة الثنائية ليست مستمرة.',
+            categories: {
+                purpose: 'Probing',
+                bloom: 'Applying',
+                w: 'What',
+                logical: null,
+                socratic: 'Consequences'
+            },
+            difficulty: 'Hard'
+        }, {
+            id: 4,
+            type: 'mcq',
+            question: 'بما أن <span class="quiz-en">MSE</span> يقيس التباين <span class="quiz-en">(Variance)</span> داخل العقد، هل من الممكن أن يكون الانقسام ذو <span class="quiz-en">MSE</span> الأقل ليس الأفضل دائمًا من حيث تعميم النموذج <span class="quiz-en">(Generalization)</span>؟',
+            options: [
+                'لا، MSE الأقل دائمًا هو الأفضل بلا استثناء',
+                'نعم، لأن الانقسام قد يؤدي إلى <span class="quiz-en">Overfitting</span> إذا كان مفرط التخصص',
+                'لا، لأن MSE هو المعيار الوحيد المعتمد علميًا',
+                'نعم، لكن فقط للبيانات الموزعة توزيعًا طبيعيًا'
+            ],
+            correct: 1,
+            explanation: 'نعم، الانقسام ذو MSE منخفض جدًا قد يعني أن الشجرة تتخصص بشكل مفرط في بيانات التدريب (Overfitting)، مما يضر بالتعميم على بيانات جديدة. يجب الموازنة بين الدقة والتعميم.',
+            categories: {
+                purpose: 'Leading',
+                bloom: 'Analyzing',
+                w: 'Why',
+                logical: null,
+                socratic: 'Challenging Assumptions'
+            },
+            difficulty: 'Hard'
+        }, {
+            id: 5,
+            type: 'mcq',
+            question: 'من بين التطبيقات التالية، أيها يُعد استخدامًا نموذجيًا لأشجار الانحدار <span class="quiz-en">(Regression Trees)</span>؟',
+            options: [
+                'اكتشاف البريد المزعج <span class="quiz-en">(Spam Detection)</span>',
+                'تصنيف الصور <span class="quiz-en">(Image Classification)</span>',
+                'التنبؤ بدرجات الحرارة <span class="quiz-en">(Temperature Prediction)</span>',
+                'التشخيص الطبي <span class="quiz-en">(Medical Diagnosis)</span>'
+            ],
+            correct: 2,
+            explanation: 'التنبؤ بدرجات الحرارة هو تطبيق انحدار لأن الهدف قيمة مستمرة. الخيارات الأخرى هي تطبيقات تصنيف (فئات منفصلة) كما ورد في الدرس.',
+            categories: {
+                purpose: 'Closed',
+                bloom: 'Remembering',
+                w: 'Who',
+                logical: null,
+                socratic: null
+            },
+            difficulty: 'Medium'
+        }, {
+            id: 6,
+            type: 'mcq',
+            question: 'متى يكون استخدام الوسيط <span class="quiz-en">(Median)</span> أفضل من المتوسط <span class="quiz-en">(Mean)</span> لتوقع القيم في العقد الورقية لشجرة الانحدار؟',
+            options: [
+                'عندما تكون البيانات موزعة توزيعًا طبيعيًا <span class="quiz-en">(Normally Distributed)</span>',
+                'عندما تكون البيانات منحرفة <span class="quiz-en">(Skewed)</span>',
+                'دائمًا يكون الوسيط أفضل',
+                'لا يُستخدم الوسيط أبدًا'
+            ],
+            correct: 1,
+            explanation: 'يُفضل الوسيط عندما تكون البيانات منحرفة (Skewed) لأنه أقل تأثرًا بالقيم الشاذة. للبيانات الموزعة طبيعيًا، الوسيط مشابه للمتوسط لكنه أكثر تكلفة حسابيًا.',
+            categories: {
+                purpose: 'Closed',
+                bloom: 'Understanding',
+                w: 'When',
+                logical: null,
+                socratic: null
+            },
+            difficulty: 'Medium'
+        }, {
+            id: 7,
+            type: 'mcq',
+            question: 'أين يتم تطبيق أشجار الانحدار <span class="quiz-en">(Regression Trees)</span> بشكل نموذجي؟',
+            options: [
+                'تصنيف الصور <span class="quiz-en">(Image Classification)</span>',
+                'اكتشاف البريد المزعج <span class="quiz-en">(Spam Detection)</span>',
+                'التنبؤ بالإيرادات <span class="quiz-en">(Revenue Prediction)</span>',
+                'التشخيص الطبي <span class="quiz-en">(Medical Diagnosis)</span>'
+            ],
+            correct: 2,
+            explanation: 'التنبؤ بالإيرادات هو تطبيق انحدار (قيمة مستمرة). الخيارات الأخرى تطبيقات تصنيف ذكرت في الدرس كحالات استخدام لأشجار التصنيف.',
+            categories: {
+                purpose: 'Closed',
+                bloom: 'Applying',
+                w: 'Where',
+                logical: null,
+                socratic: null
+            },
+            difficulty: 'Medium'
+        }, {
+            id: 8,
+            type: 'mcq',
+            question: 'لماذا يتم استخدام <span class="quiz-en">MSE</span> بدلاً من <span class="quiz-en">Entropy</span> أو <span class="quiz-en">Information Gain</span> في أشجار الانحدار؟',
+            options: [
+                'لأن MSE أسرع حسابيًا من Entropy دائمًا',
+                'لأن Entropy يعمل فقط مع الفئات المنفصلة بينما MSE يعمل مع القيم المستمرة',
+                'لأن MSE دائمًا يعطي نتائج أفضل بغض النظر عن نوع البيانات',
+                'لأن Entropy غير معرّف رياضيًا للقيم العددية'
+            ],
+            correct: 1,
+            explanation: 'Entropy وInformation Gain صُمما للفئات المنفصلة (Categorical)، بينما MSE يقيس الخطأ للقيم المستمرة، مما يجعله الأنسب لمسائل الانحدار. الخيارات الأخرى غير دقيقة.',
+            categories: {
+                purpose: 'Probing',
+                bloom: 'Analyzing',
+                w: 'Why',
+                logical: null,
+                socratic: null
+            },
+            difficulty: 'Hard'
+        }, {
+            id: 9,
+            type: 'mcq',
+            question: 'بدلاً من البحث الشامل <span class="quiz-en">(Exhaustive Search)</span> عن أفضل عتبة، ما هي الاستراتيجية البديلة المناسبة للبيانات الكبيرة جدًا؟',
+            options: [
+                'استخدام جميع العتبات الممكنة دون استثناء',
+                'اختيار مجموعة فرعية متفرقة <span class="quiz-en">(Sparse Subset)</span> من العتبات',
+                'استخدام المتوسط فقط وتجاهل العتبات',
+                'إلغاء خاصية العتبات نهائيًا واستخدام جميع القيم'
+            ],
+            correct: 1,
+            explanation: 'للمجموعات الكبيرة جدًا، اختيار مجموعة فرعية متفرقة من العتبات يحسن الكفاءة على حساب الدقة. البحث الشامل لا يتوسع جيدًا مع البيانات الكبيرة.',
+            categories: {
+                purpose: 'Probing',
+                bloom: 'Evaluating',
+                w: 'What',
+                logical: 'Alternative',
+                socratic: null
+            },
+            difficulty: 'Hard'
+        }, {
+            id: 10,
+            type: 'mcq',
+            question: 'أنت توافق على أن استخدام مجموعة فرعية متفرقة من العتبات يحسن الكفاءة على حساب الدقة، أليس كذلك؟',
+            options: [
+                'نعم، هذا صحيح تمامًا - تحسين الكفاءة يأتي على حساب الدقة',
+                'لا، لا يوجد أي مقايضة بينهما',
+                'نعم، لكن فقط للبيانات الصغيرة وليس الكبيرة',
+                'لا، المجموعة المتفرقة دائمًا أفضل في كل شيء'
+            ],
+            correct: 0,
+            explanation: 'نعم، كما ورد في الدرس: "اختيار مجموعة فرعية متفرقة من هذه العتبات يمكن أن يحسن الكفاءة على حساب الدقة". هذه مقايضة واضحة.',
+            categories: {
+                purpose: 'Closed',
+                bloom: 'Understanding',
+                w: 'What',
+                logical: 'Tag',
+                socratic: null
+            },
+            difficulty: 'Hard'
+        }, {
+            id: 11,
+            type: 'mcq',
+            question: 'السؤال الخطابي التالي: "أليس من الواضح أن تقليل التباين داخل العقد هو دائمًا الهدف النهائي بلا استثناء؟" — ما هو الافتراض الضمني الذي يحمله هذا السؤال الخطابي <span class="quiz-en">(Rhetorical Question)</span>؟',
+            options: [
+                'أن تقليل التباين دائمًا هو الأفضل بلا استثناء',
+                'أن التباين غير مهم أبدًا في أشجار الانحدار',
+                'أن دقة النموذج لا تهم',
+                'أن الانحياز <span class="quiz-en">(Bias)</span> أكثر أهمية من التباين'
+            ],
+            correct: 0,
+            explanation: 'السؤال الخطابي يحمل افتراضًا ضمنيًا بأن تقليل التباين هو دائمًا الهدف النهائي. لكن في الواقع، قد يؤدي الانخفاض المفرط إلى Overfitting، لذا الافتراض غير صحيح دائمًا.',
+            categories: {
+                purpose: 'Closed',
+                bloom: 'Evaluating',
+                w: 'Why',
+                logical: 'Rhetorical',
+                socratic: null
+            },
+            difficulty: 'Hard'
+        }, {
+            id: 12,
+            type: 'mcq',
+            question: 'في السؤال المحمّل <span class="quiz-en">(Loaded Question)</span>: "بما أن الوسيط دائمًا أفضل من المتوسط، لماذا يستخدم أي شخص المتوسط؟" — ما هو الافتراض الخاطئ في هذا السؤال؟',
+            options: [
+                'أن الوسيط دائمًا أفضل من المتوسط',
+                'أن المتوسط دائمًا أفضل من الوسيط',
+                'أن كلاهما متساوٍ تمامًا في جميع الحالات',
+                'لا يوجد أي افتراض خاطئ في السؤال'
+            ],
+            correct: 0,
+            explanation: 'الافتراض الخاطئ هو أن الوسيط دائمًا أفضل. في الواقع، الوسيط يُفضل فقط للبيانات المنحرفة، بينما للبيانات الطبيعية يكون المتوسط مشابهًا وأقل تكلفة حسابيًا.',
+            categories: {
+                purpose: 'Leading',
+                bloom: 'Analyzing',
+                w: 'Why',
+                logical: 'Loaded',
+                socratic: 'Challenging Assumptions'
+            },
+            difficulty: 'Very Hard'
+        }, {
+            id: 13,
+            type: 'mcq',
+            question: 'هل يمكنك توضيح ما الذي يعنيه <span class="quiz-en">Weighted MSE</span> في سياق تقسيم العقدة في شجرة الانحدار؟',
+            options: [
+                'متوسط MSE للعقدتين دون أي ترجيح',
+                'مجموع MSE لكل عقدة مضروبًا في عدد ملاحظاتها مقسومًا على العدد الكلي للملاحظات',
+                'MSE للعقدة اليسرى فقط لأنها الأكثر أهمية',
+                'الفرق بين MSE للعقدة اليمنى وMSE للعقدة اليسرى'
+            ],
+            correct: 1,
+            explanation: 'Weighted MSE = (n_left × MSE_left + n_right × MSE_right) / (n_left + n_right). إنه متوسط مرجح يأخذ في الاعتبار حجم كل عقدة.',
+            categories: {
+                purpose: 'Open-Ended',
+                bloom: 'Understanding',
+                w: 'What',
+                logical: null,
+                socratic: 'Clarification'
+            },
+            difficulty: 'Medium'
+        }, {
+            id: 14,
+            type: 'mcq',
+            question: 'يفترض البعض أن البحث الشامل <span class="quiz-en">(Exhaustive Search)</span> عن العتبات هو دائمًا الخيار الأفضل. ما هو التحدي الرئيسي لهذا الافتراض؟',
+            options: [
+                'أنه غير دقيق رياضيًا',
+                'أنه لا يتوسع جيدًا مع البيانات الكبيرة <span class="quiz-en">(Doesn\'t Scale Well to Big Data)</span>',
+                'أنه سهل التنفيذ للغاية',
+                'لا يوجد أي تحدٍ لهذا الافتراض'
+            ],
+            correct: 1,
+            explanation: 'التحدي الرئيسي هو أن البحث الشامل لا يتوسع جيدًا مع البيانات الكبيرة، مما يجعله غير فعال. هذا ما يدفع لاستخدام مجموعات فرعية متفرقة من العتبات.',
+            categories: {
+                purpose: 'Probing',
+                bloom: 'Evaluating',
+                w: 'What',
+                logical: null,
+                socratic: 'Challenging Assumptions'
+            },
+            difficulty: 'Hard'
+        }, {
+            id: 15,
+            type: 'mcq',
+            question: 'ما هي وجهة النظر المختلفة حول استخدام الوسيط مقابل المتوسط في توقع القيم في العقد الورقية؟',
+            options: [
+                'لا يوجد فرق بينهما إطلاقًا في أي حالة',
+                'الوسيط أفضل للبيانات المنحرفة بينما المتوسط أبسط حسابيًا وأفضل للبيانات الطبيعية',
+                'المتوسط دائمًا أفضل بلا استثناء',
+                'الوسيط دائمًا أفضل بلا استثناء'
+            ],
+            correct: 1,
+            explanation: 'وجهة النظر المتوازنة هي أن الوسيط أفضل للبيانات المنحرفة لأنه أقل تأثرًا بالقيم الشاذة، بينما المتوسط أبسط وأرخص حسابيًا ويعمل جيدًا للبيانات الموزعة طبيعيًا.',
+            categories: {
+                purpose: 'Open-Ended',
+                bloom: 'Analyzing',
+                w: 'What',
+                logical: null,
+                socratic: 'Viewpoints'
+            },
+            difficulty: 'Hard'
+        }, {
+            id: 16,
+            type: 'mcq',
+            question: 'ما هي النتيجة المترتبة على اختيار مجموعة فرعية متفرقة <span class="quiz-en">(Sparse Subset)</span> من العتبات للبيانات الكبيرة؟',
+            options: [
+                'تحسين الكفاءة مع احتمال انخفاض الدقة',
+                'تحسين الدقة مع انخفاض الكفاءة',
+                'لا يوجد أي تأثير على الكفاءة أو الدقة',
+                'تحسين الكفاءة والدقة معًا دائمًا'
+            ],
+            correct: 0,
+            explanation: 'اختيار مجموعة فرعية متفرقة يحسن الكفاءة (أسرع) على حساب الدقة (قد تفوت بعض العتبات الجيدة). هذه مقايضة واضحة ذُكرت في الدرس.',
+            categories: {
+                purpose: 'Probing',
+                bloom: 'Applying',
+                w: 'What',
+                logical: null,
+                socratic: 'Consequences'
+            },
+            difficulty: 'Hard'
+        }, {
+            id: 17,
+            type: 'open',
+            question: 'إذا طُلب منك تصميم سؤال لاختبار فهم شخص ما لمعيار <span class="quiz-en">MSE</span> في أشجار الانحدار، فما هو السؤال الذي ستطرحه؟ (فكر في سؤال يختبر الفهم العميق وليس الحفظ فقط)',
+            sampleAnswer: 'سؤال مقترح: "إذا كان لديك انقسامان محتملان لعقدة، الأول به MSE_left=2 وMSE_right=6 مع 10 عينات في اليسار و5 في اليمين، والثاني به MSE_left=3 وMSE_right=4 مع 7 عينات في كل جانب، أي انقسام أفضل ولماذا؟" — هذا يختبر فهم حساب Weighted MSE وتفسير النتائج.',
+            explanation: 'الهدف هو تصميم سؤال يتطلب حسابًا وتفسيرًا، مما يختبر الفهم العميق لمفهوم MSE وكيفية استخدامه في تقييم جودة الانقسامات.',
+            categories: {
+                purpose: 'Open-Ended',
+                bloom: 'Creating',
+                w: 'How',
+                logical: null,
+                socratic: 'Questioning the Question'
+            },
+            difficulty: 'Very Hard'
+        }, {
+            id: 18,
+            type: 'open',
+            question: 'أنشئ مثالًا عمليًا يوضح كيفية حساب العتبات المرشحة <span class="quiz-en">(Candidate Thresholds)</span> لميزة مستمرة بالقيم التالية: <strong>[7, 3, 12, 3, 9]</strong>. اكتب الخطوات كاملة.',
+            sampleAnswer: 'الخطوة 1: الترتيب → 3, 3, 7, 9, 12\nالخطوة 2: إزالة التكرار → 3, 7, 9, 12\nالخطوة 3: العتبات المرشحة = نقاط المنتصف:\nα₁ = (3+7)/2 = 5\nα₂ = (7+9)/2 = 8\nα₃ = (9+12)/2 = 10.5\nالخطوة 4: لكل عتبة، نحسب Weighted MSE ونختار الأفضل.',
+            explanation: 'العتبات المرشحة هي 5, 8, 10.5. هذه هي نقاط المنتصف بين القيم المتتالية بعد الفرز وإزالة التكرار.',
+            categories: {
+                purpose: 'Open-Ended',
+                bloom: 'Creating',
+                w: 'How',
+                logical: null,
+                socratic: null
+            },
+            difficulty: 'Very Hard'
+        }, {
+            id: 19,
+            type: 'mcq',
+            question: 'قيّم العبارة التالية: "الانقسام ذو أدنى <span class="quiz-en">Weighted MSE</span> هو دائمًا الأفضل لشجرة الانحدار في جميع الحالات."',
+            options: [
+                'صحيحة دائمًا بلا استثناء',
+                'خاطئة - قد يؤدي الانقسام ذو MSE المنخفض جدًا إلى <span class="quiz-en">Overfitting</span>',
+                'صحيحة فقط للبيانات الصغيرة',
+                'خاطئة - MSE غير مهم أصلًا في أشجار الانحدار'
+            ],
+            correct: 1,
+            explanation: 'العبارة خاطئة لأن الانقسام ذو MSE المنخفض جدًا قد يشير إلى أن الشجرة تفرط في التخصص على بيانات التدريب (Overfitting)، مما يضر بالتعميم. لا يوجد انقسام "الأفضل دائمًا".',
+            categories: {
+                purpose: 'Probing',
+                bloom: 'Evaluating',
+                w: 'Why',
+                logical: null,
+                socratic: 'Challenging Assumptions'
+            },
+            difficulty: 'Very Hard'
+        }, {
+            id: 20,
+            type: 'mcq',
+            question: 'ما الفرق بين المتغير الهدف <span class="quiz-en">(Target Variable)</span> في شجرة التصنيف وشجرة الانحدار؟',
+            options: [
+                'في التصنيف: فئوي <span class="quiz-en">(Categorical)</span>، وفي الانحدار: مستمر <span class="quiz-en">(Continuous)</span>',
+                'في التصنيف: مستمر، وفي الانحدار: فئوي',
+                'كلاهما فئوي دائمًا',
+                'كلاهما مستمر دائمًا'
+            ],
+            correct: 0,
+            explanation: 'الفرق الأساسي: المتغير الهدف في التصنيف فئوي (مثل صح/خطأ)، وفي الانحدار مستمر (مثل درجة الحرارة). هذا هو جوهر الفرق بين النوعين.',
+            categories: {
+                purpose: 'Closed',
+                bloom: 'Remembering',
+                w: 'What',
+                logical: null,
+                socratic: 'Clarification'
+            },
+            difficulty: 'Medium'
+        }];
+
+        // ========== QUIZ RENDERING ==========
+        let userAnswers = {};
+        let quizSubmitted = false;
+
+        function renderQuiz() {
+            const container = document.getElementById('quizQuestions');
+            container.innerHTML = '';
+
+            questions.forEach((q, index) => {
+                const card = document.createElement('div');
+                card.className = 'question-card';
+                card.id = 'qcard-' + q.id;
+                card.dataset.questionId = q.id;
+
+                // Build badges
+                let badgesHTML = '';
+                if (q.categories.purpose) badgesHTML +=
+                    `<span class="badge purpose">🎯 ${q.categories.purpose}</span>`;
+                if (q.categories.bloom) badgesHTML +=
+                    `<span class="badge bloom">🧠 ${q.categories.bloom}</span>`;
+                if (q.categories.w) badgesHTML += `<span class="badge w-question">❓ ${q.categories.w}</span>`;
+                if (q.categories.logical) badgesHTML +=
+                    `<span class="badge logical">🔗 ${q.categories.logical}</span>`;
+                if (q.categories.socratic) badgesHTML +=
+                    `<span class="badge socratic">💬 ${q.categories.socratic}</span>`;
+
+                let difficultyClass = 'difficulty-easy';
+                let difficultyLabel = 'متوسط';
+                if (q.difficulty === 'Hard') {
+                    difficultyClass = 'difficulty-hard';
+                    difficultyLabel = 'صعب';
+                } else if (q.difficulty === 'Very Hard') {
+                    difficultyClass = 'difficulty-very-hard';
+                    difficultyLabel = 'صعب جدًا';
+                }
+                badgesHTML +=
+                    `<span class="badge ${difficultyClass}">📊 ${difficultyLabel}</span>`;
+
+                let answerHTML = '';
+                if (q.type === 'mcq') {
+                    answerHTML = `<div class="options-list">`;
+                    q.options.forEach((opt, oi) => {
+                        answerHTML += `
+                            <label class="option-label" id="opt-${q.id}-${oi}" onclick="selectOption(${q.id}, ${oi})">
+                                <input type="radio" name="q${q.id}" value="${oi}" id="radio-${q.id}-${oi}" onchange="selectOption(${q.id}, ${oi})">
+                                <span class="option-text">${opt}</span>
+                            </label>`;
+                    });
+                    answerHTML += `</div>`;
+                } else {
+                    answerHTML = `
+                        <textarea class="textarea-answer" id="textarea-${q.id}" placeholder="اكتب إجابتك هنا..." oninput="recordOpenAnswer(${q.id}, this.value)"></textarea>
+                    `;
+                }
+
+                card.innerHTML = `
+                    <div class="question-header">
+                        <span class="question-number">سؤال ${index + 1}</span>
+                        <div class="badge-group">${badgesHTML}</div>
+                    </div>
+                    <div class="question-text">${q.question}</div>
+                    ${answerHTML}
+                    <div class="explanation-box" id="explanation-${q.id}"></div>
+                    <div class="self-assessment" id="self-assess-${q.id}" style="display:none;">
+                        <button class="btn-correct" onclick="selfAssess(${q.id}, true)">✅ كانت إجابتي صحيحة</button>
+                        <button class="btn-wrong" onclick="selfAssess(${q.id}, false)">❌ كانت إجابتي خاطئة</button>
+                    </div>
+                `;
+
+                container.appendChild(card);
+                userAnswers[q.id] = null;
+            });
+
+            updateProgress();
+        }
+
+        function selectOption(qid, oi) {
+            if (quizSubmitted) return;
+            userAnswers[qid] = oi;
+            const card = document.getElementById('qcard-' + qid);
+            const labels = card.querySelectorAll('.option-label');
+            labels.forEach((label, idx) => {
+                label.classList.remove('selected');
+                if (idx === oi) {
+                    label.classList.add('selected');
+                }
+            });
+            const radio = document.getElementById('radio-' + qid + '-' + oi);
+            if (radio) radio.checked = true;
+            updateProgress();
+        }
+
+        function recordOpenAnswer(qid, value) {
+            if (quizSubmitted) return;
+            userAnswers[qid] = value.trim() === '' ? null : value;
+            updateProgress();
+        }
+
+        function updateProgress() {
+            const answered = questions.filter(q => userAnswers[q.id] !== null && userAnswers[q.id] !== '').length;
+            const total = questions.length;
+            const pct = Math.round((answered / total) * 100);
+            document.getElementById('progressBar').style.width = pct + '%';
+            document.getElementById('progressText').textContent = answered + ' / ' + total;
+        }
+
+        function submitQuiz() {
+            if (quizSubmitted) return;
+
+            const unanswered = questions.filter(q => userAnswers[q.id] === null || userAnswers[q.id] === '');
+            if (unanswered.length > 0) {
+                alert('⚠️ يرجى الإجابة عن جميع الأسئلة قبل إنهاء الاختبار. الأسئلة غير المجاب عنها: ' + unanswered.length);
+                return;
+            }
+
+            quizSubmitted = true;
+            let correct = 0;
+            let wrong = 0;
+            let openCount = 0;
+
+            questions.forEach(q => {
+                const card = document.getElementById('qcard-' + q.id);
+                const explBox = document.getElementById('explanation-' + q.id);
+
+                if (q.type === 'mcq') {
+                    const selected = userAnswers[q.id];
+                    const isCorrect = selected === q.correct;
+
+                    // Highlight options
+                    const labels = card.querySelectorAll('.option-label');
+                    labels.forEach((label, idx) => {
+                        if (idx === q.correct) {
+                            label.classList.add('correct-option');
+                        }
+                        if (idx === selected && !isCorrect) {
+                            label.classList.add('wrong-option');
+                        }
+                        if (idx === selected && isCorrect) {
+                            label.classList.add('correct-option');
+                        }
+                    });
+
+                    if (isCorrect) {
+                        card.classList.add('correct-answer');
+                        explBox.className = 'explanation-box show correct';
+                        explBox.innerHTML = '✅ <strong>إجابة صحيحة!</strong> ' + q.explanation;
+                        correct++;
+                    } else {
+                        card.classList.add('wrong-answer');
+                        explBox.className = 'explanation-box show wrong';
+                        explBox.innerHTML = '❌ <strong>إجابة خاطئة.</strong> ' + q.explanation;
+                        wrong++;
+                    }
+
+                    // Disable radio buttons
+                    card.querySelectorAll('input[type="radio"]').forEach(r => r.disabled = true);
+                } else {
+                    // Open-ended
+                    openCount++;
+                    const textarea = document.getElementById('textarea-' + q.id);
+                    if (textarea) textarea.disabled = true;
+
+                    explBox.className = 'explanation-box show neutral';
+                    explBox.innerHTML = '📝 <strong>إجابة نموذجية:</strong><div class="sample-answer">' + q
+                        .sampleAnswer + '</div>';
+
+                    // Show self-assessment
+                    const selfAssess = document.getElementById('self-assess-' + q.id);
+                    if (selfAssess) {
+                        selfAssess.style.display = 'flex';
+                    }
+                }
+            });
+
+            // Calculate score (MCQ only for now)
+            const mcqTotal = questions.filter(q => q.type === 'mcq').length;
+            const pct = Math.round((correct / mcqTotal) * 100);
+
+            document.getElementById('scorePercentage').textContent = pct + '%';
+            document.getElementById('correctCount').textContent = correct;
+            document.getElementById('wrongCount').textContent = wrong;
+            document.getElementById('unansweredCount').textContent = openCount;
+
+            let msg = '';
+            if (pct >= 90) msg = '🏆 ممتاز! أنت تتقن أشجار الانحدار بشكل رائع!';
+            else if (pct >= 75) msg = '👏 جيد جدًا! فهمك لأشجار الانحدار قوي مع بعض النقاط للتحسين.';
+            else if (pct >= 60) msg = '📖 لا بأس! راجع الأقسام التعليمية وحاول مرة أخرى.';
+            else msg = '📚 تحتاج إلى مراجعة المحتوى التعليمي بشكل أعمق ثم إعادة المحاولة.';
+
+            document.getElementById('resultsMessage').textContent = msg;
+            document.getElementById('resultsContainer').classList.add('show');
+            document.getElementById('submitQuiz').disabled = true;
+
+            // Scroll to results
+            document.getElementById('resultsContainer').scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+
+        function selfAssess(qid, isCorrect) {
+            const card = document.getElementById('qcard-' + qid);
+            const selfAssess = document.getElementById('self-assess-' + qid);
+            const explBox = document.getElementById('explanation-' + qid);
+
+            // Remove previous classes
+            card.classList.remove('self-correct', 'self-wrong');
+
+            if (isCorrect) {
+                card.classList.add('self-correct');
+                explBox.className = 'explanation-box show correct';
+                explBox.innerHTML = '✅ <strong>تقييم ذاتي: صحيح!</strong> ' + questions.find(q => q.id === qid)
+                    .explanation;
+            } else {
+                card.classList.add('self-wrong');
+                explBox.className = 'explanation-box show wrong';
+                explBox.innerHTML = '❌ <strong>تقييم ذاتي: خاطئ.</strong> ' + questions.find(q => q.id === qid)
+                    .explanation;
+            }
+
+            // Highlight buttons
+            const buttons = selfAssess.querySelectorAll('button');
+            buttons.forEach(btn => btn.classList.remove('active'));
+            if (isCorrect) {
+                buttons[0].classList.add('active');
+            } else {
+                buttons[1].classList.add('active');
+            }
+
+            // Disable other button
+            buttons.forEach(btn => btn.disabled = true);
+        }
+
+        function resetQuiz() {
+            quizSubmitted = false;
+            userAnswers = {};
+            document.getElementById('resultsContainer').classList.remove('show');
+            document.getElementById('submitQuiz').disabled = false;
+            document.getElementById('scorePercentage').textContent = '0%';
+            document.getElementById('correctCount').textContent = '0';
+            document.getElementById('wrongCount').textContent = '0';
+            document.getElementById('unansweredCount').textContent = '0';
+            document.getElementById('resultsMessage').textContent = '';
+            renderQuiz();
+            window.scrollTo({ top: document.querySelector('.quiz-container').offsetTop - 80, behavior: 'smooth' });
+        }
+
+        // ========== INITIALIZE ==========
+        document.addEventListener('DOMContentLoaded', function() {
+            renderQuiz();
+        });
+    </script>
+</body>
+</html>

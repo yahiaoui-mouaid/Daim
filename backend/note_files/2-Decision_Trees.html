@@ -1,0 +1,1389 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>تعلم Decision Trees للتعلم الآلي</title>
+    <style>
+        :root {
+            --primary: #0d47a1;
+            --primary-light: #1565c0;
+            --primary-lighter: #e3f2fd;
+            --accent: #ff6f00;
+            --accent-light: #fff3e0;
+            --bg: #f5f7fa;
+            --card-bg: #ffffff;
+            --text: #1a1a2e;
+            --text-secondary: #4a4a6a;
+            --border: #e0e4ea;
+            --success: #2e7d32;
+            --success-light: #e8f5e9;
+            --error: #c62828;
+            --error-light: #ffebee;
+            --warning: #f9a825;
+            --warning-light: #fffde7;
+            --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.04);
+            --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.08), 0 2px 4px rgba(0, 0, 0, 0.04);
+            --shadow-lg: 0 12px 32px rgba(0, 0, 0, 0.12), 0 4px 8px rgba(0, 0, 0, 0.06);
+            --radius-sm: 8px;
+            --radius-md: 14px;
+            --radius-lg: 20px;
+            --transition: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            --font-main: 'Segoe UI', 'Tahoma', 'Arial', sans-serif;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+            font-size: 16px;
+        }
+
+        body {
+            font-family: var(--font-main);
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.75;
+            min-height: 100vh;
+            background-image:
+                radial-gradient(ellipse at 10% 20%, rgba(13, 71, 161, 0.03) 0%, transparent 60%),
+                radial-gradient(ellipse at 85% 70%, rgba(255, 111, 0, 0.03) 0%, transparent 60%),
+                radial-gradient(ellipse at 50% 50%, rgba(21, 101, 192, 0.02) 0%, transparent 70%);
+        }
+
+        /* ── Header ─────────────────────── */
+        .header {
+            background: linear-gradient(135deg, #0d47a1 0%, #0a3a85 30%, #1565c0 70%, #0d47a1 100%);
+            color: #fff;
+            padding: 2.5rem 1.5rem 2rem;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            box-shadow: var(--shadow-lg);
+        }
+        .header::before {
+            content: '';
+            position: absolute;
+            top: -60%;
+            left: -20%;
+            width: 140%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.06) 0%, transparent 60%);
+            animation: headerGlow 8s ease-in-out infinite;
+            pointer-events: none;
+        }
+        @keyframes headerGlow {
+            0%,
+            100% {
+                transform: translate(0, 0) scale(1);
+            }
+            25% {
+                transform: translate(3%, -2%) scale(1.05);
+            }
+            50% {
+                transform: translate(-2%, 3%) scale(0.97);
+            }
+            75% {
+                transform: translate(-1%, -1%) scale(1.03);
+            }
+        }
+        .header .icon-row {
+            font-size: 2.8rem;
+            margin-bottom: 0.5rem;
+            position: relative;
+            z-index: 1;
+            letter-spacing: 0.3rem;
+        }
+        .header h1 {
+            font-size: 2.2rem;
+            font-weight: 800;
+            letter-spacing: -0.02em;
+            position: relative;
+            z-index: 1;
+            margin-bottom: 0.4rem;
+        }
+        .header .subtitle {
+            font-size: 1.05rem;
+            opacity: 0.9;
+            font-weight: 400;
+            position: relative;
+            z-index: 1;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        .header .badge-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.6rem;
+            justify-content: center;
+            margin-top: 1.2rem;
+            position: relative;
+            z-index: 1;
+        }
+        .header .badge {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(6px);
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            padding: 0.35rem 1rem;
+            border-radius: 50px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            letter-spacing: 0.02em;
+        }
+
+        /* ── Container ──────────────────── */
+        .container {
+            max-width: 880px;
+            margin: 0 auto;
+            padding: 1.5rem 1.2rem 3rem;
+        }
+
+        /* ── Section Cards ─────────────── */
+        .section-card {
+            background: var(--card-bg);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-sm);
+            margin-bottom: 1.2rem;
+            border: 1px solid var(--border);
+            overflow: hidden;
+            transition: box-shadow var(--transition), border-color var(--transition);
+        }
+        .section-card:hover {
+            box-shadow: var(--shadow-md);
+            border-color: #cdd4de;
+        }
+        .section-card.open {
+            box-shadow: var(--shadow-md);
+            border-color: var(--primary-light);
+        }
+        .section-header {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 1.1rem 1.3rem;
+            cursor: pointer;
+            user-select: none;
+            transition: background var(--transition);
+            border: none;
+            background: none;
+            width: 100%;
+            text-align: right;
+            font-family: var(--font-main);
+            font-size: 1rem;
+            color: var(--text);
+            font-weight: 600;
+        }
+        .section-header:hover {
+            background: #f8fafc;
+        }
+        .section-header .icon {
+            font-size: 1.5rem;
+            flex-shrink: 0;
+            transition: transform var(--transition);
+        }
+        .section-card.open .section-header .icon {
+            transform: rotate(180deg);
+        }
+        .section-header .title-text {
+            flex: 1;
+            font-size: 1.08rem;
+            font-weight: 700;
+            color: #1a1a2e;
+        }
+        .section-header .arrow {
+            font-size: 1.2rem;
+            transition: transform var(--transition);
+            color: #888;
+            flex-shrink: 0;
+        }
+        .section-card.open .section-header .arrow {
+            transform: rotate(180deg);
+            color: var(--primary);
+        }
+        .section-body {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.45s cubic-bezier(0.4, 0, 0.2, 1), padding 0.35s ease;
+            padding: 0 1.3rem;
+        }
+        .section-card.open .section-body {
+            max-height: 2000px;
+            padding: 0 1.3rem 1.3rem;
+        }
+        .section-body p {
+            margin-bottom: 0.75rem;
+            color: var(--text-secondary);
+            font-size: 0.98rem;
+            line-height: 1.85;
+        }
+        .section-body .highlight-box {
+            background: var(--primary-lighter);
+            border-right: 4px solid var(--primary);
+            border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+            padding: 0.9rem 1.2rem;
+            margin: 1rem 0;
+            font-size: 0.95rem;
+            color: #1a3a6e;
+            font-weight: 500;
+        }
+        .section-body .key-term {
+            display: inline-block;
+            background: #fff;
+            border: 1.5px solid #b0c8e8;
+            border-radius: 6px;
+            padding: 0.15rem 0.55rem;
+            font-weight: 700;
+            color: #0d47a1;
+            font-size: 0.9rem;
+            letter-spacing: 0.01em;
+            margin: 0 0.15rem;
+            white-space: nowrap;
+        }
+        .section-body ul,
+        .section-body ol {
+            margin: 0.5rem 1.5rem 1rem;
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+        }
+        .section-body li {
+            margin-bottom: 0.45rem;
+            padding-right: 0.3rem;
+        }
+
+        /* ── Quiz Section ───────────────── */
+        .quiz-container {
+            background: var(--card-bg);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-lg);
+            border: 1px solid var(--border);
+            margin-top: 2rem;
+            overflow: hidden;
+        }
+        .quiz-header {
+            background: linear-gradient(135deg, #1a237e 0%, #0d47a1 100%);
+            color: #fff;
+            padding: 1.5rem 1.5rem 1.2rem;
+            text-align: center;
+        }
+        .quiz-header h2 {
+            font-size: 1.5rem;
+            font-weight: 800;
+            margin-bottom: 0.3rem;
+        }
+        .quiz-header .quiz-meta {
+            font-size: 0.85rem;
+            opacity: 0.85;
+        }
+        .quiz-progress-outer {
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50px;
+            height: 8px;
+            margin: 1rem 1.5rem 0;
+            overflow: hidden;
+        }
+        .quiz-progress-inner {
+            background: #ffcc02;
+            height: 100%;
+            border-radius: 50px;
+            transition: width 0.4s ease;
+            width: 0%;
+        }
+        .quiz-body {
+            padding: 1.5rem;
+        }
+        .question-card {
+            display: none;
+            animation: fadeSlideIn 0.4s ease;
+        }
+        .question-card.active {
+            display: block;
+        }
+        @keyframes fadeSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(18px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        .question-number {
+            font-size: 0.85rem;
+            color: var(--primary);
+            font-weight: 700;
+            margin-bottom: 0.3rem;
+            letter-spacing: 0.03em;
+        }
+        .question-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.4rem;
+            margin-bottom: 0.8rem;
+        }
+        .question-tag {
+            font-size: 0.7rem;
+            padding: 0.25rem 0.7rem;
+            border-radius: 50px;
+            font-weight: 600;
+            letter-spacing: 0.02em;
+            white-space: nowrap;
+        }
+        .tag-purpose {
+            background: #e8eaf6;
+            color: #283593;
+        }
+        .tag-critical {
+            background: #fce4ec;
+            color: #880e4f;
+        }
+        .tag-rhetoric {
+            background: #e0f7fa;
+            color: #006064;
+        }
+        .tag-logical {
+            background: #fff3e0;
+            color: #bf360c;
+        }
+        .tag-socratic {
+            background: #f3e5f5;
+            color: #4a148c;
+        }
+        .tag-difficulty {
+            font-weight: 700;
+        }
+        .diff-medium {
+            background: #fff8e1;
+            color: #e65100;
+        }
+        .diff-hard {
+            background: #ffebee;
+            color: #b71c1c;
+        }
+        .diff-very-hard {
+            background: #311b92;
+            color: #ede7f6;
+        }
+        .question-text {
+            font-size: 1.15rem;
+            font-weight: 700;
+            color: #1a1a2e;
+            margin-bottom: 1.2rem;
+            line-height: 1.7;
+        }
+        .options-list {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 0.6rem;
+        }
+        .option-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.85rem 1rem;
+            border: 2px solid var(--border);
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            transition: all var(--transition);
+            background: #fafbfc;
+            position: relative;
+        }
+        .option-item:hover {
+            border-color: #b0bec5;
+            background: #f5f7fa;
+            box-shadow: var(--shadow-sm);
+        }
+        .option-item.selected {
+            border-color: var(--primary);
+            background: var(--primary-lighter);
+            box-shadow: 0 0 0 3px rgba(13, 71, 161, 0.08);
+        }
+        .option-item.correct-reveal {
+            border-color: var(--success) !important;
+            background: var(--success-light) !important;
+            box-shadow: 0 0 0 4px rgba(46, 125, 50, 0.1) !important;
+        }
+        .option-item.incorrect-reveal {
+            border-color: var(--error) !important;
+            background: var(--error-light) !important;
+            box-shadow: 0 0 0 4px rgba(198, 40, 40, 0.08) !important;
+        }
+        .option-radio {
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            border: 2.5px solid #b0bec5;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all var(--transition);
+        }
+        .option-item.selected .option-radio {
+            border-color: var(--primary);
+            background: var(--primary);
+        }
+        .option-item.selected .option-radio::after {
+            content: '';
+            width: 8px;
+            height: 8px;
+            background: #fff;
+            border-radius: 50%;
+        }
+        .option-item.correct-reveal .option-radio {
+            border-color: var(--success);
+            background: var(--success);
+        }
+        .option-item.correct-reveal .option-radio::after {
+            content: '✓';
+            color: #fff;
+            font-size: 12px;
+            font-weight: bold;
+        }
+        .option-item.incorrect-reveal .option-radio {
+            border-color: var(--error);
+            background: var(--error);
+        }
+        .option-item.incorrect-reveal .option-radio::after {
+            content: '✗';
+            color: #fff;
+            font-size: 12px;
+            font-weight: bold;
+        }
+        .option-label {
+            font-size: 0.95rem;
+            color: var(--text);
+            flex: 1;
+            line-height: 1.5;
+        }
+        .option-item.correct-reveal .option-label {
+            color: #1b5e20;
+            font-weight: 600;
+        }
+        .feedback-box {
+            margin-top: 1rem;
+            padding: 0.9rem 1.2rem;
+            border-radius: var(--radius-md);
+            font-size: 0.9rem;
+            line-height: 1.6;
+            display: none;
+            animation: fadeSlideIn 0.3s ease;
+        }
+        .feedback-box.show {
+            display: block;
+        }
+        .feedback-box.correct {
+            background: var(--success-light);
+            border-right: 4px solid var(--success);
+            color: #1b5e20;
+        }
+        .feedback-box.incorrect {
+            background: var(--error-light);
+            border-right: 4px solid var(--error);
+            color: #7f0000;
+        }
+        .feedback-box.model-answer {
+            background: #fff8e1;
+            border-right: 4px solid #f9a825;
+            color: #5d3a00;
+        }
+        .open-ended-area {
+            width: 100%;
+            min-height: 120px;
+            border: 2px solid var(--border);
+            border-radius: var(--radius-md);
+            padding: 1rem;
+            font-family: var(--font-main);
+            font-size: 0.95rem;
+            resize: vertical;
+            transition: border-color var(--transition);
+            background: #fafbfc;
+            color: var(--text);
+        }
+        .open-ended-area:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(13, 71, 161, 0.06);
+        }
+        .btn {
+            display: inline-block;
+            padding: 0.7rem 1.6rem;
+            border-radius: 50px;
+            font-weight: 700;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: all var(--transition);
+            border: none;
+            font-family: var(--font-main);
+            letter-spacing: 0.01em;
+        }
+        .btn-primary {
+            background: var(--primary);
+            color: #fff;
+            box-shadow: 0 2px 8px rgba(13, 71, 161, 0.3);
+        }
+        .btn-primary:hover {
+            background: #0b3d8a;
+            box-shadow: 0 4px 16px rgba(13, 71, 161, 0.4);
+            transform: translateY(-2px);
+        }
+        .btn-primary:disabled {
+            background: #b0bec5;
+            box-shadow: none;
+            cursor: not-allowed;
+            transform: none;
+        }
+        .btn-outline {
+            background: #fff;
+            color: var(--primary);
+            border: 2px solid var(--primary);
+        }
+        .btn-outline:hover {
+            background: var(--primary-lighter);
+        }
+        .btn-accent {
+            background: var(--accent);
+            color: #fff;
+            box-shadow: 0 2px 8px rgba(255, 111, 0, 0.3);
+        }
+        .btn-accent:hover {
+            background: #e55d00;
+            box-shadow: 0 4px 16px rgba(255, 111, 0, 0.4);
+            transform: translateY(-2px);
+        }
+        .btn-sm {
+            padding: 0.4rem 1rem;
+            font-size: 0.8rem;
+        }
+        .quiz-actions {
+            display: flex;
+            gap: 0.75rem;
+            flex-wrap: wrap;
+            margin-top: 1.2rem;
+            justify-content: flex-start;
+        }
+        .quiz-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 1rem;
+            gap: 0.75rem;
+            flex-wrap: wrap;
+        }
+        .results-panel {
+            display: none;
+            text-align: center;
+            padding: 2rem 1.5rem;
+            animation: fadeSlideIn 0.5s ease;
+        }
+        .results-panel.show {
+            display: block;
+        }
+        .results-score {
+            font-size: 4rem;
+            font-weight: 900;
+            background: linear-gradient(135deg, #0d47a1, #1565c0);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .results-bar-outer {
+            background: #e0e4ea;
+            border-radius: 50px;
+            height: 18px;
+            margin: 1rem auto;
+            max-width: 400px;
+            overflow: hidden;
+        }
+        .results-bar-inner {
+            height: 100%;
+            border-radius: 50px;
+            transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+            background: linear-gradient(90deg, #2e7d32, #43a047, #66bb6a);
+        }
+        .results-detail {
+            font-size: 0.95rem;
+            color: var(--text-secondary);
+            margin-top: 0.75rem;
+            line-height: 1.8;
+        }
+        .category-breakdown {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            justify-content: center;
+            margin-top: 1rem;
+        }
+        .category-chip {
+            padding: 0.4rem 0.9rem;
+            border-radius: 50px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            background: #f5f5f5;
+            color: #555;
+            border: 1px solid #ddd;
+        }
+        .category-chip.passed {
+            background: #e8f5e9;
+            color: #2e7d32;
+            border-color: #a5d6a7;
+        }
+        .category-chip.failed {
+            background: #ffebee;
+            color: #c62828;
+            border-color: #ef9a9a;
+        }
+
+        /* ── Responsive ────────────────── */
+        @media (max-width: 600px) {
+            .header h1 {
+                font-size: 1.5rem;
+            }
+            .header .icon-row {
+                font-size: 2rem;
+            }
+            .section-header .title-text {
+                font-size: 0.95rem;
+            }
+            .question-text {
+                font-size: 1rem;
+            }
+            .option-item {
+                padding: 0.7rem 0.8rem;
+            }
+            .btn {
+                padding: 0.55rem 1.2rem;
+                font-size: 0.85rem;
+            }
+            .results-score {
+                font-size: 3rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ═══════════════ HEADER ═══════════════ -->
+    <header class="header">
+        <div class="icon-row">🌳🧠📊</div>
+        <h1>أشجار القرار في التعلم الآلي</h1>
+        <p class="subtitle">دليل تفاعلي شامل لفهم Decision Trees — من المبادئ الأساسية إلى المفاهيم المتقدمة</p>
+        <div class="badge-row">
+            <span class="badge">🎯 Machine Learning</span>
+            <span class="badge">📐 Classification</span>
+            <span class="badge">🔍 Information Gain</span>
+            <span class="badge">✂️ Pruning</span>
+            <span class="badge">📈 Entropy</span>
+        </div>
+    </header>
+
+    <!-- ═══════════════ MAIN CONTENT ═══════════════ -->
+    <main class="container">
+
+        <!-- Section 1: What is a Decision Tree -->
+        <div class="section-card open">
+            <button class="section-header" onclick="toggleSection(this)" aria-expanded="true">
+                <span class="icon">🌳</span>
+                <span class="title-text">ما هي Decision Tree؟</span>
+                <span class="arrow">▼</span>
+            </button>
+            <div class="section-body">
+                <p>
+                    <span class="key-term">Decision Tree</span> هي خوارزمية <strong>تصنيف</strong> (Classification) يمكن تمثيلها بصرياً على شكل
+                    <strong>مخطط انسيابي</strong> (Flowchart) لتقسيم نقاط البيانات إلى فئات محددة. تُعد هذه الخوارزمية من أكثر الخوارزميات
+                    <strong>قابلية للتفسير</strong> (Interpretable) في مجال التعلم الآلي، حيث يمكنك رؤية كيفية اتخاذ القرارات خطوة بخطوة.
+                </p>
+                <div class="highlight-box">
+                    <strong>🔑 المكونات الأساسية:</strong><br>
+                    • <span class="key-term">Internal Node</span> (العقدة الداخلية): تُمثل <strong>اختباراً</strong> (Test) على أحد Features البيانات.<br>
+                    • <span class="key-term">Branch</span> (الفرع): يُمثل <strong>نتيجة الاختبار</strong> ويوجه البيانات إلى العقدة التالية.<br>
+                    • <span class="key-term">Leaf Node</span> (العقدة الطرفية): تُسند جميع البيانات التي تصلها إلى <strong>فئة واحدة</strong> (Class).
+                </div>
+                <p>
+                    ببساطة، تقوم الشجرة بطرح أسئلة متتالية حول خصائص البيانات (Features) وتتفرع بناءً على الإجابات، حتى تصل إلى قرار نهائي
+                    يُحدد الفئة التي تنتمي إليها كل نقطة بيانات.
+                </p>
+            </div>
+        </div>
+
+        <!-- Section 2: Medical Example -->
+        <div class="section-card">
+            <button class="section-header" onclick="toggleSection(this)" aria-expanded="false">
+                <span class="icon">🏥</span>
+                <span class="title-text">مثال عملي: التنبؤ بالدواء المناسب (Drug A vs Drug B)</span>
+                <span class="arrow">▼</span>
+            </button>
+            <div class="section-body">
+                <p>
+                    تخيل أنك باحث تجمع بيانات لدراسة طبية. لديك مجموعة من المرضى الذين عانوا من نفس المرض، واستجاب كل مريض
+                    لأحد دوائين: <span class="key-term">Drug A</span> أو <span class="key-term">Drug B</span>.
+                </p>
+                <p>
+                    <strong>Features数据集:</strong> العمر (<span class="key-term">Age</span>: Young, Middle-aged, Senior)،
+                    الجنس (<span class="key-term">Gender</span>: Male, Female)،
+                    ضغط الدم (<span class="key-term">Blood Pressure</span>)،
+                    ومستوى الكوليسترول (<span class="key-term">Cholesterol</span>: Normal, High).
+                </p>
+                <p>
+                    <strong>الهدف (Target):</strong> التنبؤ بالدواء الذي سيستجيب له مريض جديد غير معروف.
+                </p>
+                <div class="highlight-box">
+                    <strong>📋 كيف تتخذ الشجرة قرارها في هذا المثال:</strong><br>
+                    • إذا كان المريض <strong>Middle-aged</strong> → يُقترح <strong>Drug B</strong><br>
+                    • إذا كان المريض <strong>Young & Male</strong> → يُقترح <strong>Drug B</strong><br>
+                    • إذا كان المريض <strong>Senior & Cholesterol Normal</strong> → يُقترح <strong>Drug B</strong><br>
+                    • إذا كانت المريضة <strong>Young Female</strong> → يُقترح <strong>Drug A</strong><br>
+                    • إذا كان المريض <strong>Senior & Cholesterol High</strong> → يُقترح <strong>Drug A</strong>
+                </div>
+                <p>هذه القواعد تُستخلص تلقائياً من البيانات التاريخية عبر عملية بناء الشجرة.</p>
+            </div>
+        </div>
+
+        <!-- Section 3: Building Decision Trees -->
+        <div class="section-card">
+            <button class="section-header" onclick="toggleSection(this)" aria-expanded="false">
+                <span class="icon">🔨</span>
+                <span class="title-text">كيفية بناء وتدريب Decision Tree</span>
+                <span class="arrow">▼</span>
+            </button>
+            <div class="section-body">
+                <p>تُنشأ شجرة القرار من خلال عملية تُسمى <span class="key-term">Recursive Partitioning</span> (التقسيم التكراري):</p>
+                <ol>
+                    <li><strong>ابدأ بالعقدة الجذرية</strong> (Root Node) التي تحتوي على جميع بيانات التدريب المُصنفة.</li>
+                    <li><strong>ابحث عن أفضل Feature</strong> لتقسيم البيانات وفقاً لـ <span class="key-term">Splitting Criterion</span> (معيار التقسيم) المُختار مسبقاً.</li>
+                    <li><strong>قسّم البيانات</strong> إلى مجموعات فرعية، وأرسل كل مجموعة عبر الفرع المناسب إلى عقدة جديدة.</li>
+                    <li><strong>كرر العملية</strong> لكل عقدة جديدة، مع استخدام كل Feature مرة واحدة فقط.</li>
+                    <li><strong>توقف</strong> عندما تحتوي كل عقدة على فئة واحدة فقط، أو تنفد الـ Features المتاحة، أو يتحقق <span class="key-term">Stopping Criterion</span>.</li>
+                </ol>
+                <div class="highlight-box">
+                    <strong>⚡ ملاحظة:</strong> الهدف في كل خطوة هو اختيار الـ Feature الذي <strong>يُقلل عدم التجانس</strong> (Impurity) في العقد الناتجة
+                    إلى أقصى حد ممكن، مما يجعل الأوراق (Leaves) <strong>نقية</strong> قدر الإمكان.
+                </div>
+            </div>
+        </div>
+
+        <!-- Section 4: Stopping Criteria & Pruning -->
+        <div class="section-card">
+            <button class="section-header" onclick="toggleSection(this)" aria-expanded="false">
+                <span class="icon">✂️</span>
+                <span class="title-text">معايير التوقف و Pruning (تقليم الشجرة)</span>
+                <span class="arrow">▼</span>
+            </button>
+            <div class="section-body">
+                <p>يُعرف إيقاف نمو الشجرة قبل أن تصبح معقدة جداً باسم <span class="key-term">Preemptive Pruning</span> (التقليم الاستباقي).
+                    من معايير التوقف الشائعة:</p>
+                <ul>
+                    <li>الوصول إلى <strong>أقصى عمق</strong> للشجرة (<span class="key-term">Maximum Tree Depth</span>)</li>
+                    <li>تجاوز <strong>الحد الأدنى لعدد نقاط البيانات</strong> في العقدة (<span class="key-term">Minimum Samples per Node</span>)</li>
+                    <li>تجاوز <strong>الحد الأدنى للعينات</strong> في الورقة (<span class="key-term">Minimum Samples per Leaf</span>)</li>
+                    <li>الوصول إلى <strong>أقصى عدد من العقد الطرفية</strong> (<span class="key-term">Maximum Leaf Nodes</span>)</li>
+                </ul>
+                <p>بدلاً من ذلك، يمكن <strong>قص الفروع</strong> التي لا تُحسن أداء النظام بشكل ملحوظ بعد نمو الشجرة.</p>
+                <div class="highlight-box">
+                    <strong>🎯 لماذا نلجأ إلى Pruning؟</strong><br>
+                    • <strong>منع Overfitting:</strong> الشجرة المعقدة جداً قد تلتقط الضوضاء (Noise) والتفاصيل غير المهمة.<br>
+                    • <strong>تحسين التعميم:</strong> شجرة أبسط = قدرة أفضل على التنبؤ ببيانات جديدة لم ترها من قبل.<br>
+                    • <strong>سهولة الفهم:</strong> الشجرة المُقلمة أكثر إيجازاً وقابلية للتفسير.<br>
+                    • <strong>دقة تنبؤية أفضل:</strong> التقليم يُحسن الأداء على بيانات الاختبار.
+                </div>
+            </div>
+        </div>
+
+        <!-- Section 5: Splitting Criteria -->
+        <div class="section-card">
+            <button class="section-header" onclick="toggleSection(this)" aria-expanded="false">
+                <span class="icon">📐</span>
+                <span class="title-text">معايير التقسيم: Information Gain و Gini Impurity</span>
+                <span class="arrow">▼</span>
+            </button>
+            <div class="section-body">
+                <p>لاختيار أفضل Feature للتقسيم، نحتاج إلى <strong>قياس جودة التقسيم</strong>. المعياران الأكثر شيوعاً هما:</p>
+                <ul>
+                    <li><span class="key-term">Information Gain</span> (اكتساب المعلومات): ويُعرف أيضاً بـ <strong>Entropy Reduction</strong></li>
+                    <li><span class="key-term">Gini Impurity</span> (شوائب جيني)</li>
+                </ul>
+                <p>في مثال الـ 14 مريضاً، عندما حاولت الخوارزمية استخدام <strong>Cholesterol</strong> كأول Feature للتقسيم،
+                    لم تكن النتيجة جيدة — فلم تتمكن من فصل فئات المرضى بوضوح. لكن عند استخدام <strong>Gender</strong>
+                    ثم تقسيم الذكور باستخدام <strong>Cholesterol</strong>، نتجت عقد <strong>نقية</strong> تماماً.</p>
+                <div class="highlight-box">
+                    <strong>🔍 الخلاصة:</strong> الخوارزمية تبحث دائماً عن الـ Feature الذي <strong>يُعظم Information Gain</strong>
+                    أو <strong>يُقلل Gini Impurity</strong> — أي الـ Feature الذي يجعل البيانات في العقد الناتجة <strong>أكثر تجانساً</strong>.
+                </div>
+            </div>
+        </div>
+
+        <!-- Section 6: Entropy -->
+        <div class="section-card">
+            <button class="section-header" onclick="toggleSection(this)" aria-expanded="false">
+                <span class="icon">📊</span>
+                <span class="title-text">Entropy وعلاقته بـ Information Gain</span>
+                <span class="arrow">▼</span>
+            </button>
+            <div class="section-body">
+                <p>
+                    <span class="key-term">Entropy</span> هو مقياس <strong>لفوضى المعلومات</strong> أو العشوائية في مجموعة البيانات.
+                    في سياق Decision Trees، نقيس مدى <strong>عدم اليقين</strong> في توزيع الفئات داخل العقدة.
+                </p>
+                <ul>
+                    <li>إذا كانت جميع البيانات في عقدة تنتمي إلى <strong>فئة واحدة</strong> → <span class="key-term">Entropy = 0</span> (نقاء تام)</li>
+                    <li>إذا كانت الفئات <strong>موزعة بالتساوي</strong> → <span class="key-term">Entropy = 1</span> (أقصى درجات الفوضى)</li>
+                </ul>
+                <p>
+                    <span class="key-term">Information Gain</span> = Entropy الشجرة <strong>قبل</strong> التقسيم
+                    <strong>ناقص</strong> المتوسط المرجح لـ Entropy <strong>بعد</strong> التقسيم.
+                </p>
+                <div class="highlight-box">
+                    <strong>💡 علاقة عكسية:</strong> كلما <strong>انخفضت Entropy</strong>، <strong>ارتفع Information Gain</strong> (وزادت درجة اليقين).
+                    بناء الشجرة يعني البحث عن الـ Features التي تُحقق <strong>أعلى Information Gain</strong>.
+                </div>
+                <p>في المثال، استخدام Cholesterol كـ Feature للتقسيم أعطى <span class="key-term">Information Gain = 0.042</span> فقط،
+                    مما يؤكد أنه لم يكن خياراً مثالياً.</p>
+            </div>
+        </div>
+
+        <!-- Section 7: Advantages -->
+        <div class="section-card">
+            <button class="section-header" onclick="toggleSection(this)" aria-expanded="false">
+                <span class="icon">✨</span>
+                <span class="title-text">مزايا Decision Trees</span>
+                <span class="arrow">▼</span>
+            </button>
+            <div class="section-body">
+                <ul>
+                    <li><strong>قابلية التصور:</strong> يمكن رسم الشجرة بالكامل، مما يجعل عملية اتخاذ القرار <strong>شفافة ومفهومة</strong>.</li>
+                    <li><strong>قابلية عالية للتفسير:</strong> يمكنك تتبع مسار أي نقطة بيانات من الجذر إلى الورقة.</li>
+                    <li><strong>أهمية الـ Features:</strong> بما أن الشجرة تختار الـ Feature الأفضل تدريجياً، يمكنك استنتاج <strong>أي الـ Features أكثر تنبؤية</strong> من غيرها.</li>
+                    <li><strong>لا تحتاج إلى تطبيع:</strong> لا تتطلب تحويل البيانات إلى مقاييس موحدة.</li>
+                    <li><strong>تتعامل مع البيانات الرقمية والفئوية:</strong> بمرونة عالية.</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- ═══════════════ QUIZ SECTION ═══════════════ -->
+        <div class="quiz-container" id="quizContainer">
+            <div class="quiz-header">
+                <h2>📝 اختبار المعرفة التفاعلي</h2>
+                <p class="quiz-meta">12 سؤالاً تغطي مستويات متدرجة من الصعوبة — من المتوسط إلى الصعب جداً</p>
+                <div class="quiz-progress-outer">
+                    <div class="quiz-progress-inner" id="quizProgressBar"></div>
+                </div>
+            </div>
+            <div class="quiz-body" id="quizBody">
+                <!-- Questions injected by JS -->
+            </div>
+            <div class="results-panel" id="resultsPanel">
+                <h3>🎉 اكتمل الاختبار!</h3>
+                <div class="results-score" id="resultsScore">0/12</div>
+                <div class="results-bar-outer">
+                    <div class="results-bar-inner" id="resultsBar" style="width: 0%;"></div>
+                </div>
+                <p class="results-detail" id="resultsDetail"></p>
+                <div class="category-breakdown" id="categoryBreakdown"></div>
+                <button class="btn btn-primary" onclick="restartQuiz()" style="margin-top:1.5rem;">🔄 إعادة الاختبار</button>
+            </div>
+        </div>
+
+    </main>
+
+    <script>
+        // ─────────────────────────────────────
+        // ACCORDION LOGIC
+        // ─────────────────────────────────────
+        function toggleSection(headerEl) {
+            const card = headerEl.parentElement;
+            const isOpen = card.classList.contains('open');
+            // Close all others (optional: accordion behavior)
+            // For now, independent toggles:
+            if (isOpen) {
+                card.classList.remove('open');
+                headerEl.setAttribute('aria-expanded', 'false');
+            } else {
+                card.classList.add('open');
+                headerEl.setAttribute('aria-expanded', 'true');
+            }
+        }
+
+        // ─────────────────────────────────────
+        // QUIZ DATA
+        // ─────────────────────────────────────
+        const quizQuestions = [{
+            id: 1,
+            type: 'mcq',
+            questionText: 'ما هو <span class="key-term">Decision Tree</span> في مجال Machine Learning؟',
+            options: [
+                'خوارزمية تصنيف يمكن تمثيلها كمخطط انسيابي (Flowchart) لتقسيم البيانات إلى فئات',
+                'نموذج إحصائي يستخدم الانحدار الخطي حصراً للتنبؤ بالقيم المستمرة',
+                'شبكة عصبية مبسطة تُستخدم فقط للتصنيف الثنائي (Binary Classification)',
+                'طريقة تجميع غير موجهة (Unsupervised) لا تحتاج إلى بيانات مصنفة مسبقاً'
+            ],
+            correctIndex: 0,
+            tags: [
+                { label: 'Closed', cls: 'tag-purpose' },
+                { label: 'Remembering', cls: 'tag-critical' },
+                { label: 'متوسط الصعوبة', cls: 'tag-difficulty diff-medium' }
+            ],
+            explanation: 'الـ Decision Tree هي خوارزمية تصنيف (Classification) يمكن تمثيلها بصرياً كمخطط انسيابي. الخيارات الأخرى تصف نماذج مختلفة: الانحدار الخطي (Linear Regression)، الشبكات العصبية (Neural Networks)، والتجميع غير الموجه (Unsupervised Clustering).'
+        }, {
+            id: 2,
+            type: 'mcq',
+            questionText: 'ما الدور الذي تؤديه <span class="key-term">العقدة الداخلية (Internal Node)</span> في Decision Tree؟',
+            options: [
+                'تخزين البيانات الخام مؤقتاً قبل بدء عملية التصنيف',
+                'إجراء اختبار (Test) على أحد Features البيانات وتوجيهها حسب النتيجة',
+                'تحديد الفئة النهائية التي تنتمي إليها جميع نقاط البيانات في الشجرة',
+                'حساب معامل الدقة الإجمالي (Accuracy Score) للنموذج بالكامل'
+            ],
+            correctIndex: 1,
+            tags: [
+                { label: '"What" سؤال', cls: 'tag-rhetoric' },
+                { label: 'Understanding', cls: 'tag-critical' },
+                { label: 'متوسط-صعب', cls: 'tag-difficulty diff-medium' }
+            ],
+            explanation: 'كل عقدة داخلية (Internal Node) تُمثل اختباراً على أحد Features البيانات. الفروع (Branches) تمثل نتائج هذا الاختبار، والعقد الطرفية (Leaf Nodes) هي التي تُسند البيانات إلى فئة نهائية.'
+        }, {
+            id: 3,
+            type: 'mcq',
+            questionText: 'في مثال البيانات الطبية، إذا كان المريض <strong>شاباً (Young) وأنثى (Female)</strong>، فما هو الدواء المُقترح وفقاً للشجرة؟',
+            options: [
+                'Drug A',
+                'Drug B',
+                'يتم اختيار الدواء عشوائياً بين A و B',
+                'لا يمكن تحديد الدواء دون فحص Blood Pressure أولاً'
+            ],
+            correctIndex: 0,
+            tags: [
+                { label: 'Applying', cls: 'tag-critical' },
+                { label: '"Who/What" سؤال', cls: 'tag-rhetoric' },
+                { label: 'صعب', cls: 'tag-difficulty diff-hard' }
+            ],
+            explanation: 'وفقاً للشجرة المذكورة في الدرس: "إذا كانت المريضة شابة أنثى (Young Female)، فإن فروع الشجرة تؤدي إلى وصف Drug A." هذا يتطلب تتبع المسار الصحيح في الشجرة.'
+        }, {
+            id: 4,
+            type: 'mcq',
+            questionText: 'لماذا لم يكن <span class="key-term">Cholesterol</span> هو أفضل Feature للتقسيم في المثال المذكور؟',
+            options: [
+                'لأن قيم Cholesterol غير موثوقة بطبيعتها في البيانات الطبية',
+                'لأن التقسيم بناءً على Cholesterol لم يُنتج نقاءً كافياً في العقد الناتجة — بقي التمييز بين Drug A و B غير واضح',
+                'لأن Cholesterol يرتبط ارتباطاً تاماً (Perfect Correlation) مع Age',
+                'لأن حساب Entropy لميزة Cholesterol مستحيل رياضياً لوجود قيمتين فقط (Normal/High)'
+            ],
+            correctIndex: 1,
+            tags: [
+                { label: '"Why" سؤال', cls: 'tag-rhetoric' },
+                { label: 'Analyzing', cls: 'tag-critical' },
+                { label: 'صعب', cls: 'tag-difficulty diff-hard' }
+            ],
+            explanation: 'عند التقسيم على Cholesterol، لم تتمكن الشجرة من فصل الفئات بوضوح: حتى مع High أو Normal Cholesterol، بقي التمييز بين Drug A و B ضعيفاً. Information Gain كان 0.042 فقط، مما يؤكد ضعف هذا التقسيم.'
+        }, {
+            id: 5,
+            type: 'mcq',
+            questionText: 'أي العبارات التالية تصف <strong>بدقة</strong> العلاقة بين <span class="key-term">Information Gain</span> و <span class="key-term">Gini Impurity</span>؟',
+            options: [
+                'Information Gain يُستخدم حصراً للتصنيف متعدد الفئات و Gini Impurity حصراً للتصنيف الثنائي',
+                'كلاهما يقيس جودة التقسيم ولكن بصيغ رياضية مختلفة — وكلاهما يهدف إلى تقليل عدم التجانس في العقد',
+                'Information Gain دائماً أفضل من Gini Impurity في جميع السيناريوهات دون استثناء',
+                'Gini Impurity هو مجرد الاسم القديم لـ Information Gain وتم استبداله في الإصدارات الحديثة'
+            ],
+            correctIndex: 1,
+            tags: [
+                { label: 'Probing', cls: 'tag-purpose' },
+                { label: 'Evaluating', cls: 'tag-critical' },
+                { label: 'صعب جداً', cls: 'tag-difficulty diff-very-hard' }
+            ],
+            explanation: 'Information Gain (المعتمد على Entropy) و Gini Impurity كلاهما معايير لقياس جودة التقسيم. يختلفان في الصيغة الرياضية لكنهما يخدمان نفس الهدف: إيجاد الـ Feature الذي يُقلل عدم التجانس. لكل منهما خصائصه — فـ Information Gain يميل لتفضيل الـ Features ذات القيم المتعددة.'
+        }, {
+            id: 6,
+            type: 'mcq',
+            questionText: 'تفترض الخوارزمية أن أفضل Feature للتقسيم هو <strong>الأكثر قدرة تنبؤية</strong>. في أي حالة قد <strong>يفشل</strong> هذا الافتراض عملياً؟',
+            options: [
+                'عندما تكون البيانات متوازنة تماماً بين جميع الفئات',
+                'عندما يكون الـ Feature ذو قدرة تنبؤية عالية لكنه يؤدي إلى Overfitting لأنه شديد التحديد (High Cardinality)',
+                'عندما يكون عدد الـ Features في مجموعة البيانات أقل من 5',
+                'عندما تكون جميع الـ Features رقمية (Numerical) وليست فئوية (Categorical)'
+            ],
+            correctIndex: 1,
+            tags: [
+                { label: 'Challenging Assumptions', cls: 'tag-socratic' },
+                { label: 'Evaluating', cls: 'tag-critical' },
+                { label: 'صعب جداً', cls: 'tag-difficulty diff-very-hard' }
+            ],
+            explanation: 'الـ Feature ذو القدرة التنبؤية العالية ولكن مع عدد كبير من القيم الفريدة (High Cardinality، مثل رقم الهوية) قد يُنتج عقداً نقية تماماً على بيانات التدريب لكنه يفشل في التعميم — وهذا جوهر Overfitting. Information Gain بشكل خاص عرضة لهذا الانحياز.'
+        }, {
+            id: 7,
+            type: 'mcq',
+            questionText: 'إذا كانت نسبة مرضى Drug A في عقدة = 0.25 ونسبة Drug B = 0.75، فكيف تُقارن <span class="key-term">Entropy</span> هذه العقدة مع Entropy عقدة أخرى النسب فيها متساوية (0.5 لكل منهما)؟',
+            options: [
+                'Entropy العقدة الأولى (0.25/0.75) أعلى لأن Drug B هي الغالبة',
+                'Entropy العقدة الأولى (0.25/0.75) أقل لأن التوزيع أقل تجانساً من التوزيع المتساوي',
+                'Entropy العقدتين متساويتان لأن مجموع النسب = 1 في الحالتين',
+                'لا يمكن المقارنة دون معرفة العدد الإجمالي للمرضى في كل عقدة'
+            ],
+            correctIndex: 1,
+            tags: [
+                { label: '"How" سؤال', cls: 'tag-rhetoric' },
+                { label: 'Applying', cls: 'tag-critical' },
+                { label: 'صعب', cls: 'tag-difficulty diff-hard' }
+            ],
+            explanation: 'Entropy تبلغ أقصاها (1.0) عندما تكون الفئات موزعة بالتساوي (0.5/0.5). عندما يكون التوزيع منحرفاً (0.25/0.75)، تكون Entropy أقل (~0.81)، مما يعني نقاءً أعلى. فكر فيها كمقياس للفوضى: التوزيع غير المتوازن = فوضى أقل.'
+        }, {
+            id: 8,
+            type: 'mcq',
+            questionText: 'ماذا يحدث <strong>عملياً</strong> إذا لم يتم تطبيق أي <span class="key-term">Stopping Criterion</span> أو <span class="key-term">Pruning</span> على Decision Tree؟',
+            options: [
+                'تصبح الشجرة دائماً أكثر دقة على البيانات الجديدة غير المرئية',
+                'قد تؤدي إلى Overfitting حاد — تلتقط الشجرة Noise وتفاصيل غير مهمة وتفشل في التعميم',
+                'تتوقف الشجرة تلقائياً عند 100 عقدة بغض النظر عن حجم البيانات',
+                'تتحول الشجرة تلقائياً إلى Random Forest لتحسين الأداء'
+            ],
+            correctIndex: 1,
+            tags: [
+                { label: 'Consequences', cls: 'tag-socratic' },
+                { label: 'Alternative', cls: 'tag-logical' },
+                { label: 'صعب', cls: 'tag-difficulty diff-hard' }
+            ],
+            explanation: 'بدون Stopping Criteria أو Pruning، تستمر الشجرة في النمو حتى تصبح كل ورقة نقية تماماً (عقدة لكل نقطة بيانات تقريباً). هذا يؤدي إلى Overfitting: أداء مثالي على بيانات التدريب لكن أداء سيئ على البيانات الجديدة لأن الشجرة حفظت الضوضاء بدلاً من تعلم الأنماط الحقيقية.'
+        }, {
+            id: 9,
+            type: 'mcq',
+            questionText: 'ماذا يعني أن تكون <span class="key-term">Entropy</span> عقدة ما <strong>تساوي صفراً</strong>؟',
+            options: [
+                'جميع نقاط البيانات في تلك العقدة تنتمي إلى فئة واحدة فقط — نقاء تام',
+                'العقدة فارغة تماماً ولا تحتوي على أي نقاط بيانات',
+                'البيانات موزعة بالتساوي بين جميع الفئات الممكنة',
+                'النموذج فشل في تصنيف البيانات في تلك العقدة ويحتاج إلى إعادة تدريب'
+            ],
+            correctIndex: 0,
+            tags: [
+                { label: 'Clarification', cls: 'tag-socratic' },
+                { label: 'Understanding', cls: 'tag-critical' },
+                { label: 'متوسط-صعب', cls: 'tag-difficulty diff-medium' }
+            ],
+            explanation: 'Entropy = 0 تعني النقاء التام (Perfect Purity): جميع البيانات في العقدة تنتمي إلى نفس الفئة. هذا هو الهدف المثالي لكل عقدة طرفية. على العكس، Entropy = 1 تعني توزيعاً متساوياً تماماً بين الفئات.'
+        }, {
+            id: 10,
+            type: 'mcq',
+            questionText: 'من منظور <strong>تعميم النموذج (Generalization)</strong>، لماذا يُعتبر <span class="key-term">Pruning</span> مفيداً <strong>حتى لو قلل</strong> من دقة النموذج على بيانات التدريب؟',
+            options: [
+                'لأنه يُسرع عملية التدريب فقط دون أي تأثير على جودة التنبؤات',
+                'لأنه يُبسط النموذج ويُزيل الفروع التي التقطت Noise، مما يُحسن الأداء على بيانات جديدة لم يرها النموذج',
+                'لأنه يزيل الـ Features غير المهمة من مجموعة البيانات الأصلية نهائياً',
+                'لأنه يحول Decision Tree إلى نموذج Linear Regression مما يجعله أسرع'
+            ],
+            correctIndex: 1,
+            tags: [
+                { label: 'Viewpoints', cls: 'tag-socratic' },
+                { label: 'Evaluating', cls: 'tag-critical' },
+                { label: 'صعب جداً', cls: 'tag-difficulty diff-very-hard' }
+            ],
+            explanation: 'الهدف النهائي ليس الأداء على بيانات التدريب بل على البيانات غير المرئية. Pruning يُضحي ببعض الدقة على بيانات التدريب (التي قد تكون ناتجة عن حفظ Noise) مقابل تحسين التعميم (Generalization) — أي الأداء الحقيقي في العالم الواقعي.'
+        }, {
+            id: 11,
+            type: 'mcq',
+            questionText: 'هل يمكن القول بأن <span class="key-term">Information Gain</span> هو <strong>دائماً</strong> أفضل معيار لاختيار الـ Feature المناسب للتقسيم؟ لماذا أو لماذا لا؟',
+            options: [
+                'نعم، لأنه المعيار الوحيد المدعوم في جميع مكتبات Machine Learning',
+                'لا، لأن Information Gain يميل لتفضيل الـ Features ذات القيم المتعددة (High Cardinality) حتى لو لم تكن الأفضل فعلياً للتعميم',
+                'نعم، لأنه ينتج دائماً أصغر شجرة ممكنة بأقل عدد من العقد',
+                'لا، لأنه لا يمكن حسابه إلا على البيانات النصية حصراً'
+            ],
+            correctIndex: 1,
+            tags: [
+                { label: 'Questioning the Question', cls: 'tag-socratic' },
+                { label: 'Creating', cls: 'tag-critical' },
+                { label: 'صعب جداً', cls: 'tag-difficulty diff-very-hard' }
+            ],
+            explanation: 'Information Gain لديه انحياز معروف تجاه الـ Features ذات القيم المتعددة (High Cardinality). مثلاً، Feature مثل "رقم المريض" قد يُعطي Information Gain مثالياً لكنه عديم الفائدة للتعميم. لهذا السبب، يُستخدم بدائل مثل Gain Ratio أو Gini Impurity في بعض الحالات.'
+        }, {
+            id: 12,
+            type: 'open',
+            questionText: 'إذا كنت تبني Decision Tree <strong>لاكتشاف الاحتيال المالي</strong> حيث تكلفة <span class="key-term">False Negatives</span> (تفويت حالة احتيال) مرتفعة جداً، كيف ستصمم <strong>معايير التوقف (Stopping Criteria)</strong> و <strong>استراتيجية Pruning</strong> بشكل مختلف عن الحالة الاعتيادية؟',
+            modelAnswer: 'في حالة اكتشاف الاحتيال المالي حيث False Negatives مكلفة جداً: (1) سأسمح بنمو أعمق للشجرة (Maximum Depth أعلى) لتقليل احتمالية تفويت أنماط الاحتيال الدقيقة. (2) سأستخدم دالة تكلفة غير متماثلة (Asymmetric Cost Function) تعاقب False Negatives أكثر من False Positives عند تقييم التقسيمات. (3) سأكون حذراً جداً في Pruning — قد أستخدم تقليماً Minimal Cost-Complexity مع معامل عقوبة منخفض لتجنب إزالة الفروع التي تلتقط حالات احتيال نادرة لكنها حقيقية. (4) قد أضيف معيار توقف مخصص: "لا تتوقف طالما أن هناك عقدة تحتوي على نسبة احتيال أعلى من حد معين". الهدف هو تحقيق Recall عالي حتى على حساب بعض Precision.',
+            tags: [
+                { label: 'Open-Ended', cls: 'tag-purpose' },
+                { label: 'Creating', cls: 'tag-critical' },
+                { label: 'صعب جداً', cls: 'tag-difficulty diff-very-hard' }
+            ]
+        }];
+
+        // ─────────────────────────────────────
+        // QUIZ STATE
+        // ─────────────────────────────────────
+        let currentQuestionIndex = 0;
+        let userAnswers = new Array(quizQuestions.length).fill(null); // for MCQ: selected option index; for open: string
+        let answerLocked = new Array(quizQuestions.length).fill(false);
+        let isQuizFinished = false;
+
+        // ─────────────────────────────────────
+        // RENDER QUIZ
+        // ─────────────────────────────────────
+        const quizBody = document.getElementById('quizBody');
+        const resultsPanel = document.getElementById('resultsPanel');
+        const quizProgressBar = document.getElementById('quizProgressBar');
+
+        function renderAllQuestions() {
+            quizBody.innerHTML = '';
+            quizQuestions.forEach((q, idx) => {
+                const card = document.createElement('div');
+                card.className = 'question-card' + (idx === 0 ? ' active' : '');
+                card.id = 'qcard-' + idx;
+
+                // Tags
+                let tagsHTML = '';
+                q.tags.forEach(t => {
+                    tagsHTML += `<span class="question-tag ${t.cls}">${t.label}</span>`;
+                });
+
+                // Options or textarea
+                let answerAreaHTML = '';
+                if (q.type === 'mcq') {
+                    let optsHTML = '<ul class="options-list">';
+                    q.options.forEach((opt, oi) => {
+                        const letter = String.fromCharCode(65 + oi); // A, B, C, D
+                        optsHTML += `
+                            <li class="option-item" id="opt-${idx}-${oi}" onclick="selectOption(${idx}, ${oi})">
+                                <span class="option-radio"></span>
+                                <span class="option-label"><strong>${letter}.</strong> ${opt}</span>
+                            </li>`;
+                    });
+                    optsHTML += '</ul>';
+                    answerAreaHTML = optsHTML;
+                } else {
+                    answerAreaHTML = `
+                        <textarea class="open-ended-area" id="openAnswer-${idx}" 
+                                  placeholder="اكتب إجابتك هنا... فكر في اعتبارات التكلفة غير المتماثلة، عمق الشجرة، ومعايير التقليم المخصصة..."
+                                  oninput="updateOpenAnswer(${idx}, this.value)"></textarea>
+                        <button class="btn btn-outline btn-sm" style="margin-top:0.6rem;" 
+                                onclick="revealModelAnswer(${idx})" id="revealBtn-${idx}">
+                            💡 عرض الإجابة النموذجية
+                        </button>
+                        <div class="feedback-box model-answer" id="modelAnswerBox-${idx}">
+                            <strong>📋 الإجابة النموذجية:</strong><br>${q.modelAnswer}
+                        </div>
+                    `;
+                }
+
+                card.innerHTML = `
+                    <div class="question-number">سؤال ${idx + 1} من ${quizQuestions.length}</div>
+                    <div class="question-tags">${tagsHTML}</div>
+                    <div class="question-text">${q.questionText}</div>
+                    ${answerAreaHTML}
+                    <div class="feedback-box" id="feedback-${idx}"></div>
+                    <div class="quiz-actions" id="actions-${idx}">
+                        ${q.type === 'mcq' ? `<button class="btn btn-primary" id="confirmBtn-${idx}" onclick="confirmMCQAnswer(${idx})" disabled>✅ تأكيد الإجابة</button>` : ''}
+                        ${q.type === 'open' ? `<button class="btn btn-accent btn-sm" id="selfScoreBtn-${idx}" onclick="selfScoreOpen(${idx})">📝 قيّمتُ إجابتي (تقييم ذاتي)</button>` : ''}
+                    </div>
+                `;
+                quizBody.appendChild(card);
+            });
+            updateProgress();
+        }
+
+        function updateProgress() {
+            const answered = userAnswers.filter((a, i) => {
+                if (quizQuestions[i].type === 'mcq') return a !== null;
+                return a !== null && a.trim() !== '';
+            }).length;
+            const pct = Math.round((answered / quizQuestions.length) * 100);
+            quizProgressBar.style.width = pct + '%';
+        }
+
+        function selectOption(qIdx, oIdx) {
+            if (answerLocked[qIdx]) return;
+            const q = quizQuestions[qIdx];
+            if (q.type !== 'mcq') return;
+            // Deselect all
+            q.options.forEach((_, oi) => {
+                const el = document.getElementById('opt-' + qIdx + '-' + oi);
+                if (el) el.classList.remove('selected');
+            });
+            // Select clicked
+            const selEl = document.getElementById('opt-' + qIdx + '-' + oIdx);
+            if (selEl) selEl.classList.add('selected');
+            userAnswers[qIdx] = oIdx;
+            // Enable confirm button
+            const confirmBtn = document.getElementById('confirmBtn-' + qIdx);
+            if (confirmBtn) confirmBtn.disabled = false;
+            updateProgress();
+        }
+
+        function confirmMCQAnswer(qIdx) {
+            if (answerLocked[qIdx]) return;
+            const q = quizQuestions[qIdx];
+            const selected = userAnswers[qIdx];
+            if (selected === null) return;
+            answerLocked[qIdx] = true;
+            const confirmBtn = document.getElementById('confirmBtn-' + qIdx);
+            if (confirmBtn) confirmBtn.disabled = true;
+
+            // Highlight correct & incorrect
+            q.options.forEach((_, oi) => {
+                const el = document.getElementById('opt-' + qIdx + '-' + oi);
+                if (!el) return;
+                if (oi === q.correctIndex) {
+                    el.classList.add('correct-reveal');
+                }
+                if (oi === selected && oi !== q.correctIndex) {
+                    el.classList.add('incorrect-reveal');
+                }
+                // Disable further clicks
+                el.style.pointerEvents = 'none';
+            });
+
+            // Show feedback
+            const feedbackEl = document.getElementById('feedback-' + qIdx);
+            if (feedbackEl) {
+                if (selected === q.correctIndex) {
+                    feedbackEl.className = 'feedback-box correct show';
+                    feedbackEl.innerHTML = '✅ <strong>إجابة صحيحة!</strong> ' + q.explanation;
+                } else {
+                    feedbackEl.className = 'feedback-box incorrect show';
+                    feedbackEl.innerHTML = '❌ <strong>إجابة خاطئة.</strong> ' + q.explanation;
+                }
+            }
+
+            updateProgress();
+            // Auto-advance after 1.5s
+            setTimeout(() => {
+                if (qIdx < quizQuestions.length - 1 && !isQuizFinished) {
+                    navigateToQuestion(qIdx + 1);
+                } else if (qIdx === quizQuestions.length - 1) {
+                    finishQuiz();
+                }
+            }, 1800);
+        }
+
+        function updateOpenAnswer(qIdx, value) {
+            userAnswers[qIdx] = value;
+            updateProgress();
+        }
+
+        function revealModelAnswer(qIdx) {
+            const box = document.getElementById('modelAnswerBox-' + qIdx);
+            if (box) box.classList.add('show');
+            const btn = document.getElementById('revealBtn-' + qIdx);
+            if (btn) btn.textContent = '🔄 الإجابة النموذجية معروضة';
+        }
+
+        function selfScoreOpen(qIdx) {
+            if (answerLocked[qIdx]) return;
+            answerLocked[qIdx] = true;
+            const box = document.getElementById('modelAnswerBox-' + qIdx);
+            if (box) box.classList.add('show');
+            const btn = document.getElementById('selfScoreBtn-' + qIdx);
+            if (btn) {
+                btn.textContent = '✅ تم التقييم الذاتي';
+                btn.classList.remove('btn-accent');
+                btn.classList.add('btn-primary');
+                btn.disabled = true;
+            }
+            // Mark as answered (user gets credit for attempting)
+            if (!userAnswers[qIdx] || userAnswers[qIdx].trim() === '') {
+                userAnswers[qIdx] = '(تم التقييم الذاتي)';
+            }
+            updateProgress();
+            // Auto-advance
+            setTimeout(() => {
+                if (qIdx < quizQuestions.length - 1 && !isQuizFinished) {
+                    navigateToQuestion(qIdx + 1);
+                } else if (qIdx === quizQuestions.length - 1) {
+                    finishQuiz();
+                }
+            }, 1200);
+        }
+
+        function navigateToQuestion(qIdx) {
+            if (isQuizFinished) return;
+            // Hide all
+            document.querySelectorAll('.question-card').forEach(c => c.classList.remove('active'));
+            // Show target
+            const target = document.getElementById('qcard-' + qIdx);
+            if (target) {
+                target.classList.add('active');
+                target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+            currentQuestionIndex = qIdx;
+            updateProgress();
+        }
+
+        function finishQuiz() {
+            if (isQuizFinished) return;
+            isQuizFinished = true;
+            document.querySelectorAll('.question-card').forEach(c => c.classList.remove('active'));
+            // Calculate score
+            let totalScore = 0;
+            let maxScore = quizQuestions.length;
+            const categoryResults = {}; // { categoryKey: { correct: n, total: m } }
+
+            quizQuestions.forEach((q, idx) => {
+                let earned = false;
+                if (q.type === 'mcq') {
+                    if (userAnswers[idx] === q.correctIndex) earned = true;
+                } else {
+                    // Open-ended: if user engaged (answered or self-scored), give credit
+                    if (userAnswers[idx] && userAnswers[idx].trim() !== '') earned = true;
+                }
+                if (earned) totalScore++;
+
+                // Track categories
+                q.tags.forEach(t => {
+                    const catKey = t.label;
+                    if (!categoryResults[catKey]) categoryResults[catKey] = { correct: 0, total: 0 };
+                    categoryResults[catKey].total++;
+                    if (earned) categoryResults[catKey].correct++;
+                });
+            });
+
+            // Show results
+            const pct = Math.round((totalScore / maxScore) * 100);
+            document.getElementById('resultsScore').textContent = totalScore + ' / ' + maxScore;
+            document.getElementById('resultsBar').style.width = pct + '%';
+
+            let detailMsg = '';
+            if (pct >= 90) detailMsg = '🏆 أداء استثنائي! لديك فهم عميق لمفاهيم Decision Trees.';
+            else if (pct >= 70) detailMsg = '👍 أداء جيد جداً! لديك إلمام قوي بالمفاهيم مع بعض الفرص للتعمق.';
+            else if (pct >= 50) detailMsg = '📖 أداء مقبول. نوصي بمراجعة الأقسام أعلاه特别是 Entropy و Pruning.';
+            else detailMsg = '📚 تحتاج إلى مراجعة شاملة. اقرأ الأقسام مرة أخرى وركز على الأمثلة العملية.';
+            document.getElementById('resultsDetail').textContent = detailMsg;
+
+            // Category breakdown
+            let catHTML = '';
+            for (const [cat, res] of Object.entries(categoryResults)) {
+                const catPct = Math.round((res.correct / res.total) * 100);
+                const passedClass = catPct >= 60 ? 'passed' : 'failed';
+                catHTML +=
+                    `<span class="category-chip ${passedClass}">${cat}: ${res.correct}/${res.total} (${catPct}%)</span>`;
+            }
+            document.getElementById('categoryBreakdown').innerHTML = catHTML;
+
+            resultsPanel.classList.add('show');
+            resultsPanel.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            quizProgressBar.style.width = '100%';
+        }
+
+        function restartQuiz() {
+            userAnswers = new Array(quizQuestions.length).fill(null);
+            answerLocked = new Array(quizQuestions.length).fill(false);
+            isQuizFinished = false;
+            currentQuestionIndex = 0;
+            resultsPanel.classList.remove('show');
+            document.getElementById('resultsBar').style.width = '0%';
+            document.getElementById('categoryBreakdown').innerHTML = '';
+            quizProgressBar.style.width = '0%';
+            // Re-render
+            renderAllQuestions();
+            document.getElementById('qcard-0').classList.add('active');
+            document.getElementById('qcard-0').scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+
+        // ─────────────────────────────────────
+        // INIT
+        // ─────────────────────────────────────
+        renderAllQuestions();
+    </script>
+</body>
+</html>

@@ -1,0 +1,2110 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Supervised Learning with SVMs — Interactive Lesson</title>
+
+  <style>
+    :root {
+      --bg: #0f172a;
+      --bg-soft: #111c33;
+      --card: #17233d;
+      --card-2: #1d2b49;
+      --text: #e5eefc;
+      --muted: #aebbd0;
+      --primary: #6ea8fe;
+      --primary-2: #8b5cf6;
+      --success: #34d399;
+      --danger: #fb7185;
+      --warning: #fbbf24;
+      --border: rgba(255,255,255,.09);
+      --shadow: 0 18px 45px rgba(0,0,0,.24);
+      --radius: 20px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      font-family:
+        "Segoe UI",
+        Tahoma,
+        Arial,
+        sans-serif;
+      background:
+        radial-gradient(circle at top right, rgba(110,168,254,.12), transparent 30%),
+        radial-gradient(circle at bottom left, rgba(139,92,246,.10), transparent 25%),
+        var(--bg);
+      color: var(--text);
+      line-height: 1.8;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    button,
+    input,
+    textarea,
+    select {
+      font: inherit;
+    }
+
+    .container {
+      width: min(1180px, calc(100% - 32px));
+      margin-inline: auto;
+    }
+
+    .hero {
+      padding: 48px 0 28px;
+    }
+
+    .hero-card {
+      background:
+        linear-gradient(135deg, rgba(110,168,254,.16), rgba(139,92,246,.11)),
+        var(--card);
+      border: 1px solid var(--border);
+      border-radius: 28px;
+      box-shadow: var(--shadow);
+      padding: 38px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .hero-card::after {
+      content: "";
+      position: absolute;
+      width: 260px;
+      height: 260px;
+      background: radial-gradient(circle, rgba(110,168,254,.22), transparent 68%);
+      top: -100px;
+      left: -80px;
+      pointer-events: none;
+    }
+
+    .eyebrow {
+      color: var(--primary);
+      font-weight: 700;
+      letter-spacing: .4px;
+      margin-bottom: 10px;
+    }
+
+    h1,
+    h2,
+    h3,
+    h4 {
+      line-height: 1.25;
+      margin-top: 0;
+    }
+
+    h1 {
+      font-size: clamp(2rem, 5vw, 3.6rem);
+      margin-bottom: 14px;
+    }
+
+    h2 {
+      font-size: clamp(1.55rem, 3vw, 2.1rem);
+      margin-bottom: 14px;
+    }
+
+    h3 {
+      font-size: 1.2rem;
+      margin-bottom: 10px;
+    }
+
+    p {
+      margin: 0 0 12px;
+    }
+
+    .subtitle {
+      color: var(--muted);
+      max-width: 860px;
+      font-size: 1.08rem;
+    }
+
+    .hero-actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 22px;
+    }
+
+    .btn {
+      border: 1px solid var(--border);
+      background: var(--card-2);
+      color: var(--text);
+      padding: 11px 16px;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: .2s ease;
+      font-weight: 700;
+    }
+
+    .btn:hover {
+      transform: translateY(-1px);
+      border-color: rgba(110,168,254,.4);
+    }
+
+    .btn.primary {
+      background: linear-gradient(135deg, var(--primary), var(--primary-2));
+      border: none;
+      color: white;
+    }
+
+    .nav {
+      position: sticky;
+      top: 12px;
+      z-index: 20;
+      margin: 18px 0 28px;
+      backdrop-filter: blur(14px);
+    }
+
+    .nav-inner {
+      background: rgba(23,35,61,.85);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 8px;
+      box-shadow: var(--shadow);
+      display: flex;
+      overflow-x: auto;
+      gap: 6px;
+      scrollbar-width: thin;
+    }
+
+    .nav a {
+      white-space: nowrap;
+      color: var(--muted);
+      padding: 8px 12px;
+      border-radius: 10px;
+      font-size: .92rem;
+    }
+
+    .nav a:hover {
+      background: rgba(255,255,255,.06);
+      color: var(--text);
+    }
+
+    section {
+      margin-bottom: 34px;
+    }
+
+    .section-head {
+      margin-bottom: 16px;
+    }
+
+    .section-head p {
+      color: var(--muted);
+    }
+
+    .grid {
+      display: grid;
+      gap: 18px;
+    }
+
+    .grid.two {
+      grid-template-columns: repeat(2, minmax(0,1fr));
+    }
+
+    .grid.three {
+      grid-template-columns: repeat(3, minmax(0,1fr));
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 22px;
+      box-shadow: var(--shadow);
+    }
+
+    .card p {
+      color: var(--muted);
+    }
+
+    .badge-row {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 12px;
+    }
+
+    .badge {
+      padding: 5px 9px;
+      border-radius: 999px;
+      font-size: .8rem;
+      background: rgba(110,168,254,.11);
+      color: #cfe1ff;
+      border: 1px solid rgba(110,168,254,.2);
+    }
+
+    .concept {
+      display: flex;
+      gap: 14px;
+      align-items: flex-start;
+    }
+
+    .concept-icon {
+      flex: 0 0 44px;
+      height: 44px;
+      display: grid;
+      place-items: center;
+      border-radius: 12px;
+      background: linear-gradient(135deg, rgba(110,168,254,.18), rgba(139,92,246,.18));
+      font-size: 1.25rem;
+    }
+
+    .formula {
+      direction: ltr;
+      text-align: center;
+      font-family: "Cambria Math", Georgia, serif;
+      font-size: 1.3rem;
+      background: rgba(0,0,0,.18);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 16px;
+      margin: 14px 0;
+      overflow-x: auto;
+    }
+
+    .highlight {
+      border-right: 4px solid var(--primary);
+      padding: 12px 16px;
+      background: rgba(110,168,254,.07);
+      border-radius: 12px;
+      color: #dce8ff;
+      margin: 12px 0;
+    }
+
+    .warning {
+      border-right: 4px solid var(--warning);
+      background: rgba(251,191,36,.07);
+    }
+
+    .success {
+      border-right: 4px solid var(--success);
+      background: rgba(52,211,153,.07);
+    }
+
+    .danger {
+      border-right: 4px solid var(--danger);
+      background: rgba(251,113,133,.07);
+    }
+
+    details {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 0 16px;
+      margin: 10px 0;
+    }
+
+    details[open] {
+      background: var(--card-2);
+    }
+
+    summary {
+      cursor: pointer;
+      padding: 15px 4px;
+      font-weight: 700;
+      list-style-position: inside;
+    }
+
+    .details-content {
+      padding: 0 4px 16px;
+      color: var(--muted);
+    }
+
+    .step {
+      position: relative;
+      padding-right: 28px;
+    }
+
+    .step::before {
+      content: "";
+      position: absolute;
+      right: 6px;
+      top: 8px;
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--primary), var(--primary-2));
+    }
+
+    .step::after {
+      content: "";
+      position: absolute;
+      right: 11px;
+      top: 22px;
+      width: 2px;
+      height: calc(100% - 4px);
+      background: rgba(255,255,255,.08);
+    }
+
+    .step:last-child::after {
+      display: none;
+    }
+
+    .simulator {
+      display: grid;
+      grid-template-columns: minmax(0,1.2fr) minmax(280px,.8fr);
+      gap: 18px;
+    }
+
+    .plot-wrap {
+      background: #0d1526;
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 12px;
+    }
+
+    canvas {
+      display: block;
+      width: 100%;
+      height: auto;
+      border-radius: 12px;
+      background: #0b1220;
+    }
+
+    .control-group {
+      margin-bottom: 18px;
+    }
+
+    .control-group label {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      color: var(--muted);
+      margin-bottom: 8px;
+      font-weight: 600;
+    }
+
+    input[type="range"] {
+      width: 100%;
+      accent-color: var(--primary);
+    }
+
+    select,
+    textarea {
+      width: 100%;
+      background: #0e172a;
+      color: var(--text);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 11px 12px;
+      outline: none;
+    }
+
+    textarea {
+      resize: vertical;
+      min-height: 110px;
+    }
+
+    .metric {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 10px 0;
+      border-bottom: 1px solid rgba(255,255,255,.06);
+    }
+
+    .metric:last-child {
+      border-bottom: none;
+    }
+
+    .metric span:last-child {
+      font-weight: 800;
+      color: white;
+    }
+
+    .quiz-toolbar {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 16px;
+    }
+
+    .filter-row {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .filter-btn {
+      padding: 8px 11px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      background: var(--card);
+      color: var(--muted);
+      cursor: pointer;
+      font-size: .86rem;
+    }
+
+    .filter-btn.active {
+      background: rgba(110,168,254,.13);
+      color: var(--text);
+      border-color: rgba(110,168,254,.35);
+    }
+
+    .progress {
+      height: 10px;
+      background: rgba(255,255,255,.07);
+      border-radius: 999px;
+      overflow: hidden;
+      margin: 12px 0 20px;
+    }
+
+    .progress > span {
+      display: block;
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, var(--primary), var(--primary-2));
+      transition: .25s ease;
+    }
+
+    .quiz-card {
+      display: none;
+      padding: 22px;
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      background: linear-gradient(145deg, rgba(255,255,255,.015), rgba(255,255,255,.035));
+    }
+
+    .quiz-card.active {
+      display: block;
+    }
+
+    .quiz-meta {
+      display: flex;
+      gap: 7px;
+      flex-wrap: wrap;
+      margin-bottom: 12px;
+    }
+
+    .tag {
+      font-size: .78rem;
+      padding: 5px 9px;
+      border-radius: 999px;
+      background: rgba(139,92,246,.11);
+      color: #ddd1ff;
+      border: 1px solid rgba(139,92,246,.2);
+    }
+
+    .question {
+      font-size: 1.15rem;
+      font-weight: 800;
+      margin-bottom: 16px;
+    }
+
+    .options {
+      display: grid;
+      gap: 10px;
+    }
+
+    .option {
+      background: #0e172a;
+      border: 1px solid var(--border);
+      padding: 12px 14px;
+      border-radius: 13px;
+      cursor: pointer;
+      transition: .2s;
+    }
+
+    .option:hover {
+      border-color: rgba(110,168,254,.35);
+      transform: translateY(-1px);
+    }
+
+    .option.selected {
+      border-color: var(--primary);
+      background: rgba(110,168,254,.08);
+    }
+
+    .option.correct {
+      border-color: var(--success);
+      background: rgba(52,211,153,.08);
+    }
+
+    .option.wrong {
+      border-color: var(--danger);
+      background: rgba(251,113,133,.08);
+    }
+
+    .quiz-feedback {
+      margin-top: 14px;
+      padding: 12px;
+      border-radius: 12px;
+      display: none;
+    }
+
+    .quiz-feedback.show {
+      display: block;
+    }
+
+    .quiz-controls {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      margin-top: 18px;
+      flex-wrap: wrap;
+    }
+
+    .score-card {
+      display: none;
+      margin-top: 18px;
+      text-align: center;
+      background: linear-gradient(135deg, rgba(52,211,153,.10), rgba(110,168,254,.10));
+    }
+
+    .score-card.show {
+      display: block;
+    }
+
+    .score-number {
+      font-size: 3rem;
+      font-weight: 900;
+      margin: 6px 0;
+    }
+
+    .mini-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+    }
+
+    .mini-table th,
+    .mini-table td {
+      border-bottom: 1px solid var(--border);
+      padding: 10px;
+      text-align: right;
+      vertical-align: top;
+    }
+
+    .mini-table th {
+      color: white;
+    }
+
+    .mini-table td {
+      color: var(--muted);
+    }
+
+    .footer {
+      color: var(--muted);
+      text-align: center;
+      padding: 20px 0 40px;
+    }
+
+    .kpi {
+      text-align: center;
+      padding: 18px;
+      background: rgba(255,255,255,.03);
+      border: 1px solid var(--border);
+      border-radius: 15px;
+    }
+
+    .kpi strong {
+      font-size: 1.7rem;
+      display: block;
+    }
+
+    .chip {
+      display: inline-flex;
+      gap: 6px;
+      align-items: center;
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.06);
+      color: var(--muted);
+      font-size: .82rem;
+    }
+
+    .compare-card {
+      overflow-x: auto;
+    }
+
+    @media (max-width: 900px) {
+      .grid.two,
+      .grid.three,
+      .simulator {
+        grid-template-columns: 1fr;
+      }
+
+      .hero-card {
+        padding: 26px;
+      }
+
+      .nav {
+        top: 5px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+
+    <header class="hero">
+      <div class="hero-card">
+        <div class="eyebrow">Interactive Machine Learning Lesson</div>
+        <h1>Supervised Learning with SVMs</h1>
+        <p class="subtitle">
+          صفحة تعليمية تفاعلية لفهم <strong>Support Vector Machines (SVM)</strong>،
+          من فكرة <strong>Decision Boundary</strong> و<strong>Margin</strong> و<strong>Support Vectors</strong>
+          إلى <strong>Soft Margin</strong> و<strong>Kerneling</strong> و<strong>SVR</strong>.
+        </p>
+
+        <div class="badge-row">
+          <span class="badge">Classification</span>
+          <span class="badge">Regression</span>
+          <span class="badge">Hyperplane</span>
+          <span class="badge">Margin</span>
+          <span class="badge">Kernels</span>
+          <span class="badge">Support Vectors</span>
+        </div>
+
+        <div class="hero-actions">
+          <a class="btn primary" href="#core">ابدأ الدرس</a>
+          <a class="btn" href="#simulator">جرّب المحاكي</a>
+          <a class="btn" href="#quiz">ابدأ Knowledge Check</a>
+        </div>
+      </div>
+    </header>
+
+    <nav class="nav">
+      <div class="nav-inner">
+        <a href="#core">الفكرة الأساسية</a>
+        <a href="#geometry">الهندسة</a>
+        <a href="#soft-margin">Soft Margin</a>
+        <a href="#math">الحد الأدنى من الرياضيات</a>
+        <a href="#kernels">Kernels</a>
+        <a href="#svr">SVR</a>
+        <a href="#pros-cons">المزايا والقيود</a>
+        <a href="#simulator">المحاكي</a>
+        <a href="#quiz">Quiz</a>
+      </div>
+    </nav>
+
+    <!-- CORE -->
+    <section id="core">
+      <div class="section-head">
+        <h2>1. الفكرة الأساسية لـ SVM</h2>
+        <p>ابدأ بفهم المشكلة التي يحاول النموذج حلها، قبل الدخول في التفاصيل الرياضية.</p>
+      </div>
+
+      <div class="grid two">
+        <div class="card">
+          <div class="concept">
+            <div class="concept-icon">🎯</div>
+            <div>
+              <h3>ما هو SVM؟</h3>
+              <p>
+                <strong>Support Vector Machine</strong> هو أسلوب من
+                <strong>Supervised Learning</strong> يمكن استخدامه في
+                <strong>Classification</strong> و<strong>Regression</strong>.
+              </p>
+              <div class="highlight">
+                الفكرة المركزية: ابحث عن <strong>Decision Boundary</strong> يفصل الفئات
+                مع محاولة جعل <strong>Margin</strong> أكبر ما يمكن.
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="concept">
+            <div class="concept-icon">📐</div>
+            <div>
+              <h3>كيف يرى SVM البيانات؟</h3>
+              <p>
+                كل observation تتحول إلى نقطة في فضاء متعدد الأبعاد
+                <strong>Multidimensional Space</strong>.
+                كل <strong>Feature</strong> تمثل coordinate.
+              </p>
+              <div class="highlight">
+                Feature 1 → محور<br />
+                Feature 2 → محور<br />
+                Feature 3 → محور إضافي... وهكذا.
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <details>
+        <summary>🔍 مثال عملي: Spam Detection</summary>
+        <div class="details-content">
+          <p>
+            تخيل أن لدينا رسائل بريد إلكتروني. لدينا feature مثل عدد الكلمات المرتبطة بالإعلانات
+            وfeature آخر مثل عدد الروابط.
+          </p>
+          <p>
+            كل رسالة تصبح نقطة. يحاول <strong>SVM</strong> إيجاد حد يفصل بين
+            <strong>Spam</strong> و<strong>Not Spam</strong>.
+          </p>
+          <div class="highlight">
+            عند وصول رسالة جديدة، ننظر إلى موقعها بالنسبة إلى <strong>Decision Boundary</strong>.
+          </div>
+        </div>
+      </details>
+
+      <details>
+        <summary>🧠 لماذا لا نبحث فقط عن أي خط يفصل البيانات؟</summary>
+        <div class="details-content">
+          <p>
+            لأن هناك عادةً عدة حدود يمكن أن تفصل الفئتين.
+            الهدف ليس مجرد العثور على فصل صحيح على بيانات التدريب،
+            بل العثور على حد يتوقع أن يعمم جيدًا على بيانات لم نرها من قبل.
+          </p>
+          <div class="highlight success">
+            لذلك يهتم SVM بتعظيم <strong>Margin</strong> وليس فقط بفصل نقاط التدريب.
+          </div>
+        </div>
+      </details>
+    </section>
+
+    <!-- GEOMETRY -->
+    <section id="geometry">
+      <div class="section-head">
+        <h2>2. Decision Boundary و Margin و Support Vectors</h2>
+        <p>هذه هي البنية الهندسية الأساسية التي تجعل SVM مختلفًا.</p>
+      </div>
+
+      <div class="grid three">
+        <div class="card">
+          <h3>Decision Boundary</h3>
+          <p>
+            هو الحد الذي يستخدمه النموذج لاتخاذ القرار بين الفئات.
+            في بعدين يمكن أن يكون <strong>خطًا</strong>.
+            في أبعاد أعلى يسمى <strong>Hyperplane</strong>.
+          </p>
+        </div>
+
+        <div class="card">
+          <h3>Margin</h3>
+          <p>
+            هي المسافة بين <strong>Decision Boundary</strong>
+            وأقرب نقاط من الفئتين.
+          </p>
+        </div>
+
+        <div class="card">
+          <h3>Support Vectors</h3>
+          <p>
+            هي أقرب النقاط المهمة للحد، والتي تلعب دورًا أساسيًا في تحديد
+            <strong>Margin</strong> والحد الفاصل.
+          </p>
+        </div>
+      </div>
+
+      <div class="card" style="margin-top:18px;">
+        <div class="highlight">
+          <strong>قاعدة ذهنية:</strong>
+          <span>Boundary يفصل → Margin يحدد المسافة → Support Vectors تثبّت الوضعية.</span>
+        </div>
+
+        <div class="compare-card">
+          <table class="mini-table">
+            <thead>
+              <tr>
+                <th>المفهوم</th>
+                <th>السؤال الذي يجيب عنه</th>
+                <th>صورة ذهنية</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Decision Boundary</td>
+                <td>أين يقع الحد الفاصل؟</td>
+                <td>الخط / المستوى</td>
+              </tr>
+              <tr>
+                <td>Margin</td>
+                <td>كم يبعد الحد عن أقرب نقاط؟</td>
+                <td>المساحة الآمنة حول الحد</td>
+              </tr>
+              <tr>
+                <td>Support Vectors</td>
+                <td>ما النقاط التي تحدد هذا الحد فعليًا؟</td>
+                <td>النقاط الأقرب للفاصل</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- SOFT MARGIN -->
+    <section id="soft-margin">
+      <div class="section-head">
+        <h2>3. Soft Margin و Parameter C</h2>
+        <p>البيانات الواقعية ليست مثالية: قد توجد ضوضاء وتداخل بين الفئات.</p>
+      </div>
+
+      <div class="grid two">
+        <div class="card">
+          <h3>لماذا نحتاج Soft Margin؟</h3>
+          <p>
+            عندما تكون البيانات noisy أو overlapping قد يصبح الفصل المثالي غير واقعي.
+            يسمح <strong>Soft Margin</strong> لبعض النقاط بأن تكون مصنفة بشكل غير صحيح
+            مقابل الحصول على Margin أكثر مرونة.
+          </p>
+          <div class="highlight warning">
+            <strong>الفكرة:</strong> لا تحاول الفوز بكل نقطة في التدريب بأي ثمن.
+          </div>
+        </div>
+
+        <div class="card">
+          <h3>ما دور C؟</h3>
+          <p>
+            يتحكم <strong>C</strong> في التوازن بين تعظيم Margin
+            وتقليل عدد أخطاء التصنيف.
+          </p>
+
+          <div class="metric">
+            <span>C صغير</span>
+            <span>Margin أكثر مرونة</span>
+          </div>
+          <div class="metric">
+            <span>C كبير</span>
+            <span>فصل أكثر صرامة</span>
+          </div>
+        </div>
+      </div>
+
+      <details>
+        <summary>⚖️ كيف تفكر في C بدون حفظ التعريف؟</summary>
+        <div class="details-content">
+          <p>
+            تخيل أن لديك مدربًا يراقب أخطاء النموذج.
+          </p>
+          <p>
+            عند <strong>C كبير</strong>، يصبح المدرب أكثر صرامة تجاه أخطاء التدريب،
+            فيحاول النموذج تجنبها بقوة.
+          </p>
+          <p>
+            عند <strong>C صغير</strong>، يوجد تسامح أكبر مع بعض الأخطاء،
+            مقابل الحفاظ على Margin أكثر مرونة.
+          </p>
+        </div>
+      </details>
+    </section>
+
+    <!-- MATH -->
+    <section id="math">
+      <div class="section-head">
+        <h2>4. الحد الأدنى من الرياضيات</h2>
+        <p>لا تحتاج إلى اشتقاق optimization problem كي تفهم الفكرة الأساسية.</p>
+      </div>
+
+      <div class="card">
+        <h3>الهدف الهندسي</h3>
+        <p>
+          نريد إيجاد <strong>weight vector</strong> يسمى <strong>w</strong>
+          وقيمة <strong>b</strong> تسمى <strong>bias</strong> بحيث يكون القرار
+          مبنيًا على إشارة التعبير التالي:
+        </p>
+
+        <div class="formula">
+          w · x + b
+        </div>
+
+        <p>
+          في المثال المبسط، يتم البحث عن حل يجعل طول <strong>w</strong> صغيرًا
+          مع احترام قيود التصنيف.
+        </p>
+
+        <div class="formula">
+          y (w · x + b) ≥ 1
+        </div>
+
+        <div class="highlight">
+          لاحظ الفكرة وليس التفاصيل:
+          <strong>w</strong> و<strong>b</strong> يحددان موقع وشكل الحد الفاصل.
+        </div>
+      </div>
+
+      <details>
+        <summary>🔢 ماذا يعني w · x + b عمليًا؟</summary>
+        <div class="details-content">
+          <p>
+            عبارة <strong>w · x</strong> هي <strong>inner product</strong>
+            بين أوزان النموذج وfeatures الخاصة بالنقطة.
+          </p>
+          <p>
+            بعد إضافة <strong>b</strong> نحصل على قيمة يمكن استخدامها لمعرفة
+            موقع النقطة بالنسبة للحد.
+          </p>
+          <div class="highlight success">
+            إذا كانت القيمة أكبر من صفر → جهة من الحد.<br />
+            إذا كانت أقل من صفر → الجهة الأخرى.
+          </div>
+        </div>
+      </details>
+    </section>
+
+    <!-- KERNELS -->
+    <section id="kernels">
+      <div class="section-head">
+        <h2>5. Kerneling: ماذا نفعل عندما لا يمكن فصل البيانات بخط مستقيم؟</h2>
+        <p>هذه واحدة من أهم أفكار SVM.</p>
+      </div>
+
+      <div class="card">
+        <div class="highlight">
+          أحيانًا لا يمكن فصل البيانات في الفضاء الأصلي بخط مستقيم.
+          بدلًا من الاستسلام، يمكننا تمثيل البيانات في فضاء أعلى أبعادًا.
+        </div>
+
+        <div class="step">
+          <h3>الخطوة 1 — الفضاء الأصلي</h3>
+          <p>لدينا فئتان متداخلتان هندسيًا بشكل يجعل الخط المستقيم غير كافٍ.</p>
+        </div>
+
+        <div class="step">
+          <h3>الخطوة 2 — Transform</h3>
+          <p>
+            ننشئ تمثيلًا جديدًا للfeatures، مثل إضافة feature جديدة يمكن أن تجعل
+            البنية أسهل للفصل.
+          </p>
+        </div>
+
+        <div class="step">
+          <h3>الخطوة 3 — فضاء أعلى أبعادًا</h3>
+          <p>
+            ما كان غير قابل للفصل في بعدين قد يصبح قابلًا للفصل بواسطة
+            <strong>Hyperplane</strong> في أبعاد أعلى.
+          </p>
+        </div>
+
+        <div class="step">
+          <h3>الخطوة 4 — Kernel</h3>
+          <p>
+            <strong>Kernel</strong> يسمح لـ SVM بالتعامل مع علاقات غير خطية
+            دون الحاجة إلى بناء هذا التمثيل الجديد يدويًا في كل حالة.
+          </p>
+        </div>
+      </div>
+
+      <div class="grid two" style="margin-top:18px;">
+        <div class="card">
+          <h3>Linear</h3>
+          <p>هو الشكل الخطي المعتاد لـ SVM.</p>
+          <span class="chip">Default concept</span>
+        </div>
+
+        <div class="card">
+          <h3>Polynomial</h3>
+          <p>مفيد لتمثيل علاقات يمكن أن تشبه embeddings متعددة الحدود.</p>
+          <span class="chip">Parabolic-style transformation</span>
+        </div>
+
+        <div class="card">
+          <h3>RBF</h3>
+          <p>
+            يعطي استجابة أقوى للنقاط القريبة وتتناقص مع ازدياد المسافة.
+          </p>
+          <span class="chip">Nonlinear</span>
+        </div>
+
+        <div class="card">
+          <h3>Sigmoid</h3>
+          <p>يستخدم دالة مرتبطة بفكرة <strong>logistic regression</strong>.</p>
+          <span class="chip">Alternative kernel</span>
+        </div>
+      </div>
+
+      <details>
+        <summary>🧠 كيف تعرف أنك تحتاج Kernel غير Linear؟</summary>
+        <div class="details-content">
+          <p>
+            اسأل: هل البنية العامة للفئات يمكن فصلها بحد خطي مناسب؟
+          </p>
+          <p>
+            إذا كانت العلاقة ذات شكل دائري أو معقد أو غير خطي،
+            فقد تحتاج إلى <strong>nonlinear kernel</strong>.
+          </p>
+        </div>
+      </details>
+    </section>
+
+    <!-- SVR -->
+    <section id="svr">
+      <div class="section-head">
+        <h2>6. Support Vector Regression — SVR</h2>
+        <p>SVM ليست فقط للتصنيف.</p>
+      </div>
+
+      <div class="grid two">
+        <div class="card">
+          <h3>الفكرة</h3>
+          <p>
+            في <strong>SVR</strong> لا نحاول فصل فئتين.
+            بل نحاول بناء منحنى prediction مع منطقة سماح حوله تسمى
+            <strong>epsilon tube</strong>.
+          </p>
+
+          <div class="formula">
+            Prediction ± ε
+          </div>
+        </div>
+
+        <div class="card">
+          <h3>ما معنى Epsilon؟</h3>
+          <p>
+            <strong>Epsilon</strong> يحدد عرض المنطقة التي نعتبر فيها الانحراف
+            عن prediction مقبولًا.
+          </p>
+
+          <div class="metric">
+            <span>ε = 0.2</span>
+            <span>Tube أضيق</span>
+          </div>
+          <div class="metric">
+            <span>ε = 0.4</span>
+            <span>Tube أوسع</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="highlight">
+        داخل <strong>epsilon tube</strong> → يُنظر إليه كجزء من الإشارة المقبولة.<br />
+        خارجها → يعتبر انحرافًا أكبر ويمكن التعامل معه كضوضاء.
+      </div>
+    </section>
+
+    <!-- PROS CONS -->
+    <section id="pros-cons">
+      <div class="section-head">
+        <h2>7. متى يكون SVM اختيارًا جيدًا؟</h2>
+      </div>
+
+      <div class="grid two">
+        <div class="card">
+          <h3>✅ المزايا</h3>
+          <p>• فعال في <strong>high-dimensional spaces</strong>.</p>
+          <p>• يمكن أن يكون robust نسبيًا تجاه <strong>overfitting</strong>.</p>
+          <p>• قوي عندما تكون البيانات linearly separable.</p>
+          <p>• يمكنه التعامل مع الفصل الضعيف باستخدام <strong>Soft Margin</strong>.</p>
+        </div>
+
+        <div class="card">
+          <h3>⚠️ القيود</h3>
+          <p>• قد يكون بطيئًا في التدريب على datasets الكبيرة.</p>
+          <p>• حساس للضوضاء والتداخل بين classes.</p>
+          <p>• اختيار <strong>kernel</strong> قد يكون غير بسيط.</p>
+          <p>• اختيار <strong>regularization parameters</strong> يحتاج tuning جيدًا.</p>
+        </div>
+      </div>
+
+      <div class="card" style="margin-top:18px;">
+        <h3>📌 أمثلة من الدرس</h3>
+        <div class="grid three">
+          <div class="kpi">
+            <strong>🖼️</strong>
+            Image Classification
+          </div>
+          <div class="kpi">
+            <strong>📧</strong>
+            Spam Detection
+          </div>
+          <div class="kpi">
+            <strong>💬</strong>
+            Sentiment Analysis
+          </div>
+          <div class="kpi">
+            <strong>✍️</strong>
+            Handwritten Digits
+          </div>
+          <div class="kpi">
+            <strong>🎙️</strong>
+            Speech Recognition
+          </div>
+          <div class="kpi">
+            <strong>🚨</strong>
+            Anomaly Detection
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SIMULATOR -->
+    <section id="simulator">
+      <div class="section-head">
+        <h2>8. محاكي SVM بصري</h2>
+        <p>
+          غيّر <strong>C</strong> ونمط الفصل وشاهد كيف تتغير فكرة الـ
+          <strong>Margin</strong> والـ<strong>Support Vectors</strong>.
+        </p>
+      </div>
+
+      <div class="card">
+        <div class="simulator">
+          <div class="plot-wrap">
+            <canvas id="svmCanvas" width="850" height="520"></canvas>
+          </div>
+
+          <div>
+            <div class="control-group">
+              <label>
+                <span>Parameter C</span>
+                <span id="cValue">1.0</span>
+              </label>
+              <input id="cSlider" type="range" min="0.1" max="10" step="0.1" value="1" />
+            </div>
+
+            <div class="control-group">
+              <label>
+                <span>Kernel</span>
+              </label>
+              <select id="kernelSelect">
+                <option value="linear">Linear</option>
+                <option value="rbf">RBF</option>
+                <option value="polynomial">Polynomial</option>
+              </select>
+            </div>
+
+            <div class="metric">
+              <span>Margin تقريبي</span>
+              <span id="marginValue">متوسط</span>
+            </div>
+
+            <div class="metric">
+              <span>Support Vectors</span>
+              <span id="svCount">4</span>
+            </div>
+
+            <div class="metric">
+              <span>مرونة النموذج</span>
+              <span id="flexibilityValue">متوسطة</span>
+            </div>
+
+            <div class="highlight" id="simExplain">
+              عند C منخفض، يصبح النموذج أكثر تسامحًا مع الأخطاء ويقبل Margin أكثر مرونة.
+            </div>
+
+            <button class="btn primary" id="randomizeBtn">🔀 تغيير توزيع النقاط</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- QUIZ -->
+    <section id="quiz">
+      <div class="section-head">
+        <h2>9. Interactive Quiz / Knowledge Check</h2>
+        <p>
+          الأسئلة مرتبة من مستوى متوسط إلى صعب جدًا، وتختبر أنواعًا متعددة من
+          التفكير والاستدلال.
+        </p>
+      </div>
+
+      <div class="card">
+        <div class="quiz-toolbar">
+          <div>
+            <strong>تصفية الأسئلة</strong>
+            <div class="filter-row" style="margin-top:8px;">
+              <button class="filter-btn active" data-filter="all">All</button>
+              <button class="filter-btn" data-filter="purpose">Purpose</button>
+              <button class="filter-btn" data-filter="bloom">Bloom</button>
+              <button class="filter-btn" data-filter="rhetoric">W Questions</button>
+              <button class="filter-btn" data-filter="logic">Logical</button>
+              <button class="filter-btn" data-filter="socratic">Socratic</button>
+            </div>
+          </div>
+
+          <div>
+            <span class="chip" id="quizCounter">السؤال 1 من 18</span>
+          </div>
+        </div>
+
+        <div class="progress">
+          <span id="quizProgress"></span>
+        </div>
+
+        <div id="quizContainer"></div>
+
+        <div class="score-card card" id="scoreCard">
+          <div class="eyebrow">Knowledge Check Complete</div>
+          <div class="score-number" id="scoreNumber">0%</div>
+          <p id="scoreText"></p>
+          <button class="btn primary" id="restartQuiz">إعادة الاختبار</button>
+        </div>
+      </div>
+    </section>
+
+    <footer class="footer">
+      <p>
+        الفكرة التي يجب أن تبقى في ذهنك:
+        <strong>SVM يبحث عن Boundary جيد، Margin كبير، ويستفيد من Support Vectors.</strong>
+      </p>
+    </footer>
+  </div>
+
+  <script>
+    // -------------------------------
+    // SVM VISUAL SIMULATOR
+    // -------------------------------
+    const canvas = document.getElementById("svmCanvas");
+    const ctx = canvas.getContext("2d");
+
+    const cSlider = document.getElementById("cSlider");
+    const cValue = document.getElementById("cValue");
+    const kernelSelect = document.getElementById("kernelSelect");
+    const marginValue = document.getElementById("marginValue");
+    const svCount = document.getElementById("svCount");
+    const flexibilityValue = document.getElementById("flexibilityValue");
+    const simExplain = document.getElementById("simExplain");
+    const randomizeBtn = document.getElementById("randomizeBtn");
+
+    let points = [];
+
+    function generatePoints() {
+      points = [];
+
+      const left = [
+        [180,130],[240,190],[150,270],[280,300],[210,380],[320,400]
+      ];
+
+      const right = [
+        [590,130],[650,190],[560,260],[700,300],[600,370],[690,420]
+      ];
+
+      left.forEach(([x,y]) => {
+        points.push({
+          x: x + (Math.random() - .5) * 35,
+          y: y + (Math.random() - .5) * 35,
+          cls: -1
+        });
+      });
+
+      right.forEach(([x,y]) => {
+        points.push({
+          x: x + (Math.random() - .5) * 35,
+          y: y + (Math.random() - .5) * 35,
+          cls: 1
+        });
+      });
+    }
+
+    function drawPoint(x, y, cls, support = false) {
+      ctx.beginPath();
+      ctx.arc(x, y, support ? 9 : 7, 0, Math.PI * 2);
+      ctx.fillStyle = cls === 1 ? "#60a5fa" : "#f87171";
+      ctx.fill();
+
+      if (support) {
+        ctx.lineWidth = 3;
+        ctx.strokeStyle = "#fbbf24";
+        ctx.stroke();
+      }
+    }
+
+    function drawLine(x1, y1, x2, y2, width = 4, alpha = 1) {
+      ctx.beginPath();
+      ctx.moveTo(x1, y1);
+      ctx.lineTo(x2, y2);
+      ctx.strokeStyle = `rgba(255,255,255,${alpha})`;
+      ctx.lineWidth = width;
+      ctx.stroke();
+    }
+
+    function redraw() {
+      const c = parseFloat(cSlider.value);
+      const kernel = kernelSelect.value;
+
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      // Background grid
+      ctx.strokeStyle = "rgba(255,255,255,.05)";
+      ctx.lineWidth = 1;
+
+      for (let x = 40; x < canvas.width; x += 50) {
+        ctx.beginPath();
+        ctx.moveTo(x, 0);
+        ctx.lineTo(x, canvas.height);
+        ctx.stroke();
+      }
+
+      for (let y = 40; y < canvas.height; y += 50) {
+        ctx.beginPath();
+        ctx.moveTo(0, y);
+        ctx.lineTo(canvas.width, y);
+        ctx.stroke();
+      }
+
+      let margin;
+      let supportCount;
+
+      if (kernel === "linear") {
+        margin = Math.max(35, 115 - c * 7);
+        supportCount = c < 2 ? 5 : c < 5 ? 4 : 3;
+
+        const angleOffset = (c - 1) * 3;
+        const y1 = 505;
+        const y2 = 45;
+
+        const baseX1 = 425 + angleOffset;
+        const baseX2 = 425 - angleOffset;
+
+        // Margin boundaries
+        drawLine(baseX1 - margin, y1, baseX2 - margin, y2, 2, .25);
+        drawLine(baseX1 + margin, y1, baseX2 + margin, y2, 2, .25);
+
+        // Decision boundary
+        drawLine(baseX1, y1, baseX2, y2, 4, .95);
+
+        points.forEach((p, i) => {
+          let support = i < supportCount;
+          drawPoint(p.x, p.y, p.cls, support);
+        });
+
+      } else {
+        // Nonlinear visualization
+        const cx = 425;
+        const cy = 260;
+
+        if (kernel === "rbf") {
+          ctx.beginPath();
+          ctx.arc(cx, cy, 125, 0, Math.PI * 2);
+          ctx.strokeStyle = "rgba(255,255,255,.9)";
+          ctx.lineWidth = 4;
+          ctx.stroke();
+
+          ctx.beginPath();
+          ctx.arc(cx, cy, Math.max(155, 190 - c * 3), 0, Math.PI * 2);
+          ctx.strokeStyle = "rgba(255,255,255,.22)";
+          ctx.lineWidth = 2;
+          ctx.stroke();
+
+          supportCount = c < 2 ? 6 : c < 5 ? 5 : 4;
+          margin = Math.max(35, 95 - c * 3);
+
+          points.forEach((p, i) => {
+            const dx = p.x - cx;
+            const dy = p.y - cy;
+            const dist = Math.sqrt(dx * dx + dy * dy);
+            const support = Math.abs(dist - 125) < 75 || i < supportCount;
+            drawPoint(p.x, p.y, p.cls, support);
+          });
+
+        } else {
+          // Polynomial
+          ctx.beginPath();
+          ctx.moveTo(110, 410);
+          ctx.quadraticCurveTo(420, 80, 740, 410);
+          ctx.strokeStyle = "rgba(255,255,255,.9)";
+          ctx.lineWidth = 4;
+          ctx.stroke();
+
+          ctx.beginPath();
+          ctx.moveTo(90, 450);
+          ctx.quadraticCurveTo(420, 115, 760, 450);
+          ctx.strokeStyle = "rgba(255,255,255,.23)";
+          ctx.lineWidth = 2;
+          ctx.stroke();
+
+          supportCount = c < 2 ? 6 : c < 5 ? 5 : 4;
+
+          points.forEach((p, i) => {
+            drawPoint(p.x, p.y, p.cls, i < supportCount);
+          });
+
+          margin = Math.max(40, 100 - c * 4);
+        }
+      }
+
+      cValue.textContent = c.toFixed(1);
+      svCount.textContent = supportCount;
+
+      if (c < 2) {
+        marginValue.textContent = "واسع نسبيًا";
+        flexibilityValue.textContent = "مرتفعة";
+        simExplain.textContent =
+          "C منخفض: النموذج أكثر تسامحًا مع الأخطاء، وبالتالي يسمح بـ Soft Margin أكثر وضوحًا.";
+      } else if (c < 6) {
+        marginValue.textContent = "متوسط";
+        flexibilityValue.textContent = "متوسطة";
+        simExplain.textContent =
+          "C متوسط: يوجد توازن عملي بين تعظيم Margin وتقليل أخطاء التدريب.";
+      } else {
+        marginValue.textContent = "أضيق";
+        flexibilityValue.textContent = "أقل تسامحًا";
+        simExplain.textContent =
+          "C مرتفع: تصبح أخطاء التدريب أكثر تكلفة، فيدفع النموذج نحو فصل أكثر صرامة.";
+      }
+
+      if (kernel !== "linear") {
+        simExplain.textContent +=
+          " استخدام Kernel غير خطي يسمح بتمثيل حدود Decision Boundary أكثر تعقيدًا.";
+      }
+    }
+
+    cSlider.addEventListener("input", redraw);
+    kernelSelect.addEventListener("change", redraw);
+
+    randomizeBtn.addEventListener("click", () => {
+      generatePoints();
+      redraw();
+    });
+
+    generatePoints();
+    redraw();
+
+    // -------------------------------
+    // QUIZ
+    // -------------------------------
+
+    const questions = [
+      {
+        id: 1,
+        category: "purpose",
+        purpose: "Closed",
+        bloom: "Remembering",
+        rhetoric: "What",
+        logic: "Alternative",
+        socratic: "Clarification",
+        difficulty: "متوسط",
+        type: "mcq",
+        q: "ما الهدف الأساسي لـ SVM في مهمة التصنيف الثنائية؟",
+        options: [
+          "العثور على Decision Boundary يعظم Margin بين الفئتين",
+          "تحويل كل feature إلى متغير categorical",
+          "تقليل عدد features قبل بناء النموذج",
+          "إجبار جميع نقاط التدريب على التطابق مع الحدود"
+        ],
+        answer: 0,
+        explanation: "جوهر SVM هو إيجاد Decision Boundary مع تعظيم Margin، مع السماح أحيانًا بالأخطاء عبر Soft Margin."
+      },
+      {
+        id: 2,
+        category: "bloom",
+        purpose: "Closed",
+        bloom: "Understanding",
+        rhetoric: "What",
+        logic: "Tag",
+        socratic: "Clarification",
+        difficulty: "متوسط",
+        type: "mcq",
+        q: "لماذا تسمى أقرب النقاط إلى Decision Boundary بـ Support Vectors؟",
+        options: [
+          "لأنها غالبًا النقاط التي تسهم في تحديد موقع الحد والـMargin",
+          "لأنها النقاط التي تقع دائمًا في منتصف كل class",
+          "لأنها النقاط التي تم حذفها أثناء التدريب",
+          "لأنها تحدد عدد الـfeatures المستخدمة في النموذج"
+        ],
+        answer: 0,
+        explanation: "Support Vectors هي نقاط قريبة من الحد وتلعب دورًا رئيسيًا في تحديد القرار والـMargin."
+      },
+      {
+        id: 3,
+        category: "rhetoric",
+        purpose: "Closed",
+        bloom: "Understanding",
+        rhetoric: "How",
+        logic: "Tag",
+        socratic: "Clarification",
+        difficulty: "متوسط+",
+        type: "mcq",
+        q: "كيف يتم تصنيف نقطة جديدة في مثال ثنائي الأبعاد بسيط باستخدام Decision Boundary خطي؟",
+        options: [
+          "بحسب الجهة التي تقع فيها النقطة بالنسبة إلى الخط",
+          "بحسب عدد الـfeatures في النقطة فقط",
+          "بحسب قرب النقطة من متوسط جميع البيانات",
+          "بحسب قيمة C وحدها دون النظر إلى موقع النقطة"
+        ],
+        answer: 0,
+        explanation: "في المثال الخطي، موقع النقطة بالنسبة للخط يحدد الفئة."
+      },
+      {
+        id: 4,
+        category: "logic",
+        purpose: "Alternative",
+        bloom: "Analyzing",
+        rhetoric: "Why",
+        logic: "Alternative",
+        socratic: "Challenging Assumptions",
+        difficulty: "صعب",
+        type: "mcq",
+        q: "لديك بيانات noisy ومتداخلة بين فئتين. أي تفسير أفضل لاختيار C صغير نسبيًا؟",
+        options: [
+          "السماح ببعض الأخطاء مقابل الحفاظ على Margin أكثر مرونة",
+          "إلغاء دور Support Vectors حتى يصبح النموذج أبسط",
+          "زيادة تكلفة كل خطأ حتى يتم تصنيف كل نقطة بدقة",
+          "تحويل المشكلة تلقائيًا من Classification إلى Regression"
+        ],
+        answer: 0,
+        explanation: "C الأصغر يعني تسامحًا أكبر مع misclassification، وهو متوافق مع فكرة Soft Margin."
+      },
+      {
+        id: 5,
+        category: "purpose",
+        purpose: "Open-Ended",
+        bloom: "Understanding",
+        rhetoric: "Why",
+        logic: "Rhetorical",
+        socratic: "Viewpoints",
+        difficulty: "صعب",
+        type: "text",
+        q: "لماذا لا يكفي أن نقول: «وجد SVM حدًا يفصل بيانات التدريب، إذن النموذج ممتاز»؟",
+        keywords: [
+          "margin",
+          "generalization",
+          "unseen",
+          "بيانات جديدة",
+          "تعميم",
+          "support vectors"
+        ],
+        explanation: "الإجابة القوية تربط جودة SVM بتعظيم Margin وبالقدرة على التعميم على unseen data، وليس فقط النجاح على training data."
+      },
+      {
+        id: 6,
+        category: "bloom",
+        purpose: "Closed",
+        bloom: "Applying",
+        rhetoric: "What",
+        logic: "Alternative",
+        socratic: "Consequences",
+        difficulty: "صعب",
+        type: "mcq",
+        q: "إذا رفعت C من قيمة صغيرة إلى قيمة كبيرة، فما الاتجاه المتوقع؟",
+        options: [
+          "يصبح النموذج أكثر صرامة تجاه أخطاء التدريب",
+          "يصبح النموذج أكثر تسامحًا مع أخطاء التدريب",
+          "يتوقف النموذج عن استخدام Margin",
+          "يتم تحويل كل kernel إلى RBF تلقائيًا"
+        ],
+        answer: 0,
+        explanation: "C الكبير يفرض تكلفة أعلى على أخطاء التصنيف، لذلك يصبح النموذج أكثر صرامة."
+      },
+      {
+        id: 7,
+        category: "rhetoric",
+        purpose: "W Question",
+        bloom: "Remembering",
+        rhetoric: "Where",
+        logic: "Rhetorical",
+        socratic: "Clarification",
+        difficulty: "متوسط+",
+        type: "mcq",
+        q: "أين يكون Decision Boundary في فضاء يحتوي على ميزتين؟",
+        options: [
+          "يمكن أن يكون خطًا يفصل بين الفئتين",
+          "يجب أن يكون دائمًا نقطة واحدة",
+          "يجب أن يكون دائرة مهما كانت البيانات",
+          "يجب أن يكون feature إضافية"
+        ],
+        answer: 0,
+        explanation: "في بعدين، الـhyperplane يظهر عادةً كخط."
+      },
+      {
+        id: 8,
+        category: "bloom",
+        purpose: "Closed",
+        bloom: "Analyzing",
+        rhetoric: "Why",
+        logic: "Alternative",
+        socratic: "Challenging Assumptions",
+        difficulty: "صعب",
+        type: "mcq",
+        q: "بياناتك ذات شكل دائري concentric. لماذا قد يفشل Linear SVM؟",
+        options: [
+          "لأن خطًا مستقيمًا قد لا يكون قادرًا على فصل البنيتين",
+          "لأن SVM لا يمكنه العمل إلا مع أكثر من 100 feature",
+          "لأن Support Vectors تمنع استخدام أي Decision Boundary",
+          "لأن SVM لا يدعم Classification"
+        ],
+        answer: 0,
+        explanation: "الفئات ذات البنية الدائرية قد لا تكون linearly separable، لذلك نحتاج تمثيلًا غير خطي مثل RBF."
+      },
+      {
+        id: 9,
+        category: "purpose",
+        purpose: "Probing",
+        bloom: "Analyzing",
+        rhetoric: "Why",
+        logic: "Rhetorical",
+        socratic: "Challenging Assumptions",
+        difficulty: "صعب جدًا",
+        type: "text",
+        q: "إذا كان نموذج SVM يعطي training accuracy عالية جدًا بعد رفع C كثيرًا، فما السؤال التشخيصي الذي ينبغي أن تطرحه قبل اعتبار النتيجة نجاحًا؟",
+        keywords: [
+          "generalization",
+          "test",
+          "validation",
+          "overfitting",
+          "unseen"
+        ],
+        explanation: "ينبغي فحص التعميم على validation/test data وعدم افتراض أن ارتفاع training accuracy يعني أداءً جيدًا على بيانات جديدة."
+      },
+      {
+        id: 10,
+        category: "rhetoric",
+        purpose: "W Question",
+        bloom: "Understanding",
+        rhetoric: "How",
+        logic: "Tag",
+        socratic: "Clarification",
+        difficulty: "صعب",
+        type: "mcq",
+        q: "كيف يساعد Kerneling في التعامل مع البيانات غير القابلة للفصل خطيًا؟",
+        options: [
+          "بإيجاد تمثيل يسمح بحد فاصل أبسط في فضاء أعلى أبعادًا",
+          "بحذف جميع النقاط الواقعة قرب Decision Boundary",
+          "بإجبار C على أن يصبح صفرًا",
+          "بتحويل جميع الـfeatures إلى labels"
+        ],
+        answer: 0,
+        explanation: "الفكرة الأساسية هي تمثيل البيانات في فضاء يجعل الفصل ممكنًا باستخدام hyperplane."
+      },
+      {
+        id: 11,
+        category: "logic",
+        purpose: "Tag",
+        bloom: "Analyzing",
+        rhetoric: "What",
+        logic: "Tag",
+        socratic: "Viewpoints",
+        difficulty: "صعب جدًا",
+        type: "mcq",
+        q: "أي عبارة أدق حول العلاقة بين Margin وSupport Vectors؟",
+        options: [
+          "Support Vectors هي النقاط الأقرب التي تساعد على تحديد Margin والحد الفاصل",
+          "Margin هو عدد Support Vectors في كل class",
+          "Support Vectors هي جميع النقاط الموجودة داخل كل class",
+          "Margin يساوي دائمًا عدد features في النموذج"
+        ],
+        answer: 0,
+        explanation: "العلاقة هندسية: أقرب النقاط للحد تحدد المنطقة التي تُقاس منها Margin."
+      },
+      {
+        id: 12,
+        category: "bloom",
+        purpose: "Applying",
+        bloom: "Applying",
+        rhetoric: "How",
+        logic: "Alternative",
+        socratic: "Consequences",
+        difficulty: "صعب جدًا",
+        type: "mcq",
+        q: "في SVR، لديك epsilon صغير جدًا مقارنةً بإعداد آخر. ما النتيجة المفاهيمية؟",
+        options: [
+          "تضيق منطقة السماح حول منحنى prediction",
+          "يتحول SVR تلقائيًا إلى Binary Classification",
+          "يختفي مفهوم noise تمامًا من المشكلة",
+          "يصبح الـkernel بالضرورة Linear"
+        ],
+        answer: 0,
+        explanation: "كلما صغر epsilon أصبح epsilon tube أضيق، أي مساحة الانحراف المقبول عن prediction تصبح أصغر."
+      },
+      {
+        id: 13,
+        category: "socratic",
+        purpose: "Challenging Assumptions",
+        bloom: "Evaluating",
+        rhetoric: "Why",
+        logic: "Loaded",
+        socratic: "Challenging Assumptions",
+        difficulty: "صعب جدًا",
+        type: "text",
+        q: "«إذا كان SVM robust تجاه overfitting، فلماذا نهتم أصلًا باختيار C وkernel؟» قيّم هذا الافتراض.",
+        keywords: [
+          "parameter",
+          "kernel",
+          "noise",
+          "overfitting",
+          "sensitive",
+          "tradeoff"
+        ],
+        explanation: "Robustness ليست حصانة مطلقة. الدرس يوضح أن SVM حساس لاختيار kernel وregularization parameters، كما أنه حساس للضوضاء والتداخل."
+      },
+      {
+        id: 14,
+        category: "purpose",
+        purpose: "Leading",
+        bloom: "Evaluating",
+        rhetoric: "Why",
+        logic: "Loaded",
+        socratic: "Viewpoints",
+        difficulty: "صعب جدًا",
+        type: "text",
+        q: "هل من المنطقي تفضيل SVM دائمًا على أي خوارزمية أخرى لمجرد أنه يعمل جيدًا في high-dimensional spaces؟ فسّر.",
+        keywords: [
+          "large datasets",
+          "slow",
+          "kernel",
+          "noise",
+          "comparison",
+          "tradeoff"
+        ],
+        explanation: "لا. يجب موازنة المزايا مع القيود مثل بطء التدريب على البيانات الكبيرة والحساسية للضوضاء واختيار kernel/parameters."
+      },
+      {
+        id: 15,
+        category: "socratic",
+        purpose: "Questioning the Question",
+        bloom: "Creating",
+        rhetoric: "Why",
+        logic: "Rhetorical",
+        socratic: "Questioning the Question",
+        difficulty: "صعب جدًا",
+        type: "text",
+        q: "السؤال: «ما أفضل Kernel لـ SVM؟» — كيف تعيد صياغة السؤال ليصبح أكثر فائدة؟",
+        keywords: [
+          "data",
+          "validation",
+          "performance",
+          "kernel",
+          "RBF",
+          "linear",
+          "polynomial"
+        ],
+        explanation: "صياغة أقوى مثل: «أي Kernel يحقق أفضل أداء على هذه البيانات وفق validation metric مناسب؟» لأن أفضل Kernel يعتمد على طبيعة البيانات."
+      },
+      {
+        id: 16,
+        category: "logic",
+        purpose: "Rhetorical",
+        bloom: "Evaluating",
+        rhetoric: "Who",
+        logic: "Rhetorical",
+        socratic: "Viewpoints",
+        difficulty: "صعب",
+        type: "mcq",
+        q: "أي عنصر من التالي هو الأكثر ارتباطًا بتحديد الحد الفاصل في SVM؟",
+        options: [
+          "النقاط القريبة من الحد، خصوصًا Support Vectors",
+          "اسم dataset فقط دون النظر إلى توزيعه",
+          "عدد الأعمدة النصية في ملف CSV",
+          "قيمة epsilon المستخدمة حصريًا في SVR"
+        ],
+        answer: 0,
+        explanation: "Support Vectors ترتبط مباشرةً بموقع Decision Boundary والـMargin في SVM classification."
+      },
+      {
+        id: 17,
+        category: "bloom",
+        purpose: "Creating",
+        bloom: "Creating",
+        rhetoric: "How",
+        logic: "Alternative",
+        socratic: "Consequences",
+        difficulty: "صعب جدًا",
+        type: "text",
+        q: "صمّم استراتيجية أولية لاختيار بين Linear وRBF SVM لمشكلة تصنيف جديدة اعتمادًا على ما تعلمته فقط.",
+        keywords: [
+          "linear",
+          "RBF",
+          "validation",
+          "nonlinear",
+          "separable",
+          "compare"
+        ],
+        explanation: "الإجابة الجيدة تبدأ بـLinear كخط أساس، ثم تقارن RBF عندما تشير البيانات إلى علاقة غير خطية، وتستخدم validation للمقارنة بدل اختيار kernel عشوائيًا."
+      },
+      {
+        id: 18,
+        category: "socratic",
+        purpose: "Clarification",
+        bloom: "Understanding",
+        rhetoric: "What",
+        logic: "Tag",
+        socratic: "Clarification",
+        difficulty: "متوسط+",
+        type: "mcq",
+        q: "ما الفرق المفاهيمي الأوضح بين SVM Classification وSVR؟",
+        options: [
+          "الأول يبحث عن فصل بين classes، والثاني يبني prediction مع epsilon tube",
+          "الأول يستخدم kernels والثاني لا يستخدم أي kernel",
+          "الأول لا يستخدم Margin والثاني يستخدمه فقط",
+          "الأول يحتاج ميزتين دائمًا والثاني يحتاج feature واحدة دائمًا"
+        ],
+        answer: 0,
+        explanation: "Classification يركز على فصل classes، بينما SVR يتعامل مع target مستمر باستخدام epsilon tube حول prediction."
+      }
+    ];
+
+    let activeFilter = "all";
+    let visibleQuestions = [...questions];
+    let currentIndex = 0;
+    let score = 0;
+    let answered = new Set();
+    let selectedChoices = {};
+
+    const quizContainer = document.getElementById("quizContainer");
+    const quizCounter = document.getElementById("quizCounter");
+    const quizProgress = document.getElementById("quizProgress");
+    const scoreCard = document.getElementById("scoreCard");
+    const scoreNumber = document.getElementById("scoreNumber");
+    const scoreText = document.getElementById("scoreText");
+
+    function filterQuestions(filter) {
+      activeFilter = filter;
+
+      if (filter === "all") {
+        visibleQuestions = [...questions];
+      } else if (filter === "purpose") {
+        visibleQuestions = questions.filter(q => q.purpose);
+      } else if (filter === "bloom") {
+        visibleQuestions = questions.filter(q => q.bloom);
+      } else if (filter === "rhetoric") {
+        visibleQuestions = questions.filter(q => ["Who","What","When","Where","Why","How"].includes(q.rhetoric));
+      } else if (filter === "logic") {
+        visibleQuestions = questions.filter(q => ["Alternative","Tag","Rhetorical","Loaded"].includes(q.logic));
+      } else if (filter === "socratic") {
+        visibleQuestions = questions.filter(q => ["Clarification","Challenging Assumptions","Viewpoints","Consequences","Questioning the Question"].includes(q.socratic));
+      }
+
+      currentIndex = 0;
+      renderQuestion();
+    }
+
+    document.querySelectorAll(".filter-btn").forEach(btn => {
+      btn.addEventListener("click", () => {
+        document.querySelectorAll(".filter-btn").forEach(b => b.classList.remove("active"));
+        btn.classList.add("active");
+        filterQuestions(btn.dataset.filter);
+      });
+    });
+
+    function renderQuestion() {
+      scoreCard.classList.remove("show");
+
+      if (!visibleQuestions.length) return;
+
+      const q = visibleQuestions[currentIndex];
+
+      quizCounter.textContent =
+        `السؤال ${currentIndex + 1} من ${visibleQuestions.length}`;
+
+      quizProgress.style.width =
+        `${((currentIndex + 1) / visibleQuestions.length) * 100}%`;
+
+      const card = document.createElement("div");
+      card.className = "quiz-card active";
+
+      const meta = `
+        <div class="quiz-meta">
+          <span class="tag">${q.purpose}</span>
+          <span class="tag">Bloom: ${q.bloom}</span>
+          <span class="tag">${q.rhetoric}</span>
+          <span class="tag">${q.logic}</span>
+          <span class="tag">Socratic: ${q.socratic}</span>
+          <span class="tag">الصعوبة: ${q.difficulty}</span>
+        </div>
+      `;
+
+      card.innerHTML = `
+        ${meta}
+        <div class="question">${q.q}</div>
+        <div class="question-area"></div>
+        <div class="quiz-feedback" id="feedback"></div>
+
+        <div class="quiz-controls">
+          <button class="btn" id="prevBtn" ${currentIndex === 0 ? "disabled" : ""}>السابق</button>
+          <div style="display:flex; gap:8px; flex-wrap:wrap;">
+            <button class="btn primary" id="checkBtn">تحقق</button>
+            <button class="btn" id="nextBtn">
+              ${currentIndex === visibleQuestions.length - 1 ? "إنهاء" : "التالي"}
+            </button>
+          </div>
+        </div>
+      `;
+
+      quizContainer.innerHTML = "";
+      quizContainer.appendChild(card);
+
+      const area = card.querySelector(".question-area");
+      const feedback = card.querySelector("#feedback");
+
+      if (q.type === "mcq") {
+        area.innerHTML = `
+          <div class="options">
+            ${q.options.map((option, i) => `
+              <div class="option" data-index="${i}">
+                ${option}
+              </div>
+            `).join("")}
+          </div>
+        `;
+
+        area.querySelectorAll(".option").forEach(opt => {
+          opt.addEventListener("click", () => {
+            if (answered.has(q.id)) return;
+
+            area.querySelectorAll(".option").forEach(o => o.classList.remove("selected"));
+            opt.classList.add("selected");
+            selectedChoices[q.id] = Number(opt.dataset.index);
+          });
+        });
+
+      } else {
+        area.innerHTML = `
+          <textarea id="textAnswer" placeholder="اكتب إجابتك هنا. ركّز على ربط السبب بالمفهوم، وليس مجرد ذكر كلمة واحدة..."></textarea>
+        `;
+      }
+
+      card.querySelector("#prevBtn").addEventListener("click", () => {
+        if (currentIndex > 0) {
+          currentIndex--;
+          renderQuestion();
+        }
+      });
+
+      card.querySelector("#checkBtn").addEventListener("click", () => {
+        checkAnswer(q, feedback, area);
+      });
+
+      card.querySelector("#nextBtn").addEventListener("click", () => {
+        if (currentIndex === visibleQuestions.length - 1) {
+          finishQuiz();
+        } else {
+          currentIndex++;
+          renderQuestion();
+        }
+      });
+
+      if (answered.has(q.id)) {
+        restoreAnsweredState(q, area, feedback);
+      }
+    }
+
+    function checkAnswer(q, feedback, area) {
+      if (answered.has(q.id)) return;
+
+      let correct = false;
+
+      if (q.type === "mcq") {
+        const selected = selectedChoices[q.id];
+
+        if (selected === undefined) {
+          feedback.className = "quiz-feedback show danger";
+          feedback.innerHTML = "اختر إجابة أولًا.";
+          return;
+        }
+
+        area.querySelectorAll(".option").forEach((opt, i) => {
+          if (i === q.answer) opt.classList.add("correct");
+          if (i === selected && selected !== q.answer) opt.classList.add("wrong");
+        });
+
+        correct = selected === q.answer;
+
+      } else {
+        const input = area.querySelector("#textAnswer");
+        const response = input.value.trim().toLowerCase();
+
+        if (!response) {
+          feedback.className = "quiz-feedback show danger";
+          feedback.innerHTML = "اكتب إجابتك أولًا.";
+          return;
+        }
+
+        correct = q.keywords.some(k => response.includes(k.toLowerCase()));
+
+        if (correct) {
+          feedback.className = "quiz-feedback show success";
+          feedback.innerHTML =
+            `<strong>إجابة واعدة ✅</strong><br>${q.explanation}`;
+        } else {
+          feedback.className = "quiz-feedback show warning";
+          feedback.innerHTML =
+            `<strong>تحتاج إلى تحسين.</strong><br>${q.explanation}`;
+        }
+      }
+
+      if (q.type === "mcq") {
+        feedback.className = `quiz-feedback show ${correct ? "success" : "danger"}`;
+        feedback.innerHTML =
+          `<strong>${correct ? "صحيح ✅" : "غير صحيح ❌"}</strong><br>${q.explanation}`;
+      }
+
+      answered.add(q.id);
+
+      if (correct) {
+        score++;
+      }
+    }
+
+    function restoreAnsweredState(q, area, feedback) {
+      if (q.type === "mcq") {
+        const selected = selectedChoices[q.id];
+
+        area.querySelectorAll(".option").forEach((opt, i) => {
+          if (i === q.answer) opt.classList.add("correct");
+          if (i === selected && selected !== q.answer) opt.classList.add("wrong");
+        });
+
+        const isCorrect = selected === q.answer;
+        feedback.className = `quiz-feedback show ${isCorrect ? "success" : "danger"}`;
+        feedback.innerHTML =
+          `<strong>${isCorrect ? "صحيح ✅" : "غير صحيح ❌"}</strong><br>${q.explanation}`;
+
+      } else {
+        const textarea = area.querySelector("#textAnswer");
+        textarea.disabled = true;
+        feedback.className = "quiz-feedback show success";
+        feedback.innerHTML =
+          `<strong>تم تسجيل تقييمك ✅</strong><br>${q.explanation}`;
+      }
+    }
+
+    function finishQuiz() {
+      const total = visibleQuestions.length;
+      const answeredCount = visibleQuestions.filter(q => answered.has(q.id)).length;
+
+      let filteredScore = 0;
+
+      visibleQuestions.forEach(q => {
+        if (!answered.has(q.id)) return;
+
+        if (q.type === "mcq") {
+          if (selectedChoices[q.id] === q.answer) filteredScore++;
+        } else {
+          const textarea = document.getElementById("textAnswer");
+          if (textarea && q.id === visibleQuestions[currentIndex].id) {
+            // Text questions are evaluated heuristically during answer checking.
+          }
+        }
+      });
+
+      const percentage = Math.round((filteredScore / total) * 100);
+
+      scoreNumber.textContent = `${percentage}%`;
+
+      if (percentage >= 85) {
+        scoreText.textContent =
+          `ممتاز جدًا. لديك فهم قوي للمفاهيم، خصوصًا العلاقة بين Margin وC وKernels. تمّت محاولة ${answeredCount} من ${total} أسئلة.`;
+      } else if (percentage >= 65) {
+        scoreText.textContent =
+          `جيد جدًا. راجع خصوصًا Soft Margin وKerneling وسبب استخدام Support Vectors. تمّت محاولة ${answeredCount} من ${total} أسئلة.`;
+      } else {
+        scoreText.textContent =
+          `هناك أساس جيد، لكن أعد مراجعة Decision Boundary وMargin وC وKerneling قبل الانتقال إلى مسائل أصعب. تمّت محاولة ${answeredCount} من ${total} أسئلة.`;
+      }
+
+      scoreCard.classList.add("show");
+      scoreCard.scrollIntoView({ behavior: "smooth", block: "center" });
+    }
+
+    document.getElementById("restartQuiz").addEventListener("click", () => {
+      currentIndex = 0;
+      score = 0;
+      answered.clear();
+      selectedChoices = {};
+      scoreCard.classList.remove("show");
+      renderQuestion();
+    });
+
+    renderQuestion();
+  </script>
+</body>
+</html>

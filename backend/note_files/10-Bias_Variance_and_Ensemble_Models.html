@@ -1,0 +1,1836 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Bias, Variance, and Ensemble Models — Interactive Lesson</title>
+
+  <style>
+    :root{
+      --bg:#0b1020;
+      --panel:#121a2e;
+      --panel-2:#17223b;
+      --text:#eef3ff;
+      --muted:#aebbd3;
+      --line:#293654;
+      --accent:#7c9cff;
+      --accent-2:#65e6c2;
+      --warning:#ffcc66;
+      --danger:#ff7f8a;
+      --success:#67e8a5;
+      --shadow:0 18px 50px rgba(0,0,0,.25);
+      --radius:18px;
+    }
+
+    *{box-sizing:border-box}
+
+    html{scroll-behavior:smooth}
+
+    body{
+      margin:0;
+      font-family: "Segoe UI", Tahoma, Arial, sans-serif;
+      background:
+        radial-gradient(circle at 10% 10%, rgba(124,156,255,.12), transparent 28%),
+        radial-gradient(circle at 90% 10%, rgba(101,230,194,.08), transparent 24%),
+        linear-gradient(180deg, #0a0f1d, #0d1324 50%, #0a1020);
+      color:var(--text);
+      line-height:1.8;
+    }
+
+    a{color:inherit}
+
+    .container{
+      width:min(1180px, 92%);
+      margin:auto;
+    }
+
+    header{
+      padding:42px 0 24px;
+      position:relative;
+    }
+
+    .hero{
+      background:linear-gradient(135deg, rgba(124,156,255,.14), rgba(101,230,194,.08));
+      border:1px solid rgba(124,156,255,.22);
+      border-radius:28px;
+      padding:34px;
+      box-shadow:var(--shadow);
+      overflow:hidden;
+    }
+
+    .eyebrow{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      background:#17223a;
+      color:#cbd7ff;
+      border:1px solid #2c3b61;
+      padding:6px 12px;
+      border-radius:999px;
+      font-size:.88rem;
+    }
+
+    h1{
+      margin:14px 0 10px;
+      font-size:clamp(2rem, 4vw, 3.5rem);
+      line-height:1.2;
+    }
+
+    .hero p{
+      color:var(--muted);
+      max-width:850px;
+      margin-bottom:0;
+      font-size:1.04rem;
+    }
+
+    .stats{
+      display:grid;
+      grid-template-columns:repeat(4,1fr);
+      gap:14px;
+      margin-top:22px;
+    }
+
+    .stat{
+      background:rgba(255,255,255,.03);
+      border:1px solid var(--line);
+      border-radius:16px;
+      padding:15px;
+      text-align:center;
+    }
+
+    .stat strong{
+      display:block;
+      font-size:1.4rem;
+      color:white;
+    }
+
+    .stat span{
+      color:var(--muted);
+      font-size:.85rem;
+    }
+
+    nav{
+      position:sticky;
+      top:0;
+      z-index:20;
+      backdrop-filter:blur(15px);
+      background:rgba(8,13,27,.82);
+      border-bottom:1px solid rgba(255,255,255,.05);
+    }
+
+    .nav-inner{
+      display:flex;
+      gap:8px;
+      overflow:auto;
+      padding:10px 0;
+    }
+
+    .nav-inner a{
+      white-space:nowrap;
+      text-decoration:none;
+      color:#dce5fb;
+      background:#111a31;
+      border:1px solid #24314f;
+      padding:8px 12px;
+      border-radius:12px;
+      font-size:.92rem;
+    }
+
+    section{
+      padding:34px 0;
+    }
+
+    .section-title{
+      margin-bottom:18px;
+    }
+
+    .section-title h2{
+      margin:0 0 5px;
+      font-size:1.7rem;
+    }
+
+    .section-title p{
+      margin:0;
+      color:var(--muted);
+    }
+
+    .grid{
+      display:grid;
+      grid-template-columns:repeat(2,1fr);
+      gap:18px;
+    }
+
+    .card{
+      background:linear-gradient(180deg, rgba(255,255,255,.035), rgba(255,255,255,.018));
+      border:1px solid var(--line);
+      border-radius:var(--radius);
+      padding:22px;
+      box-shadow:0 12px 30px rgba(0,0,0,.12);
+    }
+
+    .card h3{
+      margin-top:0;
+      margin-bottom:10px;
+    }
+
+    .muted{
+      color:var(--muted);
+    }
+
+    .tag{
+      display:inline-block;
+      padding:3px 9px;
+      border-radius:999px;
+      background:#172442;
+      border:1px solid #31456e;
+      color:#cfe0ff;
+      font-size:.78rem;
+      margin:3px 0;
+    }
+
+    .formula{
+      direction:ltr;
+      text-align:center;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      background:#0c1427;
+      border:1px solid #243452;
+      border-radius:14px;
+      padding:14px;
+      margin:14px 0;
+      font-size:1rem;
+      overflow:auto;
+    }
+
+    .callout{
+      border-right:4px solid var(--accent);
+      background:#111a31;
+      padding:16px 18px;
+      border-radius:12px;
+      margin:15px 0;
+    }
+
+    .callout.success{border-right-color:var(--success)}
+    .callout.warning{border-right-color:var(--warning)}
+    .callout.danger{border-right-color:var(--danger)}
+
+    details{
+      border:1px solid var(--line);
+      border-radius:14px;
+      margin:12px 0;
+      background:#10182c;
+      overflow:hidden;
+    }
+
+    details summary{
+      cursor:pointer;
+      padding:15px 17px;
+      font-weight:700;
+      background:rgba(255,255,255,.02);
+      list-style:none;
+      position:relative;
+      padding-left:46px;
+    }
+
+    details summary::-webkit-details-marker{display:none}
+
+    details summary::after{
+      content:"＋";
+      position:absolute;
+      left:16px;
+      top:13px;
+      color:var(--accent);
+      font-size:1.15rem;
+      transition:transform .2s ease;
+    }
+
+    details[open] summary::after{
+      content:"−";
+    }
+
+    .details-body{
+      padding:16px 18px 18px;
+      color:#dbe4f6;
+      border-top:1px solid var(--line);
+    }
+
+    .example{
+      display:grid;
+      gap:12px;
+      margin-top:14px;
+    }
+
+    .example-row{
+      display:grid;
+      grid-template-columns:120px 1fr;
+      gap:10px;
+      align-items:start;
+    }
+
+    .example-row strong{
+      color:#c9d6ff;
+    }
+
+    .comparison{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:14px;
+      margin-top:12px;
+    }
+
+    .comparison .mini{
+      background:#0f1729;
+      border:1px solid #283856;
+      border-radius:14px;
+      padding:15px;
+    }
+
+    .mini h4{
+      margin:0 0 6px;
+    }
+
+    .step-list{
+      display:grid;
+      gap:10px;
+      margin-top:14px;
+    }
+
+    .step{
+      display:flex;
+      gap:12px;
+      align-items:flex-start;
+    }
+
+    .step-num{
+      min-width:34px;
+      height:34px;
+      display:grid;
+      place-items:center;
+      background:#172440;
+      border:1px solid #2d4473;
+      border-radius:50%;
+      color:#dbe6ff;
+      font-weight:700;
+    }
+
+    .flow{
+      display:flex;
+      flex-wrap:wrap;
+      gap:8px;
+      align-items:center;
+      margin-top:15px;
+    }
+
+    .flow .node{
+      padding:9px 12px;
+      background:#121e37;
+      border:1px solid #2c416b;
+      border-radius:12px;
+    }
+
+    .arrow{color:var(--accent);font-weight:700}
+
+    .interactive{
+      margin-top:24px;
+      border:1px solid #30487b;
+      background:linear-gradient(135deg, rgba(124,156,255,.08), rgba(101,230,194,.05));
+      border-radius:20px;
+      padding:20px;
+    }
+
+    .slider-row{
+      display:grid;
+      grid-template-columns:1fr auto;
+      gap:15px;
+      align-items:center;
+    }
+
+    input[type="range"]{
+      width:100%;
+      accent-color:var(--accent);
+    }
+
+    .complexity-value{
+      min-width:120px;
+      text-align:center;
+      padding:10px 12px;
+      border-radius:12px;
+      background:#0e1629;
+      border:1px solid var(--line);
+      font-weight:700;
+    }
+
+    canvas{
+      width:100%;
+      height:280px;
+      background:#0b1222;
+      border:1px solid var(--line);
+      border-radius:14px;
+      display:block;
+      margin-top:15px;
+    }
+
+    .quiz-controls{
+      display:flex;
+      flex-wrap:wrap;
+      gap:10px;
+      margin:16px 0;
+    }
+
+    .btn{
+      appearance:none;
+      border:none;
+      border-radius:12px;
+      padding:10px 14px;
+      cursor:pointer;
+      font:inherit;
+      font-weight:700;
+      color:#08101f;
+      background:linear-gradient(135deg, #9eb5ff, #76e8ca);
+    }
+
+    .btn.secondary{
+      color:#e9efff;
+      background:#131f36;
+      border:1px solid #2b3c61;
+    }
+
+    .btn:hover{filter:brightness(1.06)}
+
+    .quiz-list{
+      display:grid;
+      gap:16px;
+    }
+
+    .question{
+      background:#0f1729;
+      border:1px solid #2a3a5d;
+      border-radius:16px;
+      padding:18px;
+    }
+
+    .question-head{
+      display:flex;
+      flex-wrap:wrap;
+      align-items:center;
+      gap:8px;
+      margin-bottom:12px;
+    }
+
+    .difficulty{
+      margin-right:auto;
+      font-size:.8rem;
+      padding:5px 9px;
+      border-radius:999px;
+    }
+
+    .medium{background:#29324c;color:#d9e2ff}
+    .hard{background:#4a3f29;color:#ffe4a7}
+    .very-hard{background:#4b2c35;color:#ffc6d0}
+
+    .question-text{
+      font-weight:700;
+      margin-bottom:12px;
+      font-size:1.04rem;
+    }
+
+    .options{
+      display:grid;
+      gap:9px;
+    }
+
+    .option{
+      display:flex;
+      gap:9px;
+      align-items:flex-start;
+      background:#121c31;
+      border:1px solid #273654;
+      border-radius:12px;
+      padding:11px 12px;
+      cursor:pointer;
+      transition:.2s ease;
+    }
+
+    .option:hover{
+      border-color:#4161a0;
+      transform:translateY(-1px);
+    }
+
+    .option input{
+      margin-top:5px;
+      accent-color:var(--accent);
+    }
+
+    .answer-box{
+      margin-top:11px;
+      padding:11px 13px;
+      border-radius:12px;
+      display:none;
+      border:1px solid #2f466f;
+      background:#101a30;
+    }
+
+    .answer-box.show{display:block}
+
+    .correct{
+      border-color:#31694c !important;
+      background:rgba(46,110,76,.16);
+    }
+
+    .incorrect{
+      border-color:#7b3c48 !important;
+      background:rgba(123,60,72,.12);
+    }
+
+    textarea{
+      width:100%;
+      min-height:110px;
+      resize:vertical;
+      border-radius:12px;
+      border:1px solid #2a3a5d;
+      background:#0c1426;
+      color:#eff4ff;
+      padding:12px;
+      font:inherit;
+      outline:none;
+    }
+
+    textarea:focus{
+      border-color:#5071b3;
+    }
+
+    .feedback{
+      margin-top:10px;
+      color:#cad7ef;
+      font-size:.92rem;
+    }
+
+    .score-panel{
+      display:none;
+      background:#0f1b31;
+      border:1px solid #3b5483;
+      border-radius:14px;
+      padding:15px;
+      margin-bottom:16px;
+    }
+
+    .score-panel.show{display:block}
+
+    .score-big{
+      font-size:2rem;
+      font-weight:800;
+      color:#dbe6ff;
+    }
+
+    .legend{
+      display:flex;
+      flex-wrap:wrap;
+      gap:10px;
+      margin-top:12px;
+    }
+
+    .legend span{
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+      color:var(--muted);
+      font-size:.86rem;
+    }
+
+    .dot{
+      width:10px;
+      height:10px;
+      border-radius:50%;
+      display:inline-block;
+    }
+
+    .dot.bias{background:#ff9ca5}
+    .dot.variance{background:#83c5ff}
+    .dot.error{background:#ffd67f}
+
+    .summary-box{
+      background:linear-gradient(135deg, #121e37, #10192d);
+      border:1px solid #314773;
+      border-radius:18px;
+      padding:22px;
+    }
+
+    footer{
+      padding:25px 0 45px;
+      color:#8fa0bd;
+      text-align:center;
+      font-size:.9rem;
+    }
+
+    @media (max-width: 900px){
+      .stats{grid-template-columns:repeat(2,1fr)}
+      .grid{grid-template-columns:1fr}
+    }
+
+    @media (max-width: 620px){
+      .hero{padding:24px}
+      .stats{grid-template-columns:1fr 1fr}
+      .comparison{grid-template-columns:1fr}
+      .example-row{grid-template-columns:1fr}
+      .slider-row{grid-template-columns:1fr}
+    }
+  </style>
+</head>
+
+<body>
+  <header id="top">
+    <div class="container">
+      <div class="hero">
+        <span class="eyebrow">Interactive ML Lesson</span>
+        <h1>Bias, Variance, and Ensemble Models</h1>
+        <p>
+          درس تفاعلي لفهم العلاقة بين <strong>Bias</strong> و<strong>Variance</strong>،
+          وسبب ظهور <strong>Underfitting</strong> و<strong>Overfitting</strong>،
+          وكيف تستخدم <strong>Bagging</strong> و<strong>Boosting</strong> لإدارة هذا التوازن.
+        </p>
+
+        <div class="stats">
+          <div class="stat">
+            <strong>Bias</strong>
+            <span>مدى ابتعاد التنبؤ عن الهدف</span>
+          </div>
+          <div class="stat">
+            <strong>Variance</strong>
+            <span>مدى حساسية النموذج لبيانات التدريب</span>
+          </div>
+          <div class="stat">
+            <strong>Bagging</strong>
+            <span>تقليل Variance بالتجميع</span>
+          </div>
+          <div class="stat">
+            <strong>Boosting</strong>
+            <span>تقليل Bias تدريجياً</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <nav>
+    <div class="container nav-inner">
+      <a href="#core">المفاهيم</a>
+      <a href="#tradeoff">Tradeoff</a>
+      <a href="#learners">Weak/Strong Learners</a>
+      <a href="#bagging">Bagging</a>
+      <a href="#boosting">Boosting</a>
+      <a href="#simulator">محاكاة</a>
+      <a href="#quiz">Assessment</a>
+    </div>
+  </nav>
+
+  <main class="container">
+
+    <section id="core">
+      <div class="section-title">
+        <h2>1) الفكرة الأساسية: Bias و Variance</h2>
+        <p>ابدأ بصورة ذهنية بسيطة: لوحة السهام.</p>
+      </div>
+
+      <div class="grid">
+        <div class="card">
+          <h3>🎯 Bias</h3>
+          <p>
+            <strong>Bias</strong> يعبّر عن مدى ابتعاد النموذج عن الهدف الصحيح بصورة منهجية.
+            في مثال السهام: هل السهام متمركزة حول مركز اللوحة أم بعيدة عنه؟
+          </p>
+
+          <div class="callout">
+            فكّر في <strong>Bias</strong> على أنه:
+            <strong>“هل النموذج يتجه نحو المكان الصحيح أصلاً؟”</strong>
+          </div>
+
+          <details>
+            <summary>كيف يرتبط Bias بالدقة Accuracy؟</summary>
+            <div class="details-body">
+              عندما يكون <strong>Bias</strong> مرتفعاً، يكون النموذج منحازاً نحو نمط غير مناسب،
+              فيؤدي غالباً إلى تنبؤات بعيدة عن القيم الحقيقية. في تبسيط الدرس:
+              <strong>Low Bias → Accuracy أفضل</strong>.
+            </div>
+          </details>
+        </div>
+
+        <div class="card">
+          <h3>📏 Variance</h3>
+          <p>
+            <strong>Variance</strong> يعبّر عن مقدار تغيّر تنبؤات النموذج عندما نعيد تدريبه
+            على عينات مختلفة من نفس البيانات.
+          </p>
+
+          <div class="callout">
+            فكّر في <strong>Variance</strong> على أنه:
+            <strong>“هل يتغير النموذج كثيراً عندما تتغير عينة التدريب؟”</strong>
+          </div>
+
+          <details>
+            <summary>كيف يرتبط Variance بالـ Precision؟</summary>
+            <div class="details-body">
+              في تشبيه لوحة السهام، تشتت السهام يمثل <strong>Variance</strong>.
+              تشتت قليل = نتائج متقاربة. تشتت كبير = نتائج متباعدة.
+              لهذا يستخدم الدرس تشبيه <strong>Precision</strong>.
+            </div>
+          </details>
+        </div>
+      </div>
+
+      <div class="card" style="margin-top:18px">
+        <h3>🧠 الفرق الذي يجب أن يثبت في ذهنك</h3>
+        <div class="comparison">
+          <div class="mini">
+            <h4>Low Bias + Low Variance</h4>
+            <p class="muted">
+              النموذج قريب من الحقيقة، ولا يتغير كثيراً بين عينات التدريب.
+            </p>
+          </div>
+          <div class="mini">
+            <h4>High Bias + High Variance</h4>
+            <p class="muted">
+              النموذج يعاني من انحراف منهجي، وفوق ذلك غير مستقر.
+            </p>
+          </div>
+        </div>
+
+        <div class="formula">
+          Generalization Error ≈ Bias² + Variance + Irreducible Noise
+        </div>
+
+        <div class="callout warning">
+          <strong>مهم:</strong>
+          توجد أخطاء عشوائية أو ضوضاء في البيانات لا يستطيع نموذج جيد إزالةَها بالكامل،
+          ولهذا توجد دائماً كمية من <strong>Generalization Error</strong>.
+        </div>
+      </div>
+
+      <div class="card" style="margin-top:18px">
+        <h3>📌 Prediction Bias</h3>
+        <p>
+          وفقاً للدرس، <strong>Prediction Bias</strong> يقيس متوسط الفرق بين ما يتنبأ به النموذج
+          والقيمة الحقيقية. نموذج مثالي، في هذا التصور، لديه <strong>Bias = 0</strong>.
+        </p>
+
+        <div class="formula">
+          Prediction Bias = Average(Prediction − Actual)
+        </div>
+
+        <div class="example">
+          <div class="example-row">
+            <strong>Model A</strong>
+            <div>
+              خط <strong>Ordinary Least Squares</strong> لديه Bias ≈ <strong>0.22</strong>.
+            </div>
+          </div>
+          <div class="example-row">
+            <strong>Model B</strong>
+            <div>
+              النموذج نفسه بعد إزاحته 4 وحدات إلى الأسفل لديه Bias ≈ <strong>4.22</strong>.
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card" style="margin-top:18px">
+        <h3>🌊 Prediction Variance</h3>
+        <p>
+          تخيل أنك دربت النموذج نفسه عدة مرات، لكن كل مرة باستخدام <strong>Subset</strong> مختلف
+          من بيانات التدريب. إذا خرجت منحنيات مختلفة جداً، فلدينا <strong>High Prediction Variance</strong>.
+        </p>
+
+        <details>
+          <summary>لماذا High Variance يقود غالباً إلى Overfitting؟</summary>
+          <div class="details-body">
+            لأن النموذج يصبح حساساً جداً للتفاصيل الصغيرة في عينة التدريب،
+            بما فيها <strong>Noise</strong> و<strong>Outliers</strong>.
+            فيتعلم خصائص خاصة بالتدريب بدل تعلم النمط الذي سيعمل على بيانات جديدة.
+          </div>
+        </details>
+
+        <details>
+          <summary>ماذا يحدث عندما يكون Variance قريباً من الصفر؟</summary>
+          <div class="details-body">
+            التنبؤات الناتجة من تدريبات مختلفة تصبح متقاربة جداً،
+            أي أن النموذج أكثر استقراراً تجاه تغييرات عينة التدريب.
+          </div>
+        </details>
+      </div>
+    </section>
+
+    <section id="tradeoff">
+      <div class="section-title">
+        <h2>2) Bias-Variance Tradeoff</h2>
+        <p>كلما زادت تعقيدات النموذج، لا ينخفض الخطأ بكل بساطة.</p>
+      </div>
+
+      <div class="card">
+        <h3>⚖️ ماذا يحدث عند تغيير Model Complexity؟</h3>
+
+        <div class="flow">
+          <div class="node">Model Complexity منخفض</div>
+          <div class="arrow">→</div>
+          <div class="node">Bias مرتفع</div>
+          <div class="arrow">→</div>
+          <div class="node">Underfitting</div>
+          <div class="arrow">→</div>
+          <div class="node">زيادة Complexity</div>
+          <div class="arrow">→</div>
+          <div class="node">Variance مرتفع</div>
+          <div class="arrow">→</div>
+          <div class="node">Overfitting</div>
+        </div>
+
+        <div class="comparison">
+          <div class="mini">
+            <h4>Underfitting</h4>
+            <p>
+              النموذج بسيط أكثر من اللازم، لذلك لا يلتقط النمط الأساسي حتى على بيانات التدريب.
+            </p>
+          </div>
+          <div class="mini">
+            <h4>Overfitting</h4>
+            <p>
+              النموذج معقد جداً، فيلتقط تفاصيل التدريب وNoise، ثم يفقد القدرة على التعميم.
+            </p>
+          </div>
+        </div>
+
+        <details>
+          <summary>أين توجد “النقطة المناسبة”؟</summary>
+          <div class="details-body">
+            هناك منطقة يكون فيها النموذج معقداً بالقدر الكافي لالتقاط الإشارة،
+            لكن ليس معقداً إلى الحد الذي يجعله حساساً جداً للتفاصيل العشوائية.
+            هذه هي الفكرة التعليمية الأساسية وراء <strong>Bias-Variance Tradeoff</strong>.
+          </div>
+        </details>
+      </div>
+    </section>
+
+    <section id="learners">
+      <div class="section-title">
+        <h2>3) Weak Learners و Strong Learners</h2>
+        <p>هذه المفاهيم مهمة جداً لفهم Ensemble Learning.</p>
+      </div>
+
+      <div class="grid">
+        <div class="card">
+          <h3>Weak Learner</h3>
+          <p>
+            نموذج <strong>Supervised Learning</strong> يؤدي أفضل بقليل من التخمين العشوائي.
+          </p>
+          <div class="tag">High Bias</div>
+          <div class="tag">Low Variance</div>
+
+          <details>
+            <summary>لماذا قد نستخدم نموذجاً “ضعيفاً” أصلاً؟</summary>
+            <div class="details-body">
+              لأن الهدف في <strong>Boosting</strong> ليس جعل نموذج واحد قوياً جداً،
+              بل بناء سلسلة من النماذج التي يضيف كل واحد منها شيئاً مفيداً إلى السابق.
+            </div>
+          </details>
+        </div>
+
+        <div class="card">
+          <h3>Strong Learner</h3>
+          <p>
+            نموذج ذو قدرة أكبر على التقاط النمط، لكنه قد يصبح أكثر حساسية لبيانات التدريب.
+          </p>
+          <div class="tag">Low Bias</div>
+          <div class="tag">High Variance</div>
+
+          <details>
+            <summary>ما علاقة Decision Tree بالموضوع؟</summary>
+            <div class="details-body">
+              يمكن التحكم في تعقيد <strong>Decision Tree</strong> عبر العمق،
+              ولذلك يمكن استخدامه كـ <strong>Base Learner</strong> في طرق Ensemble.
+            </div>
+          </details>
+        </div>
+      </div>
+    </section>
+
+    <section id="bagging">
+      <div class="section-title">
+        <h2>4) Bagging — Bootstrap Aggregating</h2>
+        <p>الفكرة الأساسية: درّب عدة نماذج على عينات Bootstrapped ثم اجمع النتائج.</p>
+      </div>
+
+      <div class="card">
+        <h3>🔄 كيف يعمل Bagging؟</h3>
+
+        <div class="step-list">
+          <div class="step">
+            <div class="step-num">1</div>
+            <div>
+              أنشئ عدة <strong>Bootstrap Samples</strong> من بيانات التدريب.
+            </div>
+          </div>
+
+          <div class="step">
+            <div class="step-num">2</div>
+            <div>
+              درّب <strong>Base Learner</strong> مستقلاً على كل عينة.
+            </div>
+          </div>
+
+          <div class="step">
+            <div class="step-num">3</div>
+            <div>
+              ستحصل على مجموعة من النماذج، وكل نموذج قد يعطي تنبؤاً مختلفاً قليلاً.
+            </div>
+          </div>
+
+          <div class="step">
+            <div class="step-num">4</div>
+            <div>
+              اجمع التنبؤات: غالباً عبر <strong>Average</strong> في Regression أو
+              <strong>Voting</strong> في Classification.
+            </div>
+          </div>
+        </div>
+
+        <div class="flow">
+          <div class="node">Bootstrap Sample A</div>
+          <div class="node">→ Tree A</div>
+          <div class="node">↘</div>
+          <div class="node">Aggregation</div>
+        </div>
+        <div class="flow">
+          <div class="node">Bootstrap Sample B</div>
+          <div class="node">→ Tree B</div>
+          <div class="node">↗</div>
+        </div>
+        <div class="flow">
+          <div class="node">Bootstrap Sample C</div>
+          <div class="node">→ Tree C</div>
+          <div class="node">↗</div>
+        </div>
+
+        <div class="callout success">
+          النتيجة التعليمية الأساسية:
+          <strong>Bagging يقلل Variance ويخفض خطر Overfitting.</strong>
+        </div>
+
+        <details>
+          <summary>Random Forest: ما الذي يميزه؟</summary>
+          <div class="details-body">
+            <strong>Random Forest</strong> هو مثال شهير على <strong>Bagging</strong>،
+            حيث يتم تدريب عدة <strong>Decision Trees</strong> على بيانات Bootstrapped،
+            ثم يتم تجميع نتائجها.
+          </div>
+        </details>
+      </div>
+    </section>
+
+    <section id="boosting">
+      <div class="section-title">
+        <h2>5) Boosting</h2>
+        <p>الفكرة الأساسية: ابنِ سلسلة من Weak Learners، وكل واحد منها يحاول معالجة أخطاء السابق.</p>
+      </div>
+
+      <div class="card">
+        <h3>🚀 دورة Boosting</h3>
+
+        <div class="step-list">
+          <div class="step">
+            <div class="step-num">1</div>
+            <div>
+              ابدأ بـ <strong>Weak Learner</strong>.
+            </div>
+          </div>
+
+          <div class="step">
+            <div class="step-num">2</div>
+            <div>
+              قيّم الأخطاء التي ارتكبها النموذج.
+            </div>
+          </div>
+
+          <div class="step">
+            <div class="step-num">3</div>
+            <div>
+              زد وزن الأمثلة التي تم تصنيفها بشكل خاطئ.
+            </div>
+          </div>
+
+          <div class="step">
+            <div class="step-num">4</div>
+            <div>
+              درّب Weak Learner جديداً يركز أكثر على الأخطاء السابقة.
+            </div>
+          </div>
+
+          <div class="step">
+            <div class="step-num">5</div>
+            <div>
+              اجمع النماذج في <strong>Weighted Sum</strong>.
+            </div>
+          </div>
+        </div>
+
+        <div class="formula">
+          Final Model = w₁·Learner₁ + w₂·Learner₂ + ... + wₙ·Learnerₙ
+        </div>
+
+        <div class="callout warning">
+          النتيجة التعليمية الأساسية:
+          <strong>Boosting يهدف إلى تقليل Bias عبر تحسين النموذج تدريجياً.</strong>
+        </div>
+
+        <details>
+          <summary>أمثلة مشهورة على Boosting</summary>
+          <div class="details-body">
+            من الأمثلة المذكورة في الدرس:
+            <strong>Gradient Boosting</strong>،
+            <strong>XGBoost</strong>،
+            و<strong>AdaBoost</strong>.
+          </div>
+        </details>
+      </div>
+    </section>
+
+    <section id="simulator">
+      <div class="section-title">
+        <h2>6) محاكاة تفاعلية: ماذا يحدث مع Model Complexity؟</h2>
+        <p>حرّك المؤشر وشاهد كيف تتغير صورة Bias وVariance وGeneralization Error.</p>
+      </div>
+
+      <div class="card interactive">
+        <div class="slider-row">
+          <input id="complexity" type="range" min="0" max="100" value="50" />
+          <div class="complexity-value" id="complexityValue">Complexity: 50</div>
+        </div>
+
+        <canvas id="tradeoffCanvas" width="1100" height="300"></canvas>
+
+        <div class="legend">
+          <span><i class="dot bias"></i> Bias</span>
+          <span><i class="dot variance"></i> Variance</span>
+          <span><i class="dot error"></i> Generalization Error</span>
+        </div>
+
+        <div id="simulatorExplanation" class="callout" style="margin-top:16px"></div>
+      </div>
+    </section>
+
+    <section>
+      <div class="section-title">
+        <h2>7) خريطة ذهنية سريعة</h2>
+        <p>استخدمها عند مراجعة الدرس أو حل سؤال جديد.</p>
+      </div>
+
+      <div class="card">
+        <div class="flow">
+          <div class="node">Bias ↑</div>
+          <div class="arrow">→</div>
+          <div class="node">Underfitting</div>
+          <div class="arrow">→</div>
+          <div class="node">Boosting يساعد على خفض Bias</div>
+        </div>
+
+        <div class="flow">
+          <div class="node">Variance ↑</div>
+          <div class="arrow">→</div>
+          <div class="node">Overfitting</div>
+          <div class="arrow">→</div>
+          <div class="node">Bagging يساعد على خفض Variance</div>
+        </div>
+
+        <div class="flow">
+          <div class="node">Multiple Learners</div>
+          <div class="arrow">→</div>
+          <div class="node">Ensemble</div>
+          <div class="arrow">→</div>
+          <div class="node">استغلال قوة عدة نماذج</div>
+        </div>
+      </div>
+    </section>
+
+    <section id="quiz">
+      <div class="section-title">
+        <h2>8) Interactive Assessment — Knowledge Check</h2>
+        <p>
+          الأسئلة مرتبة من مستوى متوسط إلى صعب جداً، وتجمع بين
+          Purpose وBloom وW Questions وLogical Structure وSocratic Types.
+        </p>
+      </div>
+
+      <div class="card">
+        <div class="quiz-controls">
+          <button class="btn" onclick="gradeQuiz()">تصحيح الاختبار</button>
+          <button class="btn secondary" onclick="showAllAnswers()">إظهار التفسيرات</button>
+          <button class="btn secondary" onclick="resetQuiz()">إعادة المحاولة</button>
+        </div>
+
+        <div id="scorePanel" class="score-panel"></div>
+        <div id="quizList" class="quiz-list"></div>
+      </div>
+    </section>
+
+    <section>
+      <div class="section-title">
+        <h2>9) Challenge Questions — بدون اختيارات</h2>
+        <p>اكتب الإجابة بنفسك قبل فتح النموذج التوضيحي.</p>
+      </div>
+
+      <div class="grid">
+        <div class="card">
+          <h3>🧩 سؤال تحليلي</h3>
+          <p>
+            نموذجك يحقق أداءً ممتازاً على Training Set لكنه يختلف كثيراً بعد تغيير جزء صغير
+            من بيانات التدريب. ما المشكلة المحتملة؟ وما التقنية الأنسب أولاً؟
+          </p>
+          <textarea placeholder="اكتب تحليلك هنا..."></textarea>
+          <details>
+            <summary>كشف الإجابة التوضيحية</summary>
+            <div class="details-body">
+              الإشارة الأساسية هي <strong>High Variance</strong> بسبب الحساسية العالية
+              لتغييرات عينة التدريب ووجود <strong>Overfitting</strong>.
+              لذلك يكون التفكير في <strong>Bagging</strong> مناسباً لأنه يستهدف تقليل Variance.
+            </div>
+          </details>
+        </div>
+
+        <div class="card">
+          <h3>🧠 سؤال تصميم</h3>
+          <p>
+            لديك عدة Decision Trees مستقلة نسبياً، وكل واحدة تعطي تنبؤاً مختلفاً قليلاً.
+            صمّم طريقة Ensemble هدفها الأساسي تقليل عدم الاستقرار.
+          </p>
+          <textarea placeholder="اكتب الحل خطوة بخطوة..."></textarea>
+          <details>
+            <summary>كشف الإجابة التوضيحية</summary>
+            <div class="details-body">
+              استخدم فكرة <strong>Bagging</strong>:
+              Bootstrap Samples متعددة، تدريب Tree على كل عينة، ثم Aggregation للتنبؤات.
+              الفكرة المركزية هي أن المتوسط أو التصويت يقلل تأثير الاختلافات الفردية بين النماذج.
+            </div>
+          </details>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <div class="summary-box">
+        <h2 style="margin-top:0">✅ أهم 8 أفكار يجب أن تتقنها</h2>
+        <div class="step-list">
+          <div class="step"><div class="step-num">1</div><div><strong>Bias</strong> = انحراف منهجي عن الهدف.</div></div>
+          <div class="step"><div class="step-num">2</div><div><strong>Variance</strong> = حساسية التنبؤ لتغييرات بيانات التدريب.</div></div>
+          <div class="step"><div class="step-num">3</div><div><strong>Low Complexity → High Bias → Underfitting</strong>.</div></div>
+          <div class="step"><div class="step-num">4</div><div><strong>High Complexity → High Variance → Overfitting</strong>.</div></div>
+          <div class="step"><div class="step-num">5</div><div><strong>Bagging</strong> يركز على خفض Variance عبر Aggregation.</div></div>
+          <div class="step"><div class="step-num">6</div><div><strong>Random Forest</strong> مثال مشهور على Bagging.</div></div>
+          <div class="step"><div class="step-num">7</div><div><strong>Boosting</strong> يبني Weak Learners بشكل متتابع لتصحيح الأخطاء.</div></div>
+          <div class="step"><div class="step-num">8</div><div>الهدف النهائي هو تحسين <strong>Generalization</strong> وليس الفوز على Training Set فقط.</div></div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <footer>
+    Interactive learning page — Bias, Variance, and Ensemble Models
+  </footer>
+
+  <script>
+    const questions = [
+      {
+        id: 1,
+        difficulty: "medium",
+        difficultyLabel: "متوسط",
+        purpose: "Closed",
+        bloom: "Remembering",
+        rhetoric: "What",
+        logic: "Alternative",
+        socratic: "Clarification",
+        type: "mcq",
+        text: "أي وصف يطابق Prediction Variance كما ورد في الدرس؟",
+        options: [
+          "متوسط الفرق بين Prediction وActual",
+          "مقدار تغير Predictions عند التدريب على Subsets مختلفة",
+          "قدرة النموذج على إزالة Random Noise",
+          "عدد أشجار Decision Tree داخل Ensemble"
+        ],
+        answer: 1,
+        explanation: "Prediction Variance يقيس مدى تغير تنبؤات النموذج عند تدريبه على عينات مختلفة من نفس البيانات."
+      },
+
+      {
+        id: 2,
+        difficulty: "medium",
+        difficultyLabel: "متوسط",
+        purpose: "Closed",
+        bloom: "Understanding",
+        rhetoric: "How",
+        logic: "Tag",
+        socratic: "Clarification",
+        type: "mcq",
+        text: "إذا كان النموذج منخفض التعقيد جداً ويؤدي بشكل ضعيف حتى على Training Data، فما التفسير الأقرب؟",
+        options: [
+          "High Variance وOverfitting",
+          "High Bias وUnderfitting",
+          "Low Bias وOverfitting",
+          "Low Variance وPerfect Generalization"
+        ],
+        answer: 1,
+        explanation: "النموذج البسيط أكثر من اللازم لا يلتقط النمط الأساسي، وهذا يتوافق مع High Bias وUnderfitting."
+      },
+
+      {
+        id: 3,
+        difficulty: "medium",
+        difficultyLabel: "متوسط",
+        purpose: "Probing",
+        bloom: "Understanding",
+        rhetoric: "Why",
+        logic: "Rhetorical",
+        socratic: "Challenging Assumptions",
+        type: "mcq",
+        text: "لماذا لا يكفي أن نجعل Model Complexity أعلى دائماً؟",
+        options: [
+          "لأن Bias سيرتفع دائماً مع التعقيد",
+          "لأن Variance قد يرتفع ويزيد الحساسية لبيانات التدريب",
+          "لأن Bootstrap Samples تختفي عند التعقيد العالي",
+          "لأن Boosting يمنع أي زيادة في Model Capacity"
+        ],
+        answer: 1,
+        explanation: "الدرس يربط زيادة التعقيد بانخفاض Bias وارتفاع Variance، ولذلك يمكن أن نصل إلى Overfitting."
+      },
+
+      {
+        id: 4,
+        difficulty: "medium",
+        difficultyLabel: "متوسط",
+        purpose: "Closed",
+        bloom: "Remembering",
+        rhetoric: "Who",
+        logic: "Alternative",
+        socratic: "Clarification",
+        type: "mcq",
+        text: "أي واحد من الآتي مثال معروف على Bagging؟",
+        options: [
+          "XGBoost",
+          "AdaBoost",
+          "Random Forest",
+          "Gradient Boosting"
+        ],
+        answer: 2,
+        explanation: "Random Forest ذُكر في الدرس كطريقة Bagging تعتمد على عدة Decision Trees مدربة على Bootstrap Samples."
+      },
+
+      {
+        id: 5,
+        difficulty: "hard",
+        difficultyLabel: "صعب",
+        purpose: "Closed",
+        bloom: "Applying",
+        rhetoric: "What",
+        logic: "Alternative",
+        socratic: "Consequences",
+        type: "mcq",
+        text: "لديك نماذج متشابهة لكنها تعطي تنبؤات مختلفة بوضوح عند تغيير Training Subset. ما المشكلة التي ينبغي التفكير فيها أولاً؟",
+        options: [
+          "Prediction Bias منخفض جداً",
+          "Prediction Variance مرتفع",
+          "Irreducible Noise يساوي صفراً",
+          "Weak Learner أصبح أقوى من اللازم"
+        ],
+        answer: 1,
+        explanation: "الاختلاف الواضح بين النتائج بعد تغيير Training Subset يدل على حساسية مرتفعة، أي High Prediction Variance."
+      },
+
+      {
+        id: 6,
+        difficulty: "hard",
+        difficultyLabel: "صعب",
+        purpose: "Leading",
+        bloom: "Applying",
+        rhetoric: "Why",
+        logic: "Loaded",
+        socratic: "Challenging Assumptions",
+        type: "mcq",
+        text: "إذا كان هدفك الأساسي تقليل Overfitting الناتج عن High Variance، فأي خيار يعكس منطق الدرس بشكل أفضل؟",
+        options: [
+          "زيادة Bias عمداً عبر نموذج أبسط دائماً",
+          "استخدام Bagging لتجميع عدة نماذج",
+          "استخدام Boosting فقط لأن كل Ensemble يخفض Variance",
+          "إزالة كل النماذج الضعيفة من التدريب"
+        ],
+        answer: 1,
+        explanation: "Bagging صُمم في هذا الدرس لتقليل Variance عبر Aggregation، لذلك هو الخيار الأكثر مباشرة."
+      },
+
+      {
+        id: 7,
+        difficulty: "hard",
+        difficultyLabel: "صعب",
+        purpose: "Probing",
+        bloom: "Analyzing",
+        rhetoric: "How",
+        logic: "Tag",
+        socratic: "Viewpoints",
+        type: "mcq",
+        text: "كيف يعمل Bagging على تقليل Variance منطقياً؟",
+        options: [
+          "يجعل كل Base Learner يتعلم الأخطاء نفسها",
+          "يجمع تنبؤات نماذج متعددة، فيخف تأثير التذبذب الفردي",
+          "يرفع وزن البيانات المصنفة بشكل صحيح",
+          "يمنع استخدام Bootstrap Samples"
+        ],
+        answer: 1,
+        explanation: "اختلافات النماذج الفردية يمكن أن تتوازن عند Aggregation، فيصبح التنبؤ النهائي أكثر استقراراً."
+      },
+
+      {
+        id: 8,
+        difficulty: "hard",
+        difficultyLabel: "صعب",
+        purpose: "Closed",
+        bloom: "Understanding",
+        rhetoric: "How",
+        logic: "Alternative",
+        socratic: "Clarification",
+        type: "mcq",
+        text: "في Boosting، ماذا يحدث بشكل أساسي بعد أن يخطئ Weak Learner في بعض الأمثلة؟",
+        options: [
+          "تُزال الأمثلة الخاطئة من التدريب",
+          "تزداد أوزان الأمثلة التي أُخطئ فيها",
+          "يُثبت النموذج الحالي ولا يُستخدم مجدداً",
+          "تُساوى أوزان جميع الأمثلة إلى الصفر"
+        ],
+        answer: 1,
+        explanation: "الدرس يشرح Reweighting: زيادة أوزان الأمثلة الخاطئة حتى يركز learner التالي عليها."
+      },
+
+      {
+        id: 9,
+        difficulty: "hard",
+        difficultyLabel: "صعب",
+        purpose: "Closed",
+        bloom: "Analyzing",
+        rhetoric: "When",
+        logic: "Alternative",
+        socratic: "Consequences",
+        type: "mcq",
+        text: "أي سيناريو يطابق منطق Boosting أكثر من Bagging؟",
+        options: [
+          "تدريب Trees مستقلة على Bootstrap Samples ثم Averaging",
+          "تدريب نماذج بالتتابع بحيث يركز كل نموذج على أخطاء السابق",
+          "تدريب نموذج واحد عميق جداً دون Aggregation",
+          "تغيير Validation Metric فقط دون تغيير التدريب"
+        ],
+        answer: 1,
+        explanation: "السمة الحاسمة في Boosting هي Sequential Learning مع التركيز على تصحيح الأخطاء السابقة."
+      },
+
+      {
+        id: 10,
+        difficulty: "hard",
+        difficultyLabel: "صعب",
+        purpose: "Open-Ended",
+        bloom: "Analyzing",
+        rhetoric: "Why",
+        logic: "Rhetorical",
+        socratic: "Challenging Assumptions",
+        type: "text",
+        text: "اشرح لماذا يمكن لنموذج أن يكون ممتازاً على Training Data لكنه ضعيف على Unseen Data، واربط الإجابة مباشرةً بـ Bias وVariance.",
+        expectedKeywords: ["variance", "overfitting"],
+        explanation: "الإجابة القوية تذكر أن High Variance يجعل النموذج حساساً لتفاصيل Training Data، فيلتقط Noise وOutliers، ثم يضعف Generalization."
+      },
+
+      {
+        id: 11,
+        difficulty: "hard",
+        difficultyLabel: "صعب",
+        purpose: "Closed",
+        bloom: "Analyzing",
+        rhetoric: "What",
+        logic: "Alternative",
+        socratic: "Viewpoints",
+        type: "mcq",
+        text: "إذا زادت Model Complexity، فما الاتجاه العام المتوقع حسب الرسم المفاهيمي في الدرس؟",
+        options: [
+          "Bias ↑ وVariance ↓",
+          "Bias ↓ وVariance ↑",
+          "Bias ↓ وVariance ↓",
+          "Bias ↑ وVariance ↑ فقط"
+        ],
+        answer: 1,
+        explanation: "الاتجاه المركزي في الدرس: مع زيادة التعقيد، Bias يميل إلى الانخفاض وVariance يميل إلى الارتفاع."
+      },
+
+      {
+        id: 12,
+        difficulty: "hard",
+        difficultyLabel: "صعب",
+        purpose: "Open-Ended",
+        bloom: "Applying",
+        rhetoric: "How",
+        logic: "Rhetorical",
+        socratic: "Consequences",
+        type: "text",
+        text: "صمّم Pipeline ذهني من 4 خطوات لمعالجة نموذج يعاني من High Variance باستخدام Bagging.",
+        expectedKeywords: ["bootstrap", "multiple", "aggregation", "variance"],
+        explanation: "الإجابة النموذجية: Bootstrap Samples متعددة → تدريب Base Learners مستقلة → جمع التنبؤات → تقليل تأثير تذبذب النموذج الفردي وبالتالي خفض Variance."
+      },
+
+      {
+        id: 13,
+        difficulty: "very-hard",
+        difficultyLabel: "صعب جداً",
+        purpose: "Probing",
+        bloom: "Evaluating",
+        rhetoric: "Why",
+        logic: "Loaded",
+        socratic: "Questioning the Question",
+        type: "mcq",
+        text: "باحث يقول: “كلما زادت Model Complexity، زادت الجودة”. ما المشكلة المنطقية الأساسية في هذا الاستنتاج وفق Bias-Variance Tradeoff؟",
+        options: [
+          "التعقيد العالي لا يمكن أن يقلل Bias بأي حال",
+          "قد ينخفض Bias لكن ترتفع Variance فتتدهور Generalization",
+          "التعقيد العالي يجعل Bootstrap غير صالح دائماً",
+          "التعقيد العالي يحوّل Classification إلى Regression"
+        ],
+        answer: 1,
+        explanation: "المشكلة أن انخفاض Bias لا يعني أن الخطأ العام سيستمر في الانخفاض؛ ارتفاع Variance قد يؤدي إلى Overfitting."
+      },
+
+      {
+        id: 14,
+        difficulty: "very-hard",
+        difficultyLabel: "صعب جداً",
+        purpose: "Leading",
+        bloom: "Evaluating",
+        rhetoric: "Why",
+        logic: "Loaded",
+        socratic: "Challenging Assumptions",
+        type: "mcq",
+        text: "إذا كان لديك Strong Learner منخفض Bias لكنه عالي Variance، فهل يعني ذلك أنه الخيار الأفضل دائماً؟",
+        options: [
+          "نعم، لأن Low Bias يضمن Generalization",
+          "لا، لأن High Variance قد يجعل النموذج حساساً للتدريب ويفقد التعميم",
+          "نعم، لأن Variance لا يؤثر على Unseen Data",
+          "لا، فقط لأن Strong Learners لا يمكن استخدامها في Ensemble"
+        ],
+        answer: 1,
+        explanation: "Strong Learner ليس مضمون الأفضلية؛ إذا كانت Variance عالية، يمكن أن يظهر Overfitting ويضعف الأداء على Unseen Data."
+      },
+
+      {
+        id: 15,
+        difficulty: "very-hard",
+        difficultyLabel: "صعب جداً",
+        purpose: "Closed",
+        bloom: "Analyzing",
+        rhetoric: "What",
+        logic: "Alternative",
+        socratic: "Consequences",
+        type: "mcq",
+        text: "أي وصف يوضح الفرق البنيوي الأكثر أهمية بين Bagging وBoosting؟",
+        options: [
+          "Bagging يركز على أخطاء النموذج السابق، وBoosting يجمع النماذج بالتوازي",
+          "Bagging يعتمد على نماذج يمكن تدريبها مستقلة نسبياً، وBoosting يبني نماذج متتابعة",
+          "كلاهما متطابقان لكن بأسماء مختلفة",
+          "Bagging يقلل Bias فقط، وBoosting يقلل Variance فقط"
+        ],
+        answer: 1,
+        explanation: "Bagging يعتمد على استقلال نسبي بين النماذج ثم Aggregation، بينما Boosting يعتمد على Sequential Correction."
+      },
+
+      {
+        id: 16,
+        difficulty: "very-hard",
+        difficultyLabel: "صعب جداً",
+        purpose: "Open-Ended",
+        bloom: "Evaluating",
+        rhetoric: "Why",
+        logic: "Rhetorical",
+        socratic: "Viewpoints",
+        type: "text",
+        text: "أمامك نموذجان: A لديه Bias منخفض جداً وVariance مرتفع، وB لديه Bias أعلى وVariance أقل. كيف تختار بينهما إذا كان هدفك Generalization؟",
+        expectedKeywords: ["generalization", "tradeoff"],
+        explanation: "لا يوجد اختيار صحيح مطلق من القيمتين وحدهما. يجب النظر إلى Tradeoff والأداء على Unseen/Validation Data، لأن خفض Bias مقابل رفع Variance قد ينتج نتائج مختلفة."
+      },
+
+      {
+        id: 17,
+        difficulty: "very-hard",
+        difficultyLabel: "صعب جداً",
+        purpose: "Probing",
+        bloom: "Creating",
+        rhetoric: "How",
+        logic: "Rhetorical",
+        socratic: "Consequences",
+        type: "text",
+        text: "صمّم قراراً عملياً: متى تميل إلى Bagging ومتى تميل إلى Boosting؟ لا تذكر أسماء فقط؛ اربط القرار بنمط الخطأ.",
+        expectedKeywords: ["bagging", "variance", "boosting", "bias"],
+        explanation: "إذا كان القلق الأساسي High Variance/Overfitting، يميل الاختيار إلى Bagging. إذا كانت المشكلة High Bias/Underfitting، يمكن التفكير في Boosting."
+      },
+
+      {
+        id: 18,
+        difficulty: "very-hard",
+        difficultyLabel: "صعب جداً",
+        purpose: "Closed",
+        bloom: "Creating",
+        rhetoric: "How",
+        logic: "Alternative",
+        socratic: "Questioning the Question",
+        type: "mcq",
+        text: "أي سؤال من الآتي هو الأقوى لتقييم ما إذا كان Ensemble حسّن Generalization فعلاً؟",
+        options: [
+          "هل أصبح Training Accuracy أعلى؟",
+          "هل انخفض حجم النموذج؟",
+          "هل تحسن الأداء على Unseen/Validation Data وليس التدريب فقط؟",
+          "هل أصبح عدد النماذج داخل Ensemble كبيراً؟"
+        ],
+        answer: 2,
+        explanation: "الهدف هو Generalization. لذلك يجب تقييم الأداء على بيانات لم يتعلم منها النموذج، وليس Training Accuracy فقط."
+      }
+    ];
+
+    const quizList = document.getElementById("quizList");
+    const scorePanel = document.getElementById("scorePanel");
+
+    function badge(text){
+      return `<span class="tag">${text}</span>`;
+    }
+
+    function renderQuiz(){
+      quizList.innerHTML = "";
+
+      questions.forEach((q, index) => {
+        const div = document.createElement("div");
+        div.className = "question";
+        div.dataset.id = q.id;
+
+        let inputHTML = "";
+
+        if(q.type === "mcq"){
+          inputHTML = `
+            <div class="options">
+              ${q.options.map((opt, i) => `
+                <label class="option" data-option="${i}">
+                  <input type="radio" name="q${q.id}" value="${i}">
+                  <span>${opt}</span>
+                </label>
+              `).join("")}
+            </div>
+          `;
+        } else {
+          inputHTML = `
+            <textarea
+              id="text-q-${q.id}"
+              placeholder="اكتب إجابتك هنا بناءً على المفاهيم في الدرس..."
+            ></textarea>
+          `;
+        }
+
+        div.innerHTML = `
+          <div class="question-head">
+            <span class="tag">Q${index + 1}</span>
+            ${badge(q.purpose)}
+            ${badge(q.bloom)}
+            ${badge(q.rhetoric)}
+            ${badge(q.logic)}
+            ${badge(q.socratic)}
+            <span class="difficulty ${q.difficulty}">${q.difficultyLabel}</span>
+          </div>
+
+          <div class="question-text">${q.text}</div>
+
+          ${inputHTML}
+
+          <div class="answer-box" id="answer-${q.id}">
+            <strong>التفسير:</strong> ${q.explanation}
+          </div>
+
+          <div class="feedback" id="feedback-${q.id}"></div>
+        `;
+
+        quizList.appendChild(div);
+      });
+
+      bindOptionState();
+    }
+
+    function bindOptionState(){
+      document.querySelectorAll(".option").forEach(opt => {
+        opt.addEventListener("click", () => {
+          const parent = opt.parentElement;
+          parent.querySelectorAll(".option").forEach(x => x.classList.remove("correct","incorrect"));
+          opt.classList.add("selected");
+        });
+      });
+    }
+
+    function normalizeText(text){
+      return text
+        .toLowerCase()
+        .replace(/[^\p{L}\p{N}\s]/gu, " ")
+        .replace(/\s+/g, " ")
+        .trim();
+    }
+
+    function gradeQuiz(){
+      let score = 0;
+      let graded = 0;
+
+      questions.forEach(q => {
+        const questionEl = document.querySelector(`[data-id="${q.id}"]`);
+        const feedback = document.getElementById(`feedback-${q.id}`);
+        const answerBox = document.getElementById(`answer-${q.id}`);
+
+        feedback.textContent = "";
+
+        if(q.type === "mcq"){
+          const selected = questionEl.querySelector(`input[name="q${q.id}"]:checked`);
+          const options = questionEl.querySelectorAll(".option");
+
+          options.forEach(o => o.classList.remove("correct","incorrect"));
+
+          if(!selected){
+            feedback.textContent = "لم تجب عن هذا السؤال.";
+            feedback.style.color = "#ffd67f";
+            return;
+          }
+
+          graded++;
+
+          const selectedValue = Number(selected.value);
+
+          if(selectedValue === q.answer){
+            score++;
+            feedback.textContent = "✓ إجابة صحيحة. ركّز على المنطق وليس حفظ الإجابة فقط.";
+            feedback.style.color = "#67e8a5";
+            options[selectedValue].classList.add("correct");
+          } else {
+            feedback.textContent = "✗ الإجابة تحتاج مراجعة. افتح التفسير بعد المحاولة.";
+            feedback.style.color = "#ff9ca5";
+            options[selectedValue].classList.add("incorrect");
+            options[q.answer].classList.add("correct");
+          }
+        } else {
+          const textArea = document.getElementById(`text-q-${q.id}`);
+          const value = normalizeText(textArea.value);
+
+          if(!value){
+            feedback.textContent = "اكتب إجابة أولاً.";
+            feedback.style.color = "#ffd67f";
+            return;
+          }
+
+          graded++;
+
+          const hits = q.expectedKeywords.filter(word => value.includes(normalizeText(word))).length;
+          const threshold = Math.max(1, Math.ceil(q.expectedKeywords.length * 0.5));
+
+          if(hits >= threshold){
+            score++;
+            feedback.textContent = `✓ إجابة جيدة: التقطت ${hits}/${q.expectedKeywords.length} من المفاهيم الأساسية.`;
+            feedback.style.color = "#67e8a5";
+          } else {
+            feedback.textContent = `△ الإجابة تحتاج تعميقاً: التقطت ${hits}/${q.expectedKeywords.length} فقط من الكلمات/الأفكار الأساسية.`;
+            feedback.style.color = "#ffcc66";
+          }
+        }
+      });
+
+      scorePanel.classList.add("show");
+
+      const total = questions.length;
+      const percent = Math.round((score / total) * 100);
+
+      let message = "";
+      if(percent >= 85){
+        message = "ممتاز جداً — لديك فهم قوي للعلاقة بين Bias وVariance وEnsembles.";
+      }else if(percent >= 70){
+        message = "جيد جداً — المفاهيم الأساسية واضحة، لكن راجع الأسئلة التحليلية.";
+      }else if(percent >= 50){
+        message = "بداية جيدة — ركّز على الفرق العملي بين Bagging وBoosting وعلى Generalization.";
+      }else{
+        message = "تحتاج جولة مراجعة أخرى. ابدأ من Bias → Variance → Tradeoff ثم انتقل إلى Ensembles.";
+      }
+
+      scorePanel.innerHTML = `
+        <div class="score-big">${score} / ${total}</div>
+        <div><strong>${percent}%</strong> من الأسئلة الأساسية تم التعامل معها بشكل صحيح أو مقبول.</div>
+        <div class="muted" style="margin-top:6px">${message}</div>
+        <div class="muted" style="margin-top:6px">
+          تم تقييم ${graded} سؤالاً؛ الأسئلة غير المجاب عنها لم تدخل في الدرجة.
+        </div>
+      `;
+    }
+
+    function showAllAnswers(){
+      document.querySelectorAll(".answer-box").forEach(box => box.classList.add("show"));
+    }
+
+    function resetQuiz(){
+      document.querySelectorAll('input[type="radio"]').forEach(i => {
+        i.checked = false;
+      });
+
+      document.querySelectorAll("textarea").forEach(t => {
+        t.value = "";
+      });
+
+      document.querySelectorAll(".option").forEach(o => {
+        o.classList.remove("correct","incorrect","selected");
+      });
+
+      document.querySelectorAll(".feedback").forEach(f => {
+        f.textContent = "";
+      });
+
+      document.querySelectorAll(".answer-box").forEach(a => {
+        a.classList.remove("show");
+      });
+
+      scorePanel.classList.remove("show");
+      scorePanel.innerHTML = "";
+      window.scrollTo({top: document.getElementById("quiz").offsetTop - 60, behavior:"smooth"});
+    }
+
+    // -----------------------------
+    // Complexity simulator
+    // -----------------------------
+    const complexity = document.getElementById("complexity");
+    const complexityValue = document.getElementById("complexityValue");
+    const explanation = document.getElementById("simulatorExplanation");
+    const canvas = document.getElementById("tradeoffCanvas");
+    const ctx = canvas.getContext("2d");
+
+    function drawTradeoff(){
+      const width = canvas.width;
+      const height = canvas.height;
+
+      ctx.clearRect(0,0,width,height);
+
+      // background
+      ctx.fillStyle = "#0b1222";
+      ctx.fillRect(0,0,width,height);
+
+      // grid
+      ctx.strokeStyle = "#182640";
+      ctx.lineWidth = 1;
+
+      for(let x=60; x<width-30; x+=80){
+        ctx.beginPath();
+        ctx.moveTo(x,25);
+        ctx.lineTo(x,height-40);
+        ctx.stroke();
+      }
+
+      for(let y=40; y<height-40; y+=45){
+        ctx.beginPath();
+        ctx.moveTo(50,y);
+        ctx.lineTo(width-30,y);
+        ctx.stroke();
+      }
+
+      // axes
+      ctx.strokeStyle = "#557099";
+      ctx.beginPath();
+      ctx.moveTo(50,height-40);
+      ctx.lineTo(width-30,height-40);
+      ctx.stroke();
+
+      ctx.beginPath();
+      ctx.moveTo(50,25);
+      ctx.lineTo(50,height-40);
+      ctx.stroke();
+
+      const usableW = width - 90;
+      const usableH = height - 75;
+
+      // Bias: decreasing curve
+      ctx.beginPath();
+      for(let i=0; i<=100; i++){
+        const x = 50 + (i/100)*usableW;
+        const normalized = 0.92 * Math.exp(-i/42) + 0.05;
+        const y = 25 + normalized * usableH;
+        if(i===0) ctx.moveTo(x,y);
+        else ctx.lineTo(x,y);
+      }
+      ctx.strokeStyle = "#ff9ca5";
+      ctx.lineWidth = 4;
+      ctx.stroke();
+
+      // Variance: increasing curve
+      ctx.beginPath();
+      for(let i=0; i<=100; i++){
+        const x = 50 + (i/100)*usableW;
+        const normalized = 0.05 + 0.86 * Math.pow(i/100, 1.8);
+        const y = 25 + normalized * usableH;
+        if(i===0) ctx.moveTo(x,y);
+        else ctx.lineTo(x,y);
+      }
+      ctx.strokeStyle = "#83c5ff";
+      ctx.lineWidth = 4;
+      ctx.stroke();
+
+      // Generalization error
+      ctx.beginPath();
+      for(let i=0; i<=100; i++){
+        const x = 50 + (i/100)*usableW;
+        const normalized =
+          0.16 +
+          0.58 * Math.pow(Math.abs(i-50)/50, 1.7);
+        const y = 25 + normalized * usableH;
+        if(i===0) ctx.moveTo(x,y);
+        else ctx.lineTo(x,y);
+      }
+      ctx.strokeStyle = "#ffd67f";
+      ctx.lineWidth = 4;
+      ctx.stroke();
+
+      // Current point
+      const c = Number(complexity.value);
+      const currentX = 50 + (c/100)*usableW;
+
+      ctx.strokeStyle = "#f3f6ff";
+      ctx.lineWidth = 2;
+      ctx.setLineDash([7,6]);
+      ctx.beginPath();
+      ctx.moveTo(currentX,25);
+      ctx.lineTo(currentX,height-40);
+      ctx.stroke();
+      ctx.setLineDash([]);
+
+      ctx.fillStyle = "#f3f6ff";
+      ctx.beginPath();
+      ctx.arc(currentX, height-40, 5, 0, Math.PI*2);
+      ctx.fill();
+    }
+
+    function updateSimulator(){
+      const c = Number(complexity.value);
+      complexityValue.textContent = `Complexity: ${c}`;
+
+      let title = "";
+      let text = "";
+
+      if(c < 30){
+        title = "منطقة Underfitting";
+        text = "التعقيد منخفض. Bias ما زال مرتفعاً نسبياً، والنموذج قد يكون بسيطاً أكثر من اللازم لالتقاط النمط.";
+      }else if(c < 70){
+        title = "منطقة التوازن";
+        text = "هذه المنطقة تمثل فكرة Tradeoff: Bias انخفض، وVariance لم يصل بعد إلى مستويات مرتفعة جداً. غالباً تكون Generalization أفضل.";
+      }else{
+        title = "منطقة Overfitting";
+        text = "التعقيد مرتفع. Bias منخفض نسبياً، لكن Variance يزداد، فتزداد حساسية النموذج للتفاصيل الخاصة ببيانات التدريب.";
+      }
+
+      explanation.innerHTML = `<strong>${title}:</strong> ${text}`;
+      drawTradeoff();
+    }
+
+    complexity.addEventListener("input", updateSimulator);
+    window.addEventListener("resize", drawTradeoff);
+
+    renderQuiz();
+    updateSimulator();
+  </script>
+</body>
+</html>
